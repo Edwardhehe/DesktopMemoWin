@@ -66,27 +66,35 @@ namespace DesktopMemo.Services
         /// <returns>备忘录列表</returns>
         public List<MemoItem> GetMemosByDate(DateTime date)
         {
-            using var connection = new SQLiteConnection(_connectionString);
-            var dateStr = date.ToString("yyyy-MM-dd");
-            
-            var sql = @"
-                SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
-                FROM MemoItems 
-                WHERE Date = @Date 
-                ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC";
-            
-            var memos = connection.Query<MemoItemDto>(sql, new { Date = dateStr }).Select(dto => new MemoItem
+            try
             {
-                Id = dto.Id,
-                Content = dto.Content,
-                Date = DateTime.Parse(dto.Date),
-                IsCompleted = dto.IsCompleted == 1,
-                CreatedAt = DateTime.Parse(dto.CreatedAt),
-                CompletedAt = string.IsNullOrEmpty(dto.CompletedAt) ? null : DateTime.Parse(dto.CompletedAt),
-                SortOrder = dto.SortOrder
-            }).ToList();
-            
-            return memos;
+                using var connection = new SQLiteConnection(_connectionString);
+                connection.Open();
+                var dateStr = date.ToString("yyyy-MM-dd");
+                
+                var sql = @"
+                    SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
+                    FROM MemoItems 
+                    WHERE Date = @Date 
+                    ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC";
+                
+                var memos = connection.Query<MemoItemDto>(sql, new { Date = dateStr }).Select(dto => new MemoItem
+                {
+                    Id = dto.Id,
+                    Content = dto.Content,
+                    Date = DateTime.Parse(dto.Date),
+                    IsCompleted = dto.IsCompleted == 1,
+                    CreatedAt = DateTime.Parse(dto.CreatedAt),
+                    CompletedAt = string.IsNullOrEmpty(dto.CompletedAt) ? null : DateTime.Parse(dto.CompletedAt),
+                    SortOrder = dto.SortOrder
+                }).ToList();
+                
+                return memos;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"获取备忘录数据失败: {ex.Message}", ex);
+            }
         }
 
         /// <summary>
@@ -95,21 +103,29 @@ namespace DesktopMemo.Services
         /// <param name="memo">备忘录项目</param>
         public void AddMemo(MemoItem memo)
         {
-            using var connection = new SQLiteConnection(_connectionString);
-            
-            var sql = @"
-                INSERT INTO MemoItems (Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder)
-                VALUES (@Content, @Date, @IsCompleted, @CreatedAt, @CompletedAt, @SortOrder)";
-            
-            connection.Execute(sql, new
+            try
             {
-                memo.Content,
-                Date = memo.Date.ToString("yyyy-MM-dd"),
-                memo.IsCompleted,
-                CreatedAt = memo.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
-                CompletedAt = memo.CompletedAt?.ToString("yyyy-MM-dd HH:mm:ss"),
-                memo.SortOrder
-            });
+                using var connection = new SQLiteConnection(_connectionString);
+                connection.Open();
+                
+                var sql = @"
+                    INSERT INTO MemoItems (Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder)
+                    VALUES (@Content, @Date, @IsCompleted, @CreatedAt, @CompletedAt, @SortOrder)";
+                
+                connection.Execute(sql, new
+                {
+                    memo.Content,
+                    Date = memo.Date.ToString("yyyy-MM-dd"),
+                    memo.IsCompleted,
+                    CreatedAt = memo.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+                    CompletedAt = memo.CompletedAt?.ToString("yyyy-MM-dd HH:mm:ss"),
+                    memo.SortOrder
+                });
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"添加备忘录失败: {ex.Message}", ex);
+            }
         }
 
         /// <summary>
@@ -185,9 +201,77 @@ namespace DesktopMemo.Services
         /// <param name="sourcePath">源数据库文件路径</param>
         public void ImportDatabase(string sourcePath)
         {
-            if (File.Exists(sourcePath))
+            try
             {
-                File.Copy(sourcePath, _dbPath, true);
+                if (!File.Exists(sourcePath))
+                {
+                    throw new FileNotFoundException("源数据库文件不存在", sourcePath);
+                }
+
+                // 验证源数据库文件是否为有效的SQLite数据库
+                if (!IsValidSQLiteDatabase(sourcePath))
+                {
+                    throw new InvalidOperationException("源文件不是有效的SQLite数据库文件");
+                }
+
+                // 关闭所有数据库连接
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+
+                // 备份当前数据库
+                string backupPath = _dbPath + ".backup";
+                if (File.Exists(_dbPath))
+                {
+                    File.Copy(_dbPath, backupPath, true);
+                }
+
+                try
+                {
+                    // 复制新数据库文件
+                    File.Copy(sourcePath, _dbPath, true);
+                    
+                    // 验证新数据库
+                    if (!IsValidSQLiteDatabase(_dbPath))
+                    {
+                        // 如果新数据库无效，恢复备份
+                        if (File.Exists(backupPath))
+                        {
+                            File.Copy(backupPath, _dbPath, true);
+                        }
+                        throw new InvalidOperationException("导入的数据库文件无效，已恢复原数据库");
+                    }
+
+                    // 重新初始化数据库连接
+                    InitializeDatabase();
+                }
+                catch
+                {
+                    // 如果导入失败，恢复备份
+                    if (File.Exists(backupPath))
+                    {
+                        File.Copy(backupPath, _dbPath, true);
+                    }
+                    throw;
+                }
+                finally
+                {
+                    // 清理备份文件
+                    if (File.Exists(backupPath))
+                    {
+                        try
+                        {
+                            File.Delete(backupPath);
+                        }
+                        catch
+                        {
+                            // 忽略清理备份文件的异常
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"导入数据库失败: {ex.Message}", ex);
             }
         }
 
@@ -197,9 +281,77 @@ namespace DesktopMemo.Services
         /// <param name="targetPath">目标数据库文件路径</param>
         public void ExportDatabase(string targetPath)
         {
-            if (File.Exists(_dbPath))
+            try
             {
+                if (!File.Exists(_dbPath))
+                {
+                    throw new FileNotFoundException("数据库文件不存在", _dbPath);
+                }
+
+                // 确保目标目录存在
+                var targetDirectory = Path.GetDirectoryName(targetPath);
+                if (!string.IsNullOrEmpty(targetDirectory) && !Directory.Exists(targetDirectory))
+                {
+                    Directory.CreateDirectory(targetDirectory);
+                }
+
+                // 复制数据库文件
                 File.Copy(_dbPath, targetPath, true);
+
+                // 验证导出的文件
+                if (!IsValidSQLiteDatabase(targetPath))
+                {
+                    throw new InvalidOperationException("导出的数据库文件无效");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"导出数据库失败: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// 验证SQLite数据库文件是否有效
+        /// </summary>
+        /// <param name="dbPath">数据库文件路径</param>
+        /// <returns>是否为有效的SQLite数据库</returns>
+        private bool IsValidSQLiteDatabase(string dbPath)
+        {
+            try
+            {
+                var connectionString = $"Data Source={dbPath};Version=3;";
+                using var connection = new SQLiteConnection(connectionString);
+                connection.Open();
+                
+                // 检查表是否存在
+                var tableExists = connection.QueryFirstOrDefault<int>(
+                    "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='MemoItems'");
+                
+                return tableExists > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 重新加载数据库连接
+        /// </summary>
+        public void ReloadDatabase()
+        {
+            try
+            {
+                // 强制垃圾回收，释放所有数据库连接
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                
+                // 重新初始化数据库
+                InitializeDatabase();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"重新加载数据库失败: {ex.Message}", ex);
             }
         }
     }

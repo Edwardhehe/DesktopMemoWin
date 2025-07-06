@@ -25,7 +25,8 @@ namespace DesktopMemo.Views
             InitializeComponent();
             
             _viewModel = viewModel;
-            _databaseService = new DatabaseService();
+            // 使用主视图模型中的数据库服务实例，确保数据一致性
+            _databaseService = viewModel.GetDatabaseService();
             DataContext = _viewModel;
         }
 
@@ -98,8 +99,16 @@ namespace DesktopMemo.Views
                 {
                     try
                     {
+                        // 导入数据库
                         _databaseService.ImportDatabase(openFileDialog.FileName);
-                        MessageBox.Show("数据导入成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                        
+                        // 重新加载数据库连接
+                        _databaseService.ReloadDatabase();
+                        
+                        // 刷新主界面数据
+                        _viewModel.RefreshCalendarData();
+                        
+                        MessageBox.Show("数据导入成功！界面已刷新。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     catch (Exception ex)
                     {
@@ -126,17 +135,20 @@ namespace DesktopMemo.Views
             {
                 try
                 {
-                    // 删除数据库文件并重新初始化
+                    // 删除数据库文件
                     var dbPath = _databaseService.GetDatabasePath();
                     if (File.Exists(dbPath))
                     {
                         File.Delete(dbPath);
                     }
                     
-                    // 重新创建数据库服务
-                    _databaseService = new DatabaseService();
+                    // 重新初始化数据库连接
+                    _databaseService.ReloadDatabase();
                     
-                    MessageBox.Show("数据清空成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    // 刷新主界面数据
+                    _viewModel.RefreshCalendarData();
+                    
+                    MessageBox.Show("数据清空成功！界面已刷新。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {

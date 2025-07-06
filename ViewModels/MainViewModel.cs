@@ -116,6 +116,23 @@ namespace DesktopMemo.ViewModels
         }
 
         /// <summary>
+        /// 刷新日历数据
+        /// </summary>
+        public void RefreshCalendarData()
+        {
+            LoadCalendarData();
+        }
+
+        /// <summary>
+        /// 获取数据库服务实例
+        /// </summary>
+        /// <returns>数据库服务实例</returns>
+        public DatabaseService GetDatabaseService()
+        {
+            return _databaseService;
+        }
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public MainViewModel()
@@ -149,36 +166,47 @@ namespace DesktopMemo.ViewModels
         /// </summary>
         private void LoadCalendarData()
         {
-            CalendarDays.Clear();
-
-            var firstDayOfMonth = new DateTime(_currentMonth.Year, _currentMonth.Month, 1);
-            var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
-            var firstDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
-
-            // 添加上个月的日期
-            for (int i = firstDayOfWeek - 1; i >= 0; i--)
+            try
             {
-                var date = firstDayOfMonth.AddDays(-i - 1);
-                var dayViewModel = new CalendarDayViewModel(date, false);
-                CalendarDays.Add(dayViewModel);
+                CalendarDays.Clear();
+
+                var firstDayOfMonth = new DateTime(_currentMonth.Year, _currentMonth.Month, 1);
+                var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+                var firstDayOfWeek = (int)firstDayOfMonth.DayOfWeek;
+
+                // 添加上个月的日期
+                for (int i = firstDayOfWeek - 1; i >= 0; i--)
+                {
+                    var date = firstDayOfMonth.AddDays(-i - 1);
+                    var dayViewModel = new CalendarDayViewModel(date, false);
+                    CalendarDays.Add(dayViewModel);
+                }
+
+                // 添加当前月的日期
+                for (int day = 1; day <= lastDayOfMonth.Day; day++)
+                {
+                    var date = new DateTime(_currentMonth.Year, _currentMonth.Month, day);
+                    var memos = _databaseService.GetMemosByDate(date);
+                    var dayViewModel = new CalendarDayViewModel(date, true, memos);
+                    CalendarDays.Add(dayViewModel);
+                }
+
+                // 添加下个月的日期
+                var remainingDays = 42 - CalendarDays.Count; // 保持6行7列的格式
+                for (int i = 1; i <= remainingDays; i++)
+                {
+                    var date = lastDayOfMonth.AddDays(i);
+                    var dayViewModel = new CalendarDayViewModel(date, false);
+                    CalendarDays.Add(dayViewModel);
+                }
             }
-
-            // 添加当前月的日期
-            for (int day = 1; day <= lastDayOfMonth.Day; day++)
+            catch (Exception ex)
             {
-                var date = new DateTime(_currentMonth.Year, _currentMonth.Month, day);
-                var memos = _databaseService.GetMemosByDate(date);
-                var dayViewModel = new CalendarDayViewModel(date, true, memos);
-                CalendarDays.Add(dayViewModel);
-            }
-
-            // 添加下个月的日期
-            var remainingDays = 42 - CalendarDays.Count; // 保持6行7列的格式
-            for (int i = 1; i <= remainingDays; i++)
-            {
-                var date = lastDayOfMonth.AddDays(i);
-                var dayViewModel = new CalendarDayViewModel(date, false);
-                CalendarDays.Add(dayViewModel);
+                System.Windows.MessageBox.Show(
+                    $"加载日历数据失败：{ex.Message}\n\n请检查数据库连接是否正常。",
+                    "错误",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
             }
         }
 
@@ -206,22 +234,33 @@ namespace DesktopMemo.ViewModels
         {
             if (dayViewModel == null || !dayViewModel.IsCurrentMonth) return;
 
-            var dialog = new Views.MemoInputDialog(dayViewModel.Date);
-            if (dialog.ShowDialog() == true)
+            try
             {
-                var memo = new MemoItem
+                var dialog = new Views.MemoInputDialog(dayViewModel.Date);
+                if (dialog.ShowDialog() == true)
                 {
-                    Content = dialog.MemoContent,
-                    Date = dialog.MemoDate,
-                    IsCompleted = false,
-                    CreatedAt = DateTime.Now,
-                    SortOrder = dayViewModel.Memos.Count
-                };
+                    var memo = new MemoItem
+                    {
+                        Content = dialog.MemoContent,
+                        Date = dialog.MemoDate,
+                        IsCompleted = false,
+                        CreatedAt = DateTime.Now,
+                        SortOrder = dayViewModel.Memos.Count
+                    };
 
-                _databaseService.AddMemo(memo);
-                
-                // 重新加载当前月份的数据以刷新界面
-                LoadCalendarData();
+                    _databaseService.AddMemo(memo);
+                    
+                    // 重新加载当前月份的数据以刷新界面
+                    LoadCalendarData();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(
+                    $"添加备忘录失败：{ex.Message}\n\n请检查数据库连接是否正常。",
+                    "错误",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
             }
         }
 
