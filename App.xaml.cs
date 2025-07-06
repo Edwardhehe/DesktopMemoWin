@@ -58,14 +58,24 @@ namespace DesktopMemo
         /// <param name="e">退出事件参数</param>
         protected override void OnExit(ExitEventArgs e)
         {
-            // 清理资源
-            AppDomain.CurrentDomain.UnhandledException -= CurrentDomain_UnhandledException;
-            DispatcherUnhandledException -= App_DispatcherUnhandledException;
-            
-            // 清理系统托盘资源
-            Services.SystemTrayService.CleanupAll();
-            
-            base.OnExit(e);
+            try
+            {
+                // 清理事件订阅
+                AppDomain.CurrentDomain.UnhandledException -= CurrentDomain_UnhandledException;
+                DispatcherUnhandledException -= App_DispatcherUnhandledException;
+                
+                // 清理系统托盘资源
+                Services.SystemTrayService.CleanupAll();
+            }
+            catch (Exception ex)
+            {
+                // 记录退出时的异常，但不阻止退出
+                System.Diagnostics.Debug.WriteLine($"应用程序退出时发生异常: {ex.Message}");
+            }
+            finally
+            {
+                base.OnExit(e);
+            }
         }
     }
 } 

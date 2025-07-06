@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
@@ -39,20 +40,29 @@ namespace DesktopMemo.Services
         /// </summary>
         public static void CleanupAll()
         {
-            lock (_instances)
+            try
             {
-                foreach (var instance in _instances)
+                lock (_instances)
                 {
-                    try
+                    var instancesToCleanup = _instances.ToList(); // 创建副本避免并发修改
+                    
+                    foreach (var instance in instancesToCleanup)
                     {
-                        instance.Dispose();
+                        try
+                        {
+                            instance.Dispose();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"清理系统托盘实例时发生异常: {ex.Message}");
+                        }
                     }
-                    catch
-                    {
-                        // 忽略清理时的异常
-                    }
+                    _instances.Clear();
                 }
-                _instances.Clear();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"清理所有系统托盘实例时发生异常: {ex.Message}");
             }
         }
 
@@ -264,19 +274,66 @@ namespace DesktopMemo.Services
         /// </summary>
         private void ExitApplication()
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            try
             {
-                var result = System.Windows.MessageBox.Show(
-                    "确定要退出桌面备忘录吗？",
-                    "确认退出",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    var result = System.Windows.MessageBox.Show(
+                        "确定要退出桌面备忘录吗？",
+                        "确认退出",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
 
-                if (result == MessageBoxResult.Yes)
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        // 先清理资源，再退出应用程序
+                        CleanupBeforeExit();
+                        Application.Current.Shutdown();
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                // 如果出现异常，强制退出
+                System.Diagnostics.Debug.WriteLine($"退出应用程序时发生异常: {ex.Message}");
+                try
                 {
                     Application.Current.Shutdown();
                 }
-            });
+                catch
+                {
+                    // 最后的强制退出
+                    Environment.Exit(0);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 退出前清理资源
+        /// </summary>
+        private void CleanupBeforeExit()
+        {
+            try
+            {
+                // 停止桌面监控服务
+                if (_mainViewModel != null)
+                {
+                    _mainViewModel.StopDesktopMonitoring();
+                }
+
+                // 隐藏系统托盘图标
+                if (_notifyIcon != null)
+                {
+                    _notifyIcon.Visible = false;
+                }
+
+                // 清理所有系统托盘实例
+                CleanupAll();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"清理资源时发生异常: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -318,13 +375,28 @@ namespace DesktopMemo.Services
         {
             if (!_disposed && disposing)
             {
-                lock (_instances)
+                try
                 {
-                    _instances.Remove(this);
+                    lock (_instances)
+                    {
+                        _instances.Remove(this);
+                    }
+                    
+                    if (_notifyIcon != null)
+                    {
+                        _notifyIcon.Visible = false;
+                        _notifyIcon.Dispose();
+                        _notifyIcon = null;
+                    }
                 }
-                
-                _notifyIcon?.Dispose();
-                _disposed = true;
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"释放系统托盘资源时发生异常: {ex.Message}");
+                }
+                finally
+                {
+                    _disposed = true;
+                }
             }
         }
 

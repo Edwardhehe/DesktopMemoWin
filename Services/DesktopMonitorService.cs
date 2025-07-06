@@ -57,8 +57,26 @@ namespace DesktopMemo.Services
         /// </summary>
         public void StopMonitoring()
         {
-            _cancellationTokenSource?.Cancel();
-            _monitoringTask?.Wait();
+            try
+            {
+                _cancellationTokenSource?.Cancel();
+                
+                // 等待任务完成，但设置超时时间
+                if (_monitoringTask != null)
+                {
+                    _monitoringTask.Wait(TimeSpan.FromSeconds(2));
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"停止桌面监控时发生异常: {ex.Message}");
+            }
+            finally
+            {
+                _cancellationTokenSource?.Dispose();
+                _cancellationTokenSource = null;
+                _monitoringTask = null;
+            }
         }
 
         /// <summary>

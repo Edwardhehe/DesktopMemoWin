@@ -40,7 +40,7 @@ namespace DesktopMemo.Views
             Loaded += MainWindow_Loaded;
             
             // 处理窗口关闭事件
-            //Closing += MainWindow_Closing;
+            Closing += MainWindow_Closing;
         }
 
         /// <summary>
@@ -102,12 +102,21 @@ namespace DesktopMemo.Views
         /// </summary>
         /// <param name="sender">事件发送者</param>
         /// <param name="e">取消事件参数</param>
-        //private void MainWindow_Closing(object? sender, CancelEventArgs e)
-        //{
-        //    // 取消关闭，改为隐藏到托盘
-        //    e.Cancel = true;
-        //    _systemTrayService.HideToTray();
-        //}
+        private void MainWindow_Closing(object? sender, CancelEventArgs e)
+        {
+            try
+            {
+                // 停止桌面监控服务
+                _viewModel?.StopDesktopMonitoring();
+                
+                // 清理系统托盘资源
+                _systemTrayService?.Dispose();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"窗口关闭时发生异常: {ex.Message}");
+            }
+        }
 
         /// <summary>
         /// 关闭按钮点击事件（最小化到托盘）

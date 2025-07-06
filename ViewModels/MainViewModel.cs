@@ -108,6 +108,14 @@ namespace DesktopMemo.ViewModels
         public ICommand DeleteMemoCommand { get; }
 
         /// <summary>
+        /// 停止桌面监控服务
+        /// </summary>
+        public void StopDesktopMonitoring()
+        {
+            _desktopMonitorService?.StopMonitoring();
+        }
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public MainViewModel()
