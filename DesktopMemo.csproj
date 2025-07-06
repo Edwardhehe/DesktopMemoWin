@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyTitle>桌面备忘录</AssemblyTitle>
+    <AssemblyDescription>桌面背景备忘录软件</AssemblyDescription>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
+    <PackageReference Include="Dapper" Version="2.1.15" />
+    <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
+  </ItemGroup>
+
+</Project> 

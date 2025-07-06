@@ -1,0 +1,131 @@
+<Window x:Class="DesktopMemo.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="设置" 
+        Height="400" 
+        Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- 标题 -->
+        <TextBlock Grid.Row="0" 
+                   Text="桌面备忘录设置" 
+                   FontSize="18" 
+                   FontWeight="Bold" 
+                   Margin="0,0,0,20"/>
+        
+        <!-- 设置内容 -->
+        <ScrollViewer Grid.Row="1" 
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- 开机启动设置 -->
+                <GroupBox Header="启动设置" Margin="0,0,0,20">
+                    <StackPanel Margin="10">
+                        <CheckBox Content="开机自动启动" 
+                                  IsChecked="{Binding IsStartupEnabled}" 
+                                  Margin="0,5"/>
+                        <TextBlock Text="启用后，系统启动时会自动运行桌面备忘录" 
+                                   FontSize="11" 
+                                   Foreground="#666666" 
+                                   Margin="20,0,0,10"/>
+                    </StackPanel>
+                </GroupBox>
+                
+                <!-- 外观设置 -->
+                <GroupBox Header="外观设置" Margin="0,0,0,20">
+                    <StackPanel Margin="10">
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="背景颜色：" 
+                                       VerticalAlignment="Center" 
+                                       Width="80"/>
+                            <Rectangle Width="30" 
+                                       Height="20" 
+                                       Fill="{Binding BackgroundColor}" 
+                                       Stroke="#CCCCCC" 
+                                       StrokeThickness="1" 
+                                       Margin="0,0,10,0"/>
+                            <Button Content="选择颜色" 
+                                    Click="BackgroundColorButton_Click" 
+                                    Width="80" 
+                                    Height="25"/>
+                        </StackPanel>
+                        <TextBlock Text="设置日历的背景颜色" 
+                                   FontSize="11" 
+                                   Foreground="#666666" 
+                                   Margin="0,0,0,10"/>
+                    </StackPanel>
+                </GroupBox>
+                
+                <!-- 数据管理 -->
+                <GroupBox Header="数据管理" Margin="0,0,0,20">
+                    <StackPanel Margin="10">
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <Button Content="导出数据" 
+                                    Click="ExportDataButton_Click" 
+                                    Width="80" 
+                                    Height="25" 
+                                    Margin="0,0,10,0"/>
+                            <Button Content="导入数据" 
+                                    Click="ImportDataButton_Click" 
+                                    Width="80" 
+                                    Height="25" 
+                                    Margin="0,0,10,0"/>
+                            <Button Content="清空数据" 
+                                    Click="ClearDataButton_Click" 
+                                    Width="80" 
+                                    Height="25"/>
+                        </StackPanel>
+                        <TextBlock Text="导出数据可以将备忘录备份到其他位置，导入数据可以从备份文件恢复备忘录" 
+                                   FontSize="11" 
+                                   Foreground="#666666" 
+                                   TextWrapping="Wrap" 
+                                   Margin="0,0,0,10"/>
+                    </StackPanel>
+                </GroupBox>
+                
+                <!-- 关于 -->
+                <GroupBox Header="关于" Margin="0,0,0,20">
+                    <StackPanel Margin="10">
+                        <TextBlock Text="桌面备忘录 v1.0.0" 
+                                   FontWeight="Bold" 
+                                   Margin="0,5"/>
+                        <TextBlock Text="一个简单的桌面背景备忘录软件" 
+                                   FontSize="11" 
+                                   Foreground="#666666" 
+                                   Margin="0,0,0,5"/>
+                        <TextBlock Text="技术栈：.NET 8 WPF + SQLite" 
+                                   FontSize="11" 
+                                   Foreground="#666666" 
+                                   Margin="0,0,0,5"/>
+                        <TextBlock Text="支持Windows 10及以上系统" 
+                                   FontSize="11" 
+                                   Foreground="#666666"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+        
+        <!-- 按钮区域 -->
+        <StackPanel Grid.Row="2" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right" 
+                    Margin="0,20,0,0">
+            <Button Content="确定" 
+                    Click="OkButton_Click" 
+                    Width="80" 
+                    Height="30" 
+                    Margin="0,0,10,0"/>
+            <Button Content="取消" 
+                    Click="CancelButton_Click" 
+                    Width="80" 
+                    Height="30"/>
+        </StackPanel>
+    </Grid>
+</Window> 
