@@ -19,47 +19,44 @@
         
         <!-- 日历格子样式 -->
         <Style x:Key="CalendarDayStyle" TargetType="Border">
-            <Setter Property="BorderBrush" Value="#E0E0E0"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="Margin" Value="0"/>
-            <Setter Property="MinHeight" Value="120"/>
-            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Background" Value="#66FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#00FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="MinHeight" Value="100"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="#007ACC"/>
-                    <Setter Property="Background" Value="#F8F9FA"/>
+                    <Setter Property="Background" Value="#99E3F2FD"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
         
         <!-- 备忘录项样式 -->
         <Style x:Key="MemoItemStyle" TargetType="Border">
-            <Setter Property="Background" Value="#F8F9FA"/>
-            <Setter Property="BorderBrush" Value="#D1D5DB"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="#B3F8F9FA"/>
+            <Setter Property="BorderBrush" Value="#00FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="Margin" Value="2"/>
             <Setter Property="Padding" Value="4"/>
-            <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="MinHeight" Value="24"/>
         </Style>
         
         <Style x:Key="CompletedMemoStyle" TargetType="Border">
-            <Setter Property="Background" Value="#E8F5E8"/>
-            <Setter Property="BorderBrush" Value="#90EE90"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="#B3E8F5E8"/>
+            <Setter Property="BorderBrush" Value="#00FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="Margin" Value="2"/>
             <Setter Property="Padding" Value="4"/>
-            <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="MinHeight" Value="24"/>
-            <Setter Property="Opacity" Value="0.8"/>
+            <Setter Property="Opacity" Value="0.7"/>
         </Style>
         
         <!-- 按钮样式 -->
         <Style x:Key="ModernButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#F8F9FA"/>
-            <Setter Property="BorderBrush" Value="#D1D5DB"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="#66FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#00FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="8,4"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -67,16 +64,13 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4"
+                                CornerRadius="6"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#E5F3FF"/>
-                                <Setter Property="BorderBrush" Value="#007ACC"/>
+                                <Setter Property="Background" Value="#99E3F2FD"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -85,11 +79,7 @@
         </Style>
     </Window.Resources>
     
-    <Border Background="{Binding BackgroundColor}" 
-            CornerRadius="12" 
-            BorderBrush="#E0E0E0" 
-            BorderThickness="1"
-            Effect="{StaticResource DropShadowEffect}">
+    <Border Background="#AAFFFFFF" CornerRadius="18" BorderBrush="#00FFFFFF" BorderThickness="0" Effect="{StaticResource DropShadowEffect}">
         
         <Grid>
             <Grid.RowDefinitions>
@@ -99,24 +89,16 @@
             </Grid.RowDefinitions>
             
             <!-- 标题栏 -->
-            <Border Grid.Row="0" CornerRadius="12,12,0,0" Height="30">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="#F8F9FA" Offset="0"/>
-                        <GradientStop Color="#E9ECEF" Offset="1"/>
-                    </LinearGradientBrush>
-                </Border.Background>
+            <Border Grid.Row="0" CornerRadius="14,14,0,0" Height="34" Background="#66FFFFFF" BorderBrush="#00FFFFFF" BorderThickness="0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    
                     <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
                         <TextBlock Text="📝 桌面备忘录" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" Foreground="#2D3748"/>
                         <TextBlock Text="{Binding CurrentMonth, StringFormat='yyyy年MM月'}" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="12" Foreground="#718096"/>
                     </StackPanel>
-                    
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
                         <Button Content="◀" Command="{Binding PreviousMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="30" Height="25" Margin="3" ToolTip="上个月"/>
                         <Button Content="▶" Command="{Binding NextMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="30" Height="25" Margin="3" ToolTip="下个月"/>
@@ -309,24 +291,16 @@
             </ScrollViewer>
             
             <!-- 状态栏 -->
-            <Border Grid.Row="2" CornerRadius="0,0,12,12" Height="35">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="#E9ECEF" Offset="0"/>
-                        <GradientStop Color="#F8F9FA" Offset="1"/>
-                    </LinearGradientBrush>
-                </Border.Background>
+            <Border Grid.Row="2" CornerRadius="0,0,14,14" Height="34" Background="#66FFFFFF" BorderBrush="#00FFFFFF" BorderThickness="0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    
                     <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
                         <Ellipse Width="8" Height="8" Fill="#28A745" Margin="0,0,8,0"/>
                         <TextBlock Text="桌面备忘录正在运行中" VerticalAlignment="Center" FontSize="11" Foreground="#495057"/>
                     </StackPanel>
-                    
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
                         <CheckBox Content="开机启动" IsChecked="{Binding IsStartupEnabled}" VerticalAlignment="Center" FontSize="11" Foreground="#495057"/>
                     </StackPanel>
