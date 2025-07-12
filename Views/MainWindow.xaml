@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:DesktopMemo.Converters"
         x:Name="MemoWindow"
         Title="桌面备忘录" 
-        Height="750" 
+        Height="800" 
         Width="850"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -15,6 +15,17 @@
         Top="0">
     
     <Window.Resources>
+        <!-- 转换器 -->
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <local:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+        <local:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
+        <local:BoolToForegroundConverter x:Key="BoolToForegroundConverter"/>
+        <local:BoolToMemoStyleConverter x:Key="BoolToMemoStyleConverter"/>
+        <local:BoolToTextDecorationConverter x:Key="BoolToTextDecorationConverter"/>
+        <local:TextTruncateConverter x:Key="TextTruncateConverter"/>
+        <local:TodayCalendarDayStyleConverter x:Key="TodayCalendarDayStyleConverter"/>
+        <local:TodayForegroundConverter x:Key="TodayForegroundConverter"/>
+        <local:BoolToFontWeightConverter x:Key="BoolToFontWeightConverter"/>
         
         
         <!-- 日历格子样式 -->
@@ -22,12 +33,30 @@
             <Setter Property="Background" Value="#66FFFFFF"/>
             <Setter Property="BorderBrush" Value="#00FFFFFF"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="CornerRadius" Value="10"/>
-            <Setter Property="Margin" Value="2"/>
-            <Setter Property="MinHeight" Value="100"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="MinHeight" Value="95"/>
+            <Setter Property="Padding" Value="4"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#99E3F2FD"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <!-- 当天日期格子样式 -->
+        <Style x:Key="TodayCalendarDayStyle" TargetType="Border">
+            <Setter Property="Background" Value="#B3E3F2FD"/>
+            <Setter Property="BorderBrush" Value="#4A90E2"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="MinHeight" Value="95"/>
+            <Setter Property="Padding" Value="4"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#CCE3F2FD"/>
+                    <Setter Property="BorderBrush" Value="#5A9FE2"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -38,7 +67,7 @@
             <Setter Property="BorderBrush" Value="#00FFFFFF"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="CornerRadius" Value="6"/>
-            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Margin" Value="1"/>
             <Setter Property="Padding" Value="4"/>
         </Style>
         
@@ -46,9 +75,9 @@
             <Setter Property="Background" Value="#B3E8F5E8"/>
             <Setter Property="BorderBrush" Value="#00FFFFFF"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="CornerRadius" Value="6"/>
-            <Setter Property="Margin" Value="2"/>
-            <Setter Property="Padding" Value="4"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="Padding" Value="3"/>
             <Setter Property="Opacity" Value="0.7"/>
         </Style>
         
@@ -109,30 +138,7 @@
             </Border>
             
             <!-- 日历内容 -->
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                <ScrollViewer.Resources>
-                    <Style TargetType="ScrollBar">
-                        <Setter Property="Width" Value="2"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ScrollBar">
-                                    <Grid Background="Transparent">
-                                        <Track x:Name="PART_Track"
-                                               IsDirectionReversed="true"
-                                               Focusable="false">
-                                            <Track.Thumb>
-                                                <Thumb Background="#888" Width="2" MinWidth="2" MaxWidth="2" BorderThickness="0"/>
-                                            </Track.Thumb>
-                                        </Track>
-                                    </Grid>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="BorderBrush" Value="Transparent"/>
-                        <Setter Property="BorderThickness" Value="0"/>
-                    </Style>
-                </ScrollViewer.Resources>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -170,7 +176,7 @@
                         
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Style="{StaticResource CalendarDayStyle}"
+                                <Border Style="{Binding IsToday, Converter={StaticResource TodayCalendarDayStyleConverter}}"
                                         Opacity="{Binding IsCurrentMonth, Converter={StaticResource BoolToOpacityConverter}}">
                                     <Grid>
                                         <Grid.RowDefinitions>
@@ -178,110 +184,113 @@
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
                                         
-                                        <!-- 日期数字 -->
-                                        <TextBlock Grid.Row="0" 
-                                                   Text="{Binding Date.Day}" 
-                                                   HorizontalAlignment="Right" 
-                                                   Margin="5,2" 
-                                                   FontSize="12"
-                                                   Foreground="{Binding IsCurrentMonth, Converter={StaticResource BoolToForegroundConverter}}"/>
-                                        
-                                        <!-- 备忘录列表 -->
-                                        <Grid Grid.Row="1" Margin="2">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="Auto"/>
-                                            </Grid.RowDefinitions>
-                                            
-                                            <!-- 备忘录条目 -->
-                                            <ScrollViewer Grid.Row="0" 
-                                                          VerticalScrollBarVisibility="Hidden" 
-                                                          HorizontalScrollBarVisibility="Disabled"
-                                                          MaxHeight="70">
-                                                <ItemsControl ItemsSource="{Binding Memos}">
-                                                    <ItemsControl.ItemTemplate>
-                                                        <DataTemplate>
-                                                            <Border Style="{Binding IsCompleted, Converter={StaticResource BoolToMemoStyleConverter}}"
-                                                                    MouseLeftButtonDown="MemoItem_MouseLeftButtonDown"
-                                                                    Tag="{Binding}">
-                                                                <Border.InputBindings>
-                                                                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.ShowMemoDetailCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}"/>
-                                                                </Border.InputBindings>
-                                                                <Border.ContextMenu>
-                                                                    <ContextMenu>
-                                                                        <MenuItem Header="删除备忘录" 
-                                                                                  Command="{Binding DataContext.DeleteMemoCommand, Source={x:Reference MemoWindow}}"
-                                                                                  CommandParameter="{Binding}"/>
-                                                                    </ContextMenu>
-                                                                </Border.ContextMenu>
-                                                                <Grid>
-                                                                    <Grid.ColumnDefinitions>
-                                                                        <ColumnDefinition Width="*"/>
-                                                                        <ColumnDefinition Width="Auto"/>
-                                                                    </Grid.ColumnDefinitions>
-                                                                    
-                                                                    <TextBlock Grid.Column="0" 
-                                                                               Text="{Binding Content, Converter={StaticResource TextTruncateConverter}, ConverterParameter=8}" 
-                                                                               TextWrapping="NoWrap" 
-                                                                               TextTrimming="CharacterEllipsis"
-                                                                               FontSize="9"
-                                                                               VerticalAlignment="Center"
-                                                                               ToolTip="{Binding Content}"
-                                                                               TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToTextDecorationConverter}}"/>
-                                                                    
-                                                                    <Button Grid.Column="1"
-                                                                            Content="✓" 
-                                                                            Command="{Binding DataContext.MarkCompletedCommand, Source={x:Reference MemoWindow}}" 
-                                                                            CommandParameter="{Binding}"
-                                                                            Width="11" 
-                                                                            Height="11" 
-                                                                            FontSize="8" 
-                                                                            Margin="4,0,0,0"
-                                                                            Background="LightBlue"
-                                                                            Foreground="White"
-                                                                            BorderThickness="0"
-                                                                            ToolTip="标记为完成"
-                                                                            Visibility="{Binding IsCompleted, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                                                                        <Button.Template>
-                                                                            <ControlTemplate TargetType="Button">
-                                                                                <Border Background="{TemplateBinding Background}" CornerRadius="2">
-                                                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                                                </Border>
-                                                                            </ControlTemplate>
-                                                                        </Button.Template>
-                                                                    </Button>
-                                                                </Grid>
-                                                            </Border>
-                                                        </DataTemplate>
-                                                    </ItemsControl.ItemTemplate>
-                                                </ItemsControl>
-                                            </ScrollViewer>
+                                        <!-- 日期行 -->
+                                        <Grid Grid.Row="0" Margin="2,2,2,1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
                                             
                                             <!-- 添加备忘录按钮 -->
-                                            <Button Grid.Row="1"
+                                            <Button Grid.Column="0"
                                                     Content="+" 
                                                     Command="{Binding DataContext.AddMemoCommand, Source={x:Reference MemoWindow}}" 
                                                     CommandParameter="{Binding}"
-                                                    Width="24" 
-                                                    Height="20" 
-                                                    FontSize="14" 
+                                                    Width="18" 
+                                                    Height="18" 
+                                                    FontSize="11" 
                                                     FontWeight="Bold"
-                                                    Margin="0,2,0,0"
+                                                    Margin="0,0,1,0"
                                                     Background="LightBlue"
                                                     Foreground="White"
                                                     BorderThickness="0"
                                                     ToolTip="添加新备忘录"
-                                                    HorizontalAlignment="Left"
                                                     Visibility="{Binding IsCurrentMonth, Converter={StaticResource BoolToVisibilityConverter}}">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
-                                                        <Border Background="{TemplateBinding Background}" CornerRadius="3">
+                                                        <Border Background="{TemplateBinding Background}" CornerRadius="2">
                                                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                         </Border>
                                                     </ControlTemplate>
                                                 </Button.Template>
                                             </Button>
+                                            
+                                            <!-- 日期数字 -->
+                                            <TextBlock Grid.Column="2" 
+                                                       Text="{Binding Date.Day}" 
+                                                       HorizontalAlignment="Right" 
+                                                       FontSize="11"
+                                                       Margin="0,0,2,0"
+                                                       FontWeight="{Binding IsToday, Converter={StaticResource BoolToFontWeightConverter}}"
+                                                       Foreground="{Binding IsToday, Converter={StaticResource TodayForegroundConverter}}"/>
                                         </Grid>
+                                        
+                                        <!-- 备忘录列表 -->
+                                        <ScrollViewer Grid.Row="1" 
+                                                      VerticalScrollBarVisibility="Hidden" 
+                                                      HorizontalScrollBarVisibility="Disabled"
+                                                      MaxHeight="68"
+                                                      Margin="0,1,0,2">
+                                            <ItemsControl ItemsSource="{Binding Memos}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Style="{Binding IsCompleted, Converter={StaticResource BoolToMemoStyleConverter}}"
+                                                                MouseLeftButtonDown="MemoItem_MouseLeftButtonDown"
+                                                                Tag="{Binding}">
+                                                            <Border.InputBindings>
+                                                                <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.ShowMemoDetailCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}"/>
+                                                            </Border.InputBindings>
+                                                            <Border.ContextMenu>
+                                                                <ContextMenu>
+                                                                    <MenuItem Header="删除备忘录" 
+                                                                              Command="{Binding DataContext.DeleteMemoCommand, Source={x:Reference MemoWindow}}"
+                                                                              CommandParameter="{Binding}"/>
+                                                                </ContextMenu>
+                                                            </Border.ContextMenu>
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                </Grid.ColumnDefinitions>
+                                                                
+                                                                <TextBlock Grid.Column="0" 
+                                                                           Text="{Binding Content, Converter={StaticResource TextTruncateConverter}, ConverterParameter=8}" 
+                                                                           TextWrapping="NoWrap" 
+                                                                           TextTrimming="CharacterEllipsis"
+                                                                           FontSize="9"
+                                                                           VerticalAlignment="Center"
+                                                                           Margin="0,0,1,0"
+                                                                           ToolTip="{Binding Content}"
+                                                                           TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToTextDecorationConverter}}"/>
+                                                                
+                                                                <Button Grid.Column="1"
+                                                                        Content="✓" 
+                                                                        Command="{Binding DataContext.MarkCompletedCommand, Source={x:Reference MemoWindow}}" 
+                                                                        CommandParameter="{Binding}"
+                                                                        Width="10" 
+                                                                        Height="10" 
+                                                                        FontSize="7" 
+                                                                        Margin="1,0,0,0"
+                                                                        Background="LightBlue"
+                                                                        Foreground="White"
+                                                                        BorderThickness="0"
+                                                                        ToolTip="标记为完成"
+                                                                        Visibility="{Binding IsCompleted, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                                                    <Button.Template>
+                                                                        <ControlTemplate TargetType="Button">
+                                                                            <Border Background="{TemplateBinding Background}" CornerRadius="1">
+                                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                            </Border>
+                                                                        </ControlTemplate>
+                                                                    </Button.Template>
+                                                                </Button>
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

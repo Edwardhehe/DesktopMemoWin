@@ -392,4 +392,188 @@ namespace DesktopMemo.Converters
             throw new NotImplementedException();
         }
     }
+
+    /// <summary>
+    /// 当天日期格子样式转换器
+    /// </summary>
+    public class TodayCalendarDayStyleConverter : IValueConverter
+    {
+        // 静态样式缓存，避免重复创建
+        private static Style? _todayStyle;
+        private static Style? _normalStyle;
+
+        /// <summary>
+        /// 转换方法
+        /// </summary>
+        /// <param name="value">源值</param>
+        /// <param name="targetType">目标类型</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="culture">文化信息</param>
+        /// <returns>转换结果</returns>
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+            {
+                // 查找应用程序资源中的样式
+                var app = Application.Current;
+                if (app?.Resources != null)
+                {
+                    string styleKey = boolValue ? "TodayCalendarDayStyle" : "CalendarDayStyle";
+                    if (app.Resources.Contains(styleKey))
+                    {
+                        return app.Resources[styleKey];
+                    }
+                }
+
+                // 如果找不到样式，返回缓存的默认样式
+                return boolValue ? GetTodayStyle() : GetNormalStyle();
+            }
+            return GetNormalStyle();
+        }
+
+        /// <summary>
+        /// 获取当天日期格子样式
+        /// </summary>
+        /// <returns>样式对象</returns>
+        private static Style GetTodayStyle()
+        {
+            if (_todayStyle == null)
+            {
+                _todayStyle = CreateTodayStyle();
+            }
+            return _todayStyle;
+        }
+
+        /// <summary>
+        /// 获取普通日期格子样式
+        /// </summary>
+        /// <returns>样式对象</returns>
+        private static Style GetNormalStyle()
+        {
+            if (_normalStyle == null)
+            {
+                _normalStyle = CreateNormalStyle();
+            }
+            return _normalStyle;
+        }
+
+        /// <summary>
+        /// 创建当天日期格子样式
+        /// </summary>
+        /// <returns>样式对象</returns>
+        private static Style CreateTodayStyle()
+        {
+            var style = new Style(typeof(Border));
+            style.Setters.Add(new Setter(Border.BackgroundProperty, new SolidColorBrush(Color.FromArgb(179, 227, 242, 253))));
+            style.Setters.Add(new Setter(Border.BorderBrushProperty, new SolidColorBrush(Color.FromRgb(74, 144, 226))));
+            style.Setters.Add(new Setter(Border.BorderThicknessProperty, new Thickness(2)));
+            style.Setters.Add(new Setter(Border.CornerRadiusProperty, new CornerRadius(8)));
+            style.Setters.Add(new Setter(Border.MarginProperty, new Thickness(1)));
+            style.Setters.Add(new Setter(Border.MinHeightProperty, 95.0));
+            style.Setters.Add(new Setter(Border.PaddingProperty, new Thickness(4)));
+            return style;
+        }
+
+        /// <summary>
+        /// 创建普通日期格子样式
+        /// </summary>
+        /// <returns>样式对象</returns>
+        private static Style CreateNormalStyle()
+        {
+            var style = new Style(typeof(Border));
+            style.Setters.Add(new Setter(Border.BackgroundProperty, new SolidColorBrush(Color.FromArgb(102, 255, 255, 255))));
+            style.Setters.Add(new Setter(Border.BorderBrushProperty, new SolidColorBrush(Colors.Transparent)));
+            style.Setters.Add(new Setter(Border.BorderThicknessProperty, new Thickness(0)));
+            style.Setters.Add(new Setter(Border.CornerRadiusProperty, new CornerRadius(8)));
+            style.Setters.Add(new Setter(Border.MarginProperty, new Thickness(1)));
+            style.Setters.Add(new Setter(Border.MinHeightProperty, 95.0));
+            style.Setters.Add(new Setter(Border.PaddingProperty, new Thickness(4)));
+            return style;
+        }
+
+        /// <summary>
+        /// 反向转换方法
+        /// </summary>
+        /// <param name="value">目标值</param>
+        /// <param name="targetType">源类型</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="culture">文化信息</param>
+        /// <returns>转换结果</returns>
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// 当天前景色转换器
+    /// </summary>
+    public class TodayForegroundConverter : IValueConverter
+    {
+        /// <summary>
+        /// 转换方法
+        /// </summary>
+        /// <param name="value">源值</param>
+        /// <param name="targetType">目标类型</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="culture">文化信息</param>
+        /// <returns>转换结果</returns>
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+            {
+                return boolValue ? new SolidColorBrush(Color.FromRgb(74, 144, 226)) : Brushes.Black;
+            }
+            return Brushes.Black;
+        }
+
+        /// <summary>
+        /// 反向转换方法
+        /// </summary>
+        /// <param name="value">目标值</param>
+        /// <param name="targetType">源类型</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="culture">文化信息</param>
+        /// <returns>转换结果</returns>
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// 布尔值到字体粗细转换器
+    /// </summary>
+    public class BoolToFontWeightConverter : IValueConverter
+    {
+        /// <summary>
+        /// 转换方法
+        /// </summary>
+        /// <param name="value">源值</param>
+        /// <param name="targetType">目标类型</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="culture">文化信息</param>
+        /// <returns>转换结果</returns>
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is bool boolValue)
+            {
+                return boolValue ? FontWeights.Bold : FontWeights.Normal;
+            }
+            return FontWeights.Normal;
+        }
+
+        /// <summary>
+        /// 反向转换方法
+        /// </summary>
+        /// <param name="value">目标值</param>
+        /// <param name="targetType">源类型</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="culture">文化信息</param>
+        /// <returns>转换结果</returns>
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

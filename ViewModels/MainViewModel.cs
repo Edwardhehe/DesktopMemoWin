@@ -487,6 +487,7 @@ namespace DesktopMemo.ViewModels
     {
         private DateTime _date;
         private bool _isCurrentMonth;
+        private bool _isToday;
         private ObservableCollection<MemoItem> _memos;
 
         /// <summary>
@@ -516,6 +517,19 @@ namespace DesktopMemo.ViewModels
         }
 
         /// <summary>
+        /// 是否为今天
+        /// </summary>
+        public bool IsToday
+        {
+            get => _isToday;
+            set
+            {
+                _isToday = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
         /// 备忘录列表
         /// </summary>
         public ObservableCollection<MemoItem> Memos
@@ -538,6 +552,7 @@ namespace DesktopMemo.ViewModels
         {
             _date = date;
             _isCurrentMonth = isCurrentMonth;
+            _isToday = date.Date == DateTime.Today;
             _memos = new ObservableCollection<MemoItem>(memos ?? new System.Collections.Generic.List<MemoItem>());
         }
 
