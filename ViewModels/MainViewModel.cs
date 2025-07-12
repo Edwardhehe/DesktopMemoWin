@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using System.IO;
 
 namespace DesktopMemo.ViewModels
 {
@@ -22,6 +23,10 @@ namespace DesktopMemo.ViewModels
         private bool _isDesktopVisible;
         private bool _isStartupEnabled;
         private string _backgroundColor = "#FFFFFF";
+        // 配置文件路径
+        private readonly string _configPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            "DesktopMemo", "config.txt");
 
         /// <summary>
         /// 当前月份
@@ -73,6 +78,7 @@ namespace DesktopMemo.ViewModels
             set
             {
                 _backgroundColor = value;
+                SaveBackgroundColor(value);
                 OnPropertyChanged();
             }
         }
@@ -148,6 +154,9 @@ namespace DesktopMemo.ViewModels
 
             _currentMonth = DateTime.Now;
             _isStartupEnabled = _startupService.IsStartupEnabled();
+
+            // 加载背景色
+            _backgroundColor = LoadBackgroundColor();
 
             // 初始化命令
             PreviousMonthCommand = new RelayCommand(PreviousMonth);
@@ -426,6 +435,34 @@ namespace DesktopMemo.ViewModels
         private void OnDesktopVisibilityChanged(object? sender, bool isVisible)
         {
             IsDesktopVisible = isVisible;
+        }
+
+        /// <summary>
+        /// 保存背景颜色到本地配置
+        /// </summary>
+        /// <param name="color">颜色字符串</param>
+        private void SaveBackgroundColor(string color)
+        {
+            try
+            {
+                File.WriteAllText(_configPath, color);
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// 读取本地配置的背景颜色
+        /// </summary>
+        /// <returns>颜色字符串</returns>
+        private string LoadBackgroundColor()
+        {
+            try
+            {
+                if (File.Exists(_configPath))
+                    return File.ReadAllText(_configPath).Trim();
+            }
+            catch { }
+            return "#FFFFFF";
         }
 
         /// <summary>
