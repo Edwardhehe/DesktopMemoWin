@@ -23,7 +23,8 @@ namespace DesktopMemo.Views
         /// </summary>
         /// <param name="date">备忘录日期</param>
         /// <param name="existingContent">现有内容（用于编辑）</param>
-        public MemoInputDialog(DateTime date, string existingContent = "")
+        /// <param name="owner">父窗口</param>
+        public MemoInputDialog(DateTime date, string existingContent = "", Window? owner = null)
         {
             InitializeComponent();
 
@@ -35,6 +36,37 @@ namespace DesktopMemo.Views
             {
                 ContentTextBox.Text = existingContent;
                 Title = "编辑备忘录";
+            }
+
+            // 设置父窗口并调整位置
+            if (owner != null)
+            {
+                this.Owner = owner;
+                this.WindowStartupLocation = WindowStartupLocation.Manual;
+                
+                // 计算对话框位置，确保在主窗口范围内
+                var ownerLeft = owner.Left;
+                var ownerTop = owner.Top;
+                var ownerWidth = owner.Width;
+                var ownerHeight = owner.Height;
+                
+                // 对话框位置：主窗口中心偏右下方
+                this.Left = ownerLeft + (ownerWidth - this.Width) / 2 + 50;
+                this.Top = ownerTop + (ownerHeight - this.Height) / 2 + 50;
+                
+                // 确保对话框不会超出屏幕边界
+                var screenWidth = SystemParameters.WorkArea.Width;
+                var screenHeight = SystemParameters.WorkArea.Height;
+                
+                if (this.Left + this.Width > screenWidth)
+                {
+                    this.Left = screenWidth - this.Width - 10;
+                }
+                
+                if (this.Top + this.Height > screenHeight)
+                {
+                    this.Top = screenHeight - this.Height - 10;
+                }
             }
 
             // 设置焦点到文本框

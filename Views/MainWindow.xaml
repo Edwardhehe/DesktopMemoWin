@@ -213,6 +213,9 @@
                                                             <Border Style="{Binding IsCompleted, Converter={StaticResource BoolToMemoStyleConverter}}"
                                                                     MouseLeftButtonDown="MemoItem_MouseLeftButtonDown"
                                                                     Tag="{Binding}">
+                                                                <Border.InputBindings>
+                                                                    <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.ShowMemoDetailCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}"/>
+                                                                </Border.InputBindings>
                                                                 <Border.ContextMenu>
                                                                     <ContextMenu>
                                                                         <MenuItem Header="删除备忘录" 

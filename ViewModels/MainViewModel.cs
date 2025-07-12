@@ -3,6 +3,7 @@ using DesktopMemo.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 
@@ -107,6 +108,11 @@ namespace DesktopMemo.ViewModels
         public ICommand DeleteMemoCommand { get; }
 
         /// <summary>
+        /// 显示备忘录详情命令
+        /// </summary>
+        public ICommand ShowMemoDetailCommand { get; }
+
+        /// <summary>
         /// 停止桌面监控服务
         /// </summary>
         public void StopDesktopMonitoring()
@@ -149,6 +155,7 @@ namespace DesktopMemo.ViewModels
             AddMemoCommand = new RelayCommand<CalendarDayViewModel>(AddMemo);
             MarkCompletedCommand = new RelayCommand<MemoItem>(MarkCompleted);
             DeleteMemoCommand = new RelayCommand<MemoItem>(DeleteMemo);
+            ShowMemoDetailCommand = new RelayCommand<MemoItem>(ShowMemoDetail);
 
             // 订阅桌面可见性变化事件
             _desktopMonitorService.DesktopVisibilityChanged += OnDesktopVisibilityChanged;
@@ -234,7 +241,9 @@ namespace DesktopMemo.ViewModels
 
             try
             {
-                var dialog = new Views.MemoInputDialog(dayViewModel.Date);
+                // 获取主窗口实例
+                var mainWindow = System.Windows.Application.Current.MainWindow;
+                var dialog = new Views.MemoInputDialog(dayViewModel.Date, "", mainWindow);
                 if (dialog.ShowDialog() == true)
                 {
                     var memo = new MemoItem
@@ -277,8 +286,8 @@ namespace DesktopMemo.ViewModels
                 memo.CompletedAt = DateTime.Now;
                 _databaseService.MarkAsCompleted(memo.Id);
 
-                // 不需要重新加载整个日历，只需要触发属性变化通知
-                // 备忘录的IsCompleted属性变化会自动更新UI
+                // 重新排序备忘录列表，将已完成的放到未完成的后面
+                ReorderMemosInDay(memo);
             }
             catch (Exception ex)
             {
@@ -286,6 +295,93 @@ namespace DesktopMemo.ViewModels
                 // 恢复状态
                 memo.IsCompleted = false;
                 memo.CompletedAt = null;
+            }
+        }
+
+        /// <summary>
+        /// 重新排序指定日期的备忘录列表
+        /// </summary>
+        /// <param name="memo">备忘录</param>
+        private void ReorderMemosInDay(MemoItem memo)
+        {
+            // 找到包含该备忘录的日期视图模型
+            foreach (var day in CalendarDays)
+            {
+                if (day.Memos.Contains(memo))
+                {
+                    // 创建新的排序列表：未完成的在前，已完成的在后
+                    var sortedMemos = day.Memos
+                        .OrderBy(m => m.IsCompleted)  // 未完成的排在前面
+                        .ThenBy(m => m.CreatedAt)     // 同状态内按创建时间排序
+                        .ToList();
+
+                    // 清空并重新添加排序后的备忘录
+                    day.Memos.Clear();
+                    foreach (var sortedMemo in sortedMemos)
+                    {
+                        day.Memos.Add(sortedMemo);
+                    }
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 显示备忘录详情
+        /// </summary>
+        /// <param name="memo">备忘录</param>
+        private void ShowMemoDetail(MemoItem? memo)
+        {
+            if (memo == null) return;
+
+            try
+            {
+                var detailWindow = new Views.MemoDetailWindow(memo, EditMemoCallback);
+                var mainWindow = System.Windows.Application.Current.MainWindow;
+                if (mainWindow != null)
+                {
+                    detailWindow.Owner = mainWindow;
+                }
+                detailWindow.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"显示备忘录详情失败：{ex.Message}");
+                System.Windows.MessageBox.Show(
+                    $"显示备忘录详情失败：{ex.Message}",
+                    "错误",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// 编辑备忘录回调
+        /// </summary>
+        /// <param name="memo">要编辑的备忘录</param>
+        private void EditMemoCallback(MemoItem memo)
+        {
+            try
+            {
+                var mainWindow = System.Windows.Application.Current.MainWindow;
+                var dialog = new Views.MemoInputDialog(memo.Date, memo.Content, mainWindow);
+                if (dialog.ShowDialog() == true)
+                {
+                    memo.Content = dialog.MemoContent;
+                    memo.Date = dialog.MemoDate;
+
+                    // 更新数据库
+                    _databaseService.UpdateMemo(memo);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"编辑备忘录失败：{ex.Message}");
+                System.Windows.MessageBox.Show(
+                    $"编辑备忘录失败：{ex.Message}",
+                    "错误",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
             }
         }
 

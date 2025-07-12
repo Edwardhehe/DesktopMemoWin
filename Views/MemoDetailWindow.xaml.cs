@@ -77,7 +77,7 @@ namespace DesktopMemo.Views
                 else
                 {
                     // 如果没有提供编辑回调，打开编辑对话框
-                    var dialog = new MemoInputDialog(_memo.Date, _memo.Content);
+                    var dialog = new MemoInputDialog(_memo.Date, _memo.Content, this.Owner);
                     if (dialog.ShowDialog() == true)
                     {
                         _memo.Content = dialog.MemoContent;

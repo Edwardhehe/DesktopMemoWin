@@ -154,6 +154,8 @@ namespace DesktopMemo.Views
             }
         }
 
+
+
         /// <summary>
         /// 备忘录文本鼠标左键点击事件
         /// </summary>
@@ -186,7 +188,7 @@ namespace DesktopMemo.Views
         {
             try
             {
-                var dialog = new Views.MemoInputDialog(memo.Date, memo.Content);
+                var dialog = new Views.MemoInputDialog(memo.Date, memo.Content, this);
                 if (dialog.ShowDialog() == true)
                 {
                     memo.Content = dialog.MemoContent;
