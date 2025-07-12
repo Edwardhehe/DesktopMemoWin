@@ -17,17 +17,14 @@
     <Window.Resources>
         <!-- 自定义滚动条样式 -->
         <Style x:Key="ThinScrollBarStyle" TargetType="ScrollBar">
-            <Setter Property="Width" Value="8"/>
+            <Setter Property="Width" Value="6"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ScrollBar">
                         <Grid>
-                            <Border Background="{TemplateBinding Background}" 
-                                    CornerRadius="4" 
-                                    Opacity="0.3"/>
-                            <Track x:Name="PART_Track" 
-                                   IsDirectionReversed="True">
+                            <Border Background="#E0E0E0" CornerRadius="3" Opacity="0.5"/>
+                            <Track x:Name="PART_Track" IsDirectionReversed="True">
                                 <Track.Thumb>
                                     <Thumb Style="{StaticResource ThinScrollBarThumb}"/>
                                 </Track.Thumb>
@@ -40,29 +37,23 @@
         
         <Style x:Key="ThinScrollBarThumb" TargetType="Thumb">
             <Setter Property="Background" Value="#C0C0C0"/>
-            <Setter Property="Width" Value="6"/>
+            <Setter Property="Width" Value="4"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Thumb">
-                        <Border Background="{TemplateBinding Background}" 
-                                CornerRadius="3"/>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#A0A0A0"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
+                        <Border Background="{TemplateBinding Background}" CornerRadius="2"/>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
         
-        <!-- 样式定义 -->
+        <!-- 日历格子样式 -->
         <Style x:Key="CalendarDayStyle" TargetType="Border">
             <Setter Property="BorderBrush" Value="#E0E0E0"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Background" Value="White"/>
             <Setter Property="Margin" Value="1"/>
-            <Setter Property="MinHeight" Value="100"/>
+            <Setter Property="MinHeight" Value="120"/>
             <Setter Property="CornerRadius" Value="6"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -72,19 +63,15 @@
             </Style.Triggers>
         </Style>
         
+        <!-- 备忘录项样式 -->
         <Style x:Key="MemoItemStyle" TargetType="Border">
             <Setter Property="Background" Value="#F8F9FA"/>
             <Setter Property="BorderBrush" Value="#D1D5DB"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Margin" Value="2"/>
-            <Setter Property="Padding" Value="6"/>
+            <Setter Property="Padding" Value="4"/>
             <Setter Property="CornerRadius" Value="4"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#E5F3FF"/>
-                    <Setter Property="BorderBrush" Value="#007ACC"/>
-                </Trigger>
-            </Style.Triggers>
+            <Setter Property="MinHeight" Value="24"/>
         </Style>
         
         <Style x:Key="CompletedMemoStyle" TargetType="Border">
@@ -92,12 +79,13 @@
             <Setter Property="BorderBrush" Value="#90EE90"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Margin" Value="2"/>
-            <Setter Property="Padding" Value="6"/>
+            <Setter Property="Padding" Value="4"/>
             <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="MinHeight" Value="24"/>
             <Setter Property="Opacity" Value="0.8"/>
         </Style>
         
-        <!-- 现代化按钮样式 -->
+        <!-- 按钮样式 -->
         <Style x:Key="ModernButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#F8F9FA"/>
             <Setter Property="BorderBrush" Value="#D1D5DB"/>
@@ -113,16 +101,12 @@
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="4"
                                 Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Background" Value="#E5F3FF"/>
                                 <Setter Property="BorderBrush" Value="#007ACC"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#C7E6FF"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -145,9 +129,7 @@
             </Grid.RowDefinitions>
             
             <!-- 标题栏 -->
-            <Border Grid.Row="0" 
-                    CornerRadius="12,12,0,0" 
-                    Height="50">
+            <Border Grid.Row="0" CornerRadius="12,12,0,0" Height="50">
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                         <GradientStop Color="#F8F9FA" Offset="0"/>
@@ -160,62 +142,22 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     
-                    <StackPanel Grid.Column="0" 
-                                Orientation="Horizontal" 
-                                VerticalAlignment="Center" 
-                                Margin="15,0">
-                        <TextBlock Text="📝 桌面备忘录" 
-                                   FontWeight="Bold" 
-                                   FontSize="14"
-                                   VerticalAlignment="Center"
-                                   Foreground="#2D3748"/>
-                        <TextBlock Text="{Binding CurrentMonth, StringFormat='yyyy年MM月'}" 
-                                   Margin="15,0,0,0" 
-                                   VerticalAlignment="Center" 
-                                   FontSize="12"
-                                   Foreground="#718096"/>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
+                        <TextBlock Text="📝 桌面备忘录" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" Foreground="#2D3748"/>
+                        <TextBlock Text="{Binding CurrentMonth, StringFormat='yyyy年MM月'}" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="12" Foreground="#718096"/>
                     </StackPanel>
                     
-                    <StackPanel Grid.Column="1" 
-                                Orientation="Horizontal" 
-                                VerticalAlignment="Center" 
-                                Margin="0,0,15,0">
-                        <Button Content="◀" 
-                                Command="{Binding PreviousMonthCommand}" 
-                                Style="{StaticResource ModernButtonStyle}"
-                                Width="35" 
-                                Height="30" 
-                                Margin="3"
-                                ToolTip="上个月"/>
-                        <Button Content="▶" 
-                                Command="{Binding NextMonthCommand}" 
-                                Style="{StaticResource ModernButtonStyle}"
-                                Width="35" 
-                                Height="30" 
-                                Margin="3"
-                                ToolTip="下个月"/>
-                        <Button Content="⚙" 
-                                Click="SettingsButton_Click" 
-                                Style="{StaticResource ModernButtonStyle}"
-                                Width="35" 
-                                Height="30" 
-                                Margin="3"
-                                ToolTip="设置"/>
-                        <Button Content="✕" 
-                                Click="CloseButton_Click" 
-                                Style="{StaticResource ModernButtonStyle}"
-                                Width="35" 
-                                Height="30" 
-                                Margin="3"
-                                ToolTip="关闭"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
+                        <Button Content="◀" Command="{Binding PreviousMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="35" Height="30" Margin="3" ToolTip="上个月"/>
+                        <Button Content="▶" Command="{Binding NextMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="35" Height="30" Margin="3" ToolTip="下个月"/>
+                        <Button Content="⚙" Click="SettingsButton_Click" Style="{StaticResource ModernButtonStyle}" Width="35" Height="30" Margin="3" ToolTip="设置"/>
+                        <Button Content="✕" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="35" Height="30" Margin="3" ToolTip="关闭"/>
                     </StackPanel>
                 </Grid>
             </Border>
             
             <!-- 日历内容 -->
-            <ScrollViewer Grid.Row="1" 
-                          VerticalScrollBarVisibility="Auto" 
-                          HorizontalScrollBarVisibility="Disabled">
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -244,8 +186,7 @@
                     </Grid>
                     
                     <!-- 日历网格 -->
-                    <ItemsControl Grid.Row="1" 
-                                  ItemsSource="{Binding CalendarDays}">
+                    <ItemsControl Grid.Row="1" ItemsSource="{Binding CalendarDays}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <UniformGrid Columns="7"/>
@@ -271,13 +212,17 @@
                                                    Foreground="{Binding IsCurrentMonth, Converter={StaticResource BoolToForegroundConverter}}"/>
                                         
                                         <!-- 备忘录列表 -->
-                                        <ScrollViewer Grid.Row="1" 
-                                                      VerticalScrollBarVisibility="Auto" 
-                                                      MaxHeight="60">
-                                            <ScrollViewer.Resources>
-                                                <Style TargetType="ScrollBar" BasedOn="{StaticResource ThinScrollBarStyle}"/>
-                                            </ScrollViewer.Resources>
-                                            <StackPanel>
+                                        <Grid Grid.Row="1" Margin="5">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            
+                                            <!-- 备忘录条目 -->
+                                            <ScrollViewer Grid.Row="0" 
+                                                          VerticalScrollBarVisibility="Auto" 
+                                                          HorizontalScrollBarVisibility="Disabled"
+                                                          MaxHeight="70">
                                                 <ItemsControl ItemsSource="{Binding Memos}">
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
@@ -298,96 +243,67 @@
                                                                     </Grid.ColumnDefinitions>
                                                                     
                                                                     <TextBlock Grid.Column="0" 
-                                                                               Text="{Binding Content}" 
-                                                                               TextWrapping="Wrap" 
+                                                                               Text="{Binding Content, Converter={StaticResource TextTruncateConverter}, ConverterParameter=8}" 
+                                                                               TextWrapping="NoWrap" 
+                                                                               TextTrimming="CharacterEllipsis"
                                                                                FontSize="10"
+                                                                               VerticalAlignment="Center"
+                                                                               ToolTip="{Binding Content}"
                                                                                TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToTextDecorationConverter}}"/>
                                                                     
-                                                                    <StackPanel Grid.Column="1" 
-                                                                                Orientation="Horizontal" 
-                                                                                VerticalAlignment="Top">
-                                                                        <Button Content="✓" 
-                                                                                Command="{Binding DataContext.MarkCompletedCommand, Source={x:Reference MemoWindow}}" 
-                                                                                CommandParameter="{Binding}"
-                                                                                Width="18" 
-                                                                                Height="18" 
-                                                                                FontSize="9" 
-                                                                                Margin="2,0,0,0"
-                                                                                Background="#28A745"
-                                                                                Foreground="White"
-                                                                                BorderThickness="0"
-                                                                                ToolTip="标记为完成"
-                                                                                Visibility="{Binding IsCompleted, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                                                                            <Button.Style>
-                                                                                <Style TargetType="Button">
-                                                                                    <Setter Property="Template">
-                                                                                        <Setter.Value>
-                                                                                            <ControlTemplate TargetType="Button">
-                                                                                                <Border Background="{TemplateBinding Background}"
-                                                                                                        CornerRadius="2">
-                                                                                                    <ContentPresenter HorizontalAlignment="Center"
-                                                                                                                      VerticalAlignment="Center"/>
-                                                                                                </Border>
-                                                                                                <ControlTemplate.Triggers>
-                                                                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                                                                        <Setter Property="Background" Value="#218838"/>
-                                                                                                    </Trigger>
-                                                                                                </ControlTemplate.Triggers>
-                                                                                            </ControlTemplate>
-                                                                                        </Setter.Value>
-                                                                                    </Setter>
-                                                                                </Style>
-                                                                            </Button.Style>
-                                                                        </Button>
-                                                                    </StackPanel>
+                                                                    <Button Grid.Column="1"
+                                                                            Content="✓" 
+                                                                            Command="{Binding DataContext.MarkCompletedCommand, Source={x:Reference MemoWindow}}" 
+                                                                            CommandParameter="{Binding}"
+                                                                            Width="20" 
+                                                                            Height="20" 
+                                                                            FontSize="10" 
+                                                                            Margin="4,0,0,0"
+                                                                            Background="#28A745"
+                                                                            Foreground="White"
+                                                                            BorderThickness="0"
+                                                                            ToolTip="标记为完成"
+                                                                            Visibility="{Binding IsCompleted, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                                                        <Button.Template>
+                                                                            <ControlTemplate TargetType="Button">
+                                                                                <Border Background="{TemplateBinding Background}" CornerRadius="2">
+                                                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                                </Border>
+                                                                            </ControlTemplate>
+                                                                        </Button.Template>
+                                                                    </Button>
                                                                 </Grid>
                                                             </Border>
                                                         </DataTemplate>
                                                     </ItemsControl.ItemTemplate>
                                                 </ItemsControl>
-                                                
-                                                <!-- 添加备忘录按钮 -->
-                                                <Button Content="+" 
-                                                        Command="{Binding DataContext.AddMemoCommand, Source={x:Reference MemoWindow}}" 
-                                                        CommandParameter="{Binding}"
-                                                        Width="24" 
-                                                        Height="20" 
-                                                        FontSize="14" 
-                                                        FontWeight="Bold"
-                                                        Margin="2"
-                                                        Background="#007ACC"
-                                                        Foreground="White"
-                                                        BorderThickness="0"
-                                                        ToolTip="添加新备忘录"
-                                                        Visibility="{Binding IsCurrentMonth, Converter={StaticResource BoolToVisibilityConverter}}">
-                                                    <Button.Style>
-                                                        <Style TargetType="Button">
-                                                            <Setter Property="Template">
-                                                                <Setter.Value>
-                                                                    <ControlTemplate TargetType="Button">
-                                                                        <Border Background="{TemplateBinding Background}"
-                                                                                CornerRadius="3"
-                                                                                BorderBrush="#007ACC"
-                                                                                BorderThickness="1">
-                                                                            <ContentPresenter HorizontalAlignment="Center"
-                                                                                              VerticalAlignment="Center"/>
-                                                                        </Border>
-                                                                        <ControlTemplate.Triggers>
-                                                                            <Trigger Property="IsMouseOver" Value="True">
-                                                                                <Setter Property="Background" Value="#005A9E"/>
-                                                                            </Trigger>
-                                                                            <Trigger Property="IsPressed" Value="True">
-                                                                                <Setter Property="Background" Value="#004578"/>
-                                                                            </Trigger>
-                                                                        </ControlTemplate.Triggers>
-                                                                    </ControlTemplate>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </Style>
-                                                    </Button.Style>
-                                                </Button>
-                                            </StackPanel>
-                                        </ScrollViewer>
+                                            </ScrollViewer>
+                                            
+                                            <!-- 添加备忘录按钮 -->
+                                            <Button Grid.Row="1"
+                                                    Content="+" 
+                                                    Command="{Binding DataContext.AddMemoCommand, Source={x:Reference MemoWindow}}" 
+                                                    CommandParameter="{Binding}"
+                                                    Width="24" 
+                                                    Height="20" 
+                                                    FontSize="14" 
+                                                    FontWeight="Bold"
+                                                    Margin="0,2,0,0"
+                                                    Background="#007ACC"
+                                                    Foreground="White"
+                                                    BorderThickness="0"
+                                                    ToolTip="添加新备忘录"
+                                                    HorizontalAlignment="Left"
+                                                    Visibility="{Binding IsCurrentMonth, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border Background="{TemplateBinding Background}" CornerRadius="3">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                        </Grid>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -397,9 +313,7 @@
             </ScrollViewer>
             
             <!-- 状态栏 -->
-            <Border Grid.Row="2" 
-                    CornerRadius="0,0,12,12" 
-                    Height="35">
+            <Border Grid.Row="2" CornerRadius="0,0,12,12" Height="35">
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                         <GradientStop Color="#E9ECEF" Offset="0"/>
@@ -412,28 +326,13 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     
-                    <StackPanel Grid.Column="0" 
-                                Orientation="Horizontal"
-                                VerticalAlignment="Center" 
-                                Margin="15,0">
-                        <Ellipse Width="8" Height="8" 
-                                 Fill="#28A745" 
-                                 Margin="0,0,8,0"/>
-                        <TextBlock Text="桌面备忘录正在运行中" 
-                                   VerticalAlignment="Center" 
-                                   FontSize="11" 
-                                   Foreground="#495057"/>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
+                        <Ellipse Width="8" Height="8" Fill="#28A745" Margin="0,0,8,0"/>
+                        <TextBlock Text="桌面备忘录正在运行中" VerticalAlignment="Center" FontSize="11" Foreground="#495057"/>
                     </StackPanel>
                     
-                    <StackPanel Grid.Column="1" 
-                                Orientation="Horizontal" 
-                                VerticalAlignment="Center" 
-                                Margin="0,0,15,0">
-                        <CheckBox Content="开机启动" 
-                                  IsChecked="{Binding IsStartupEnabled}" 
-                                  VerticalAlignment="Center" 
-                                  FontSize="11"
-                                  Foreground="#495057"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
+                        <CheckBox Content="开机启动" IsChecked="{Binding IsStartupEnabled}" VerticalAlignment="Center" FontSize="11" Foreground="#495057"/>
                     </StackPanel>
                 </Grid>
             </Border>

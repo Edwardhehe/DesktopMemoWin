@@ -69,6 +69,7 @@
         <local:BoolToMemoStyleConverter x:Key="BoolToMemoStyleConverter"/>
         <local:BoolToTextDecorationConverter x:Key="BoolToTextDecorationConverter"/>
         <local:SubtractConverter x:Key="SubtractConverter"/>
+        <local:TextTruncateConverter x:Key="TextTruncateConverter"/>
 
         <!-- 阴影效果 -->
         <DropShadowEffect x:Key="DropShadowEffect" 

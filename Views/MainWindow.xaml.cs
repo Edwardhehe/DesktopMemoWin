@@ -155,6 +155,55 @@ namespace DesktopMemo.Views
         }
 
         /// <summary>
+        /// 备忘录文本鼠标左键点击事件
+        /// </summary>
+        /// <param name="sender">事件发送者</param>
+        /// <param name="e">鼠标按钮事件参数</param>
+        private void MemoTextBlock_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            // 判断是否为双击
+            if (e.ClickCount == 2 && sender is FrameworkElement element && element.Tag is Models.MemoItem memo)
+            {
+                try
+                {
+                    var detailWindow = new Views.MemoDetailWindow(memo, EditMemoCallback);
+                    detailWindow.Owner = this;
+                    detailWindow.ShowDialog();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"打开备忘录详情窗口时发生异常：{ex.Message}");
+                    MessageBox.Show($"打开备忘录详情失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 编辑备忘录回调
+        /// </summary>
+        /// <param name="memo">要编辑的备忘录</param>
+        private void EditMemoCallback(Models.MemoItem memo)
+        {
+            try
+            {
+                var dialog = new Views.MemoInputDialog(memo.Date, memo.Content);
+                if (dialog.ShowDialog() == true)
+                {
+                    memo.Content = dialog.MemoContent;
+                    memo.Date = dialog.MemoDate;
+                    
+                    // 更新数据库
+                    _viewModel?.GetDatabaseService()?.UpdateMemo(memo);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"编辑备忘录时发生异常：{ex.Message}");
+                MessageBox.Show($"编辑备忘录失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
         /// 窗口加载完成事件
         /// </summary>
         /// <param name="sender">事件发送者</param>

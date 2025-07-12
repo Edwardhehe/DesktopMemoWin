@@ -168,6 +168,10 @@ namespace DesktopMemo.Converters
     /// </summary>
     public class BoolToMemoStyleConverter : IValueConverter
     {
+        // 静态样式缓存，避免重复创建
+        private static Style? _completedMemoStyle;
+        private static Style? _normalMemoStyle;
+
         /// <summary>
         /// 转换方法
         /// </summary>
@@ -191,10 +195,36 @@ namespace DesktopMemo.Converters
                     }
                 }
                 
-                // 如果找不到样式，返回默认样式
-                return CreateDefaultStyle(boolValue);
+                // 如果找不到样式，返回缓存的默认样式
+                return boolValue ? GetCompletedMemoStyle() : GetNormalMemoStyle();
             }
-            return CreateDefaultStyle(false);
+            return GetNormalMemoStyle();
+        }
+
+        /// <summary>
+        /// 获取已完成的备忘录样式
+        /// </summary>
+        /// <returns>样式对象</returns>
+        private static Style GetCompletedMemoStyle()
+        {
+            if (_completedMemoStyle == null)
+            {
+                _completedMemoStyle = CreateDefaultStyle(true);
+            }
+            return _completedMemoStyle;
+        }
+
+        /// <summary>
+        /// 获取普通备忘录样式
+        /// </summary>
+        /// <returns>样式对象</returns>
+        private static Style GetNormalMemoStyle()
+        {
+            if (_normalMemoStyle == null)
+            {
+                _normalMemoStyle = CreateDefaultStyle(false);
+            }
+            return _normalMemoStyle;
         }
 
         /// <summary>
@@ -202,7 +232,7 @@ namespace DesktopMemo.Converters
         /// </summary>
         /// <param name="isCompleted">是否已完成</param>
         /// <returns>样式对象</returns>
-        private Style CreateDefaultStyle(bool isCompleted)
+        private static Style CreateDefaultStyle(bool isCompleted)
         {
             var style = new Style(typeof(Border));
             
@@ -213,14 +243,14 @@ namespace DesktopMemo.Converters
             }
             else
             {
-                style.Setters.Add(new Setter(Border.BackgroundProperty, new SolidColorBrush(Color.FromRgb(240, 240, 240))));
-                style.Setters.Add(new Setter(Border.BorderBrushProperty, new SolidColorBrush(Color.FromRgb(204, 204, 204))));
+                style.Setters.Add(new Setter(Border.BackgroundProperty, new SolidColorBrush(Color.FromRgb(248, 249, 250))));
+                style.Setters.Add(new Setter(Border.BorderBrushProperty, new SolidColorBrush(Color.FromRgb(209, 213, 219))));
             }
             
             style.Setters.Add(new Setter(Border.BorderThicknessProperty, new Thickness(1)));
             style.Setters.Add(new Setter(Border.MarginProperty, new Thickness(2)));
-            style.Setters.Add(new Setter(Border.PaddingProperty, new Thickness(4)));
-            style.Setters.Add(new Setter(Border.CornerRadiusProperty, new CornerRadius(3)));
+            style.Setters.Add(new Setter(Border.PaddingProperty, new Thickness(6)));
+            style.Setters.Add(new Setter(Border.CornerRadiusProperty, new CornerRadius(4)));
             
             return style;
         }
@@ -298,6 +328,55 @@ namespace DesktopMemo.Converters
                 }
             }
             return value;
+        }
+
+        /// <summary>
+        /// 反向转换方法
+        /// </summary>
+        /// <param name="value">目标值</param>
+        /// <param name="targetType">源类型</param>
+        /// <param name="parameter">参数</param>
+        /// <param name="culture">文化信息</param>
+        /// <returns>转换结果</returns>
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// 文本截断转换器
+    /// </summary>
+    public class TextTruncateConverter : IValueConverter
+    {
+        /// <summary>
+        /// 转换方法
+        /// </summary>
+        /// <param name="value">源值</param>
+        /// <param name="targetType">目标类型</param>
+        /// <param name="parameter">参数（最大字符数，默认20）</param>
+        /// <param name="culture">文化信息</param>
+        /// <returns>转换结果</returns>
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string text)
+            {
+                // 获取最大字符数参数，默认为20
+                int maxLength = 20;
+                if (parameter is string paramString && int.TryParse(paramString, out int paramLength))
+                {
+                    maxLength = paramLength;
+                }
+                
+                // 如果文本长度超过最大长度，则截断并添加省略号
+                if (text.Length > maxLength)
+                {
+                    return text.Substring(0, maxLength) + "...";
+                }
+                
+                return text;
+            }
+            return value ?? string.Empty;
         }
 
         /// <summary>

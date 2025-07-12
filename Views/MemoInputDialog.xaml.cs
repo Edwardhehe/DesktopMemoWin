@@ -22,12 +22,20 @@ namespace DesktopMemo.Views
         /// 构造函数
         /// </summary>
         /// <param name="date">备忘录日期</param>
-        public MemoInputDialog(DateTime date)
+        /// <param name="existingContent">现有内容（用于编辑）</param>
+        public MemoInputDialog(DateTime date, string existingContent = "")
         {
             InitializeComponent();
             
             MemoDate = date;
             DateTextBlock.Text = $"日期：{date:yyyy年MM月dd日}";
+            
+            // 如果有现有内容，设置为编辑模式
+            if (!string.IsNullOrEmpty(existingContent))
+            {
+                ContentTextBox.Text = existingContent;
+                Title = "编辑备忘录";
+            }
             
             // 设置焦点到文本框
             Loaded += (s, e) => ContentTextBox.Focus();

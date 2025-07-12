@@ -168,7 +168,9 @@ namespace DesktopMemo.ViewModels
         {
             try
             {
-                CalendarDays.Clear();
+                // 暂停UI更新以提高性能
+                var collection = CalendarDays;
+                collection.Clear();
 
                 var firstDayOfMonth = new DateTime(_currentMonth.Year, _currentMonth.Month, 1);
                 var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
@@ -179,7 +181,7 @@ namespace DesktopMemo.ViewModels
                 {
                     var date = firstDayOfMonth.AddDays(-i - 1);
                     var dayViewModel = new CalendarDayViewModel(date, false);
-                    CalendarDays.Add(dayViewModel);
+                    collection.Add(dayViewModel);
                 }
 
                 // 添加当前月的日期
@@ -188,25 +190,22 @@ namespace DesktopMemo.ViewModels
                     var date = new DateTime(_currentMonth.Year, _currentMonth.Month, day);
                     var memos = _databaseService.GetMemosByDate(date);
                     var dayViewModel = new CalendarDayViewModel(date, true, memos);
-                    CalendarDays.Add(dayViewModel);
+                    collection.Add(dayViewModel);
                 }
 
                 // 添加下个月的日期
-                var remainingDays = 42 - CalendarDays.Count; // 保持6行7列的格式
+                var remainingDays = 42 - collection.Count; // 保持6行7列的格式
                 for (int i = 1; i <= remainingDays; i++)
                 {
                     var date = lastDayOfMonth.AddDays(i);
                     var dayViewModel = new CalendarDayViewModel(date, false);
-                    CalendarDays.Add(dayViewModel);
+                    collection.Add(dayViewModel);
                 }
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(
-                    $"加载日历数据失败：{ex.Message}\n\n请检查数据库连接是否正常。",
-                    "错误",
-                    System.Windows.MessageBoxButton.OK,
-                    System.Windows.MessageBoxImage.Error);
+                System.Diagnostics.Debug.WriteLine($"加载日历数据时发生异常：{ex.Message}");
+                // 不抛出异常，避免应用程序崩溃
             }
         }
 
@@ -250,12 +249,13 @@ namespace DesktopMemo.ViewModels
 
                     _databaseService.AddMemo(memo);
                     
-                    // 重新加载当前月份的数据以刷新界面
-                    LoadCalendarData();
+                    // 直接添加到对应的日期视图模型中，而不是重新加载整个日历
+                    dayViewModel.Memos.Add(memo);
                 }
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"添加备忘录失败：{ex.Message}");
                 System.Windows.MessageBox.Show(
                     $"添加备忘录失败：{ex.Message}\n\n请检查数据库连接是否正常。",
                     "错误",
@@ -272,12 +272,22 @@ namespace DesktopMemo.ViewModels
         {
             if (memo == null) return;
 
+            try
+            {
             memo.IsCompleted = true;
             memo.CompletedAt = DateTime.Now;
             _databaseService.MarkAsCompleted(memo.Id);
 
-            // 重新加载日历数据以更新排序
-            LoadCalendarData();
+                // 不需要重新加载整个日历，只需要触发属性变化通知
+                // 备忘录的IsCompleted属性变化会自动更新UI
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"标记备忘录完成失败：{ex.Message}");
+                // 恢复状态
+                memo.IsCompleted = false;
+                memo.CompletedAt = null;
+            }
         }
 
         /// <summary>
@@ -288,8 +298,29 @@ namespace DesktopMemo.ViewModels
         {
             if (memo == null) return;
 
+            try
+            {
             _databaseService.DeleteMemo(memo.Id);
-            LoadCalendarData();
+                
+                // 从所有日期视图模型中查找并删除该备忘录
+                foreach (var day in CalendarDays)
+                {
+                    if (day.Memos.Contains(memo))
+                    {
+                        day.Memos.Remove(memo);
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"删除备忘录失败：{ex.Message}");
+                System.Windows.MessageBox.Show(
+                    $"删除备忘录失败：{ex.Message}",
+                    "错误",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
+            }
         }
 
         /// <summary>

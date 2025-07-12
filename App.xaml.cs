@@ -28,12 +28,28 @@ namespace DesktopMemo
         /// <param name="e">未处理异常事件参数</param>
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            var exception = e.ExceptionObject as Exception;
-            MessageBox.Show(
-                $"应用程序发生未处理的异常：\n{exception?.Message}\n\n详细信息：\n{exception?.StackTrace}",
-                "应用程序错误",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
+            try
+            {
+                var exception = e.ExceptionObject as Exception;
+                
+                // 记录异常信息到调试输出
+                System.Diagnostics.Debug.WriteLine($"应用程序域发生未处理异常：{exception?.Message}");
+                System.Diagnostics.Debug.WriteLine($"异常堆栈：{exception?.StackTrace}");
+                Console.WriteLine($"应用程序域异常：{exception?.Message}");
+                
+                // 检查是否为严重异常
+                if (e.IsTerminating)
+                {
+                    System.Diagnostics.Debug.WriteLine("应用程序即将终止");
+                    Console.WriteLine("应用程序即将终止");
+                }
+            }
+            catch (Exception ex)
+            {
+                // 如果异常处理过程中再次发生异常，只记录到调试输出
+                System.Diagnostics.Debug.WriteLine($"异常处理过程中发生错误：{ex.Message}");
+                Console.WriteLine($"异常处理失败：{ex.Message}");
+            }
         }
 
         /// <summary>
@@ -43,13 +59,50 @@ namespace DesktopMemo
         /// <param name="e">未处理异常事件参数</param>
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            MessageBox.Show(
-                $"应用程序发生异常：\n{e.Exception.Message}",
-                "应用程序错误",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-            
+            // 立即标记为已处理，防止异常传播
             e.Handled = true;
+            
+            try
+            {
+                // 记录异常信息到调试输出
+                System.Diagnostics.Debug.WriteLine($"应用程序发生异常：{e.Exception.Message}");
+                System.Diagnostics.Debug.WriteLine($"异常堆栈：{e.Exception.StackTrace}");
+                
+                // 检查是否为栈溢出异常
+                if (e.Exception is StackOverflowException)
+                {
+                    System.Diagnostics.Debug.WriteLine("检测到栈溢出异常，尝试恢复应用程序状态");
+                    return;
+                }
+                
+                // 使用简单的控制台输出而不是MessageBox，避免UI线程问题
+                Console.WriteLine($"应用程序发生异常：{e.Exception.Message}");
+                
+                // 如果是严重的异常，可以考虑关闭应用程序
+                if (e.Exception is OutOfMemoryException || e.Exception is StackOverflowException)
+                {
+                    System.Diagnostics.Debug.WriteLine("检测到严重异常，准备关闭应用程序");
+                    // 延迟关闭，避免在异常处理过程中直接关闭
+                    System.Windows.Threading.Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() =>
+                    {
+                        try
+                        {
+                            System.Windows.Application.Current.Shutdown();
+                        }
+                        catch
+                        {
+                            // 如果关闭失败，强制退出
+                            Environment.Exit(1);
+                        }
+                    }), System.Windows.Threading.DispatcherPriority.Background);
+                }
+            }
+            catch (Exception ex)
+            {
+                // 如果异常处理过程中再次发生异常，只记录到调试输出
+                System.Diagnostics.Debug.WriteLine($"异常处理过程中发生错误：{ex.Message}");
+                Console.WriteLine($"异常处理失败：{ex.Message}");
+            }
         }
 
         /// <summary>
