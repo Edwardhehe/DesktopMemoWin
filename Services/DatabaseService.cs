@@ -1,10 +1,10 @@
+using Dapper;
+using DesktopMemo.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
-using Dapper;
-using DesktopMemo.Models;
 
 namespace DesktopMemo.Services
 {
@@ -24,15 +24,15 @@ namespace DesktopMemo.Services
             // 数据库文件存储在用户文件夹
             var userFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             var appFolder = Path.Combine(userFolder, "DesktopMemo");
-            
+
             if (!Directory.Exists(appFolder))
             {
                 Directory.CreateDirectory(appFolder);
             }
-            
+
             _dbPath = Path.Combine(appFolder, "memo.db");
             _connectionString = $"Data Source={_dbPath};Version=3;";
-            
+
             InitializeDatabase();
         }
 
@@ -43,7 +43,7 @@ namespace DesktopMemo.Services
         {
             using var connection = new SQLiteConnection(_connectionString);
             connection.Open();
-            
+
             // 创建备忘录表
             var createTableSql = @"
                 CREATE TABLE IF NOT EXISTS MemoItems (
@@ -55,7 +55,7 @@ namespace DesktopMemo.Services
                     CompletedAt TEXT,
                     SortOrder INTEGER NOT NULL DEFAULT 0
                 )";
-            
+
             connection.Execute(createTableSql);
         }
 
@@ -71,13 +71,13 @@ namespace DesktopMemo.Services
                 using var connection = new SQLiteConnection(_connectionString);
                 connection.Open();
                 var dateStr = date.ToString("yyyy-MM-dd");
-                
+
                 var sql = @"
                     SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
                     FROM MemoItems 
                     WHERE Date = @Date 
                     ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC";
-                
+
                 var memos = connection.Query<MemoItemDto>(sql, new { Date = dateStr }).Select(dto => new MemoItem
                 {
                     Id = dto.Id,
@@ -88,7 +88,7 @@ namespace DesktopMemo.Services
                     CompletedAt = string.IsNullOrEmpty(dto.CompletedAt) ? null : DateTime.Parse(dto.CompletedAt),
                     SortOrder = dto.SortOrder
                 }).ToList();
-                
+
                 return memos;
             }
             catch (Exception ex)
@@ -107,11 +107,11 @@ namespace DesktopMemo.Services
             {
                 using var connection = new SQLiteConnection(_connectionString);
                 connection.Open();
-                
+
                 var sql = @"
                     INSERT INTO MemoItems (Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder)
                     VALUES (@Content, @Date, @IsCompleted, @CreatedAt, @CompletedAt, @SortOrder)";
-                
+
                 connection.Execute(sql, new
                 {
                     memo.Content,
@@ -135,13 +135,13 @@ namespace DesktopMemo.Services
         public void UpdateMemo(MemoItem memo)
         {
             using var connection = new SQLiteConnection(_connectionString);
-            
+
             var sql = @"
                 UPDATE MemoItems 
                 SET Content = @Content, Date = @Date, IsCompleted = @IsCompleted, 
                     CreatedAt = @CreatedAt, CompletedAt = @CompletedAt, SortOrder = @SortOrder
                 WHERE Id = @Id";
-            
+
             connection.Execute(sql, new
             {
                 memo.Id,
@@ -161,7 +161,7 @@ namespace DesktopMemo.Services
         public void DeleteMemo(int id)
         {
             using var connection = new SQLiteConnection(_connectionString);
-            
+
             var sql = "DELETE FROM MemoItems WHERE Id = @Id";
             connection.Execute(sql, new { Id = id });
         }
@@ -173,12 +173,12 @@ namespace DesktopMemo.Services
         public void MarkAsCompleted(int id)
         {
             using var connection = new SQLiteConnection(_connectionString);
-            
+
             var sql = @"
                 UPDATE MemoItems 
                 SET IsCompleted = 1, CompletedAt = @CompletedAt, SortOrder = (SELECT COALESCE(MAX(SortOrder), 0) + 1 FROM MemoItems)
                 WHERE Id = @Id";
-            
+
             connection.Execute(sql, new
             {
                 Id = id,
@@ -229,7 +229,7 @@ namespace DesktopMemo.Services
                 {
                     // 复制新数据库文件
                     File.Copy(sourcePath, _dbPath, true);
-                    
+
                     // 验证新数据库
                     if (!IsValidSQLiteDatabase(_dbPath))
                     {
@@ -322,11 +322,11 @@ namespace DesktopMemo.Services
                 var connectionString = $"Data Source={dbPath};Version=3;";
                 using var connection = new SQLiteConnection(connectionString);
                 connection.Open();
-                
+
                 // 检查表是否存在
                 var tableExists = connection.QueryFirstOrDefault<int>(
                     "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='MemoItems'");
-                
+
                 return tableExists > 0;
             }
             catch
@@ -345,7 +345,7 @@ namespace DesktopMemo.Services
                 // 强制垃圾回收，释放所有数据库连接
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
-                
+
                 // 重新初始化数据库
                 InitializeDatabase();
             }
@@ -369,4 +369,4 @@ namespace DesktopMemo.Services
         public string? CompletedAt { get; set; }
         public int SortOrder { get; set; }
     }
-} 
+}

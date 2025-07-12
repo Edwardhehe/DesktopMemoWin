@@ -1,9 +1,9 @@
+using DesktopMemo.Services;
+using DesktopMemo.ViewModels;
 using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
-using DesktopMemo.Services;
-using DesktopMemo.ViewModels;
 
 namespace DesktopMemo.Views
 {
@@ -26,19 +26,19 @@ namespace DesktopMemo.Views
         public MainWindow()
         {
             InitializeComponent();
-            
+
             _viewModel = new MainViewModel();
             DataContext = _viewModel;
-            
+
             // 初始化系统托盘服务
             _systemTrayService = new SystemTrayService();
-            
+
             // 订阅桌面可见性变化事件
             _viewModel.PropertyChanged += ViewModel_PropertyChanged;
-            
+
             // 窗口加载完成后初始化托盘
             Loaded += MainWindow_Loaded;
-            
+
             // 处理窗口关闭事件
             Closing += MainWindow_Closing;
         }
@@ -57,7 +57,7 @@ namespace DesktopMemo.Views
                 {
                     Show();
                     // 设置窗口为最顶层，但不使用Topmost属性
-                    SetWindowPos(new System.Windows.Interop.WindowInteropHelper(this).Handle, 
+                    SetWindowPos(new System.Windows.Interop.WindowInteropHelper(this).Handle,
                                 new IntPtr(-1), 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0004);
                 }
                 else
@@ -108,7 +108,7 @@ namespace DesktopMemo.Views
             {
                 // 停止桌面监控服务
                 _viewModel?.StopDesktopMonitoring();
-                
+
                 // 清理系统托盘资源
                 _systemTrayService?.Dispose();
             }
@@ -191,7 +191,7 @@ namespace DesktopMemo.Views
                 {
                     memo.Content = dialog.MemoContent;
                     memo.Date = dialog.MemoDate;
-                    
+
                     // 更新数据库
                     _viewModel?.GetDatabaseService()?.UpdateMemo(memo);
                 }
@@ -213,4 +213,4 @@ namespace DesktopMemo.Views
             // 窗口加载完成后的初始化操作
         }
     }
-} 
+}

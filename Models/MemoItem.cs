@@ -29,7 +29,7 @@ namespace DesktopMemo.Models
                 OnPropertyChanged();
             }
         }
-        
+
         /// <summary>
         /// 备忘录内容
         /// </summary>
@@ -42,7 +42,7 @@ namespace DesktopMemo.Models
                 OnPropertyChanged();
             }
         }
-        
+
         /// <summary>
         /// 备忘录日期
         /// </summary>
@@ -55,7 +55,7 @@ namespace DesktopMemo.Models
                 OnPropertyChanged();
             }
         }
-        
+
         /// <summary>
         /// 是否已完成
         /// </summary>
@@ -68,7 +68,7 @@ namespace DesktopMemo.Models
                 OnPropertyChanged();
             }
         }
-        
+
         /// <summary>
         /// 创建时间
         /// </summary>
@@ -81,7 +81,7 @@ namespace DesktopMemo.Models
                 OnPropertyChanged();
             }
         }
-        
+
         /// <summary>
         /// 完成时间
         /// </summary>
@@ -94,7 +94,7 @@ namespace DesktopMemo.Models
                 OnPropertyChanged();
             }
         }
-        
+
         /// <summary>
         /// 排序顺序
         /// </summary>
@@ -122,4 +122,4 @@ namespace DesktopMemo.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-} 
+}

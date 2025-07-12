@@ -1,6 +1,5 @@
 using Microsoft.Win32;
 using System;
-using System.IO;
 
 namespace DesktopMemo.Services
 {
@@ -62,4 +61,4 @@ namespace DesktopMemo.Services
             }
         }
     }
-} 
+}

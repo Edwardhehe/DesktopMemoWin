@@ -60,7 +60,7 @@ namespace DesktopMemo.Services
             try
             {
                 _cancellationTokenSource?.Cancel();
-                
+
                 // 等待任务完成，但设置超时时间
                 if (_monitoringTask != null)
                 {
@@ -92,7 +92,7 @@ namespace DesktopMemo.Services
                 try
                 {
                     bool isDesktopVisible = IsDesktopVisible();
-                    
+
                     if (isDesktopVisible != lastDesktopVisible)
                     {
                         lastDesktopVisible = isDesktopVisible;
@@ -127,7 +127,7 @@ namespace DesktopMemo.Services
 
                 // 获取当前活动窗口
                 IntPtr foregroundWindow = GetForegroundWindow();
-                
+
                 if (foregroundWindow == IntPtr.Zero)
                     return true;
 
@@ -145,7 +145,7 @@ namespace DesktopMemo.Services
 
                 // 检查当前窗口是否为系统窗口或桌面相关进程
                 GetWindowThreadProcessId(foregroundWindow, out uint processId);
-                
+
                 // 系统进程ID检查
                 if (processId == 0 || processId == 4) // System Idle Process 或 System
                     return true;
@@ -157,15 +157,15 @@ namespace DesktopMemo.Services
                     var windowText = new System.Text.StringBuilder(256);
                     GetWindowText(foregroundWindow, windowText, 256);
                     string title = windowText.ToString().ToLower();
-                    
-                    if (string.IsNullOrEmpty(title) || 
+
+                    if (string.IsNullOrEmpty(title) ||
                         title.Contains("desktop") ||
                         title.Contains("explorer") ||
                         title.Contains("program manager"))
                     {
                         return true;
                     }
-                    
+
                     return false;
                 }
 
@@ -192,7 +192,7 @@ namespace DesktopMemo.Services
                 string title = windowText.ToString().ToLower();
 
                 // 检查窗口标题是否包含桌面相关关键词
-                if (string.IsNullOrEmpty(title) || 
+                if (string.IsNullOrEmpty(title) ||
                     title.Contains("desktop") ||
                     title.Contains("explorer") ||
                     title.Contains("program manager") ||
@@ -215,4 +215,4 @@ namespace DesktopMemo.Services
 
 
     }
-} 
+}

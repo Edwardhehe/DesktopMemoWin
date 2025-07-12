@@ -12,7 +12,7 @@ namespace DesktopMemo.Views
         /// 备忘录内容
         /// </summary>
         public string MemoContent { get; private set; } = string.Empty;
-        
+
         /// <summary>
         /// 备忘录日期
         /// </summary>
@@ -26,17 +26,17 @@ namespace DesktopMemo.Views
         public MemoInputDialog(DateTime date, string existingContent = "")
         {
             InitializeComponent();
-            
+
             MemoDate = date;
             DateTextBlock.Text = $"日期：{date:yyyy年MM月dd日}";
-            
+
             // 如果有现有内容，设置为编辑模式
             if (!string.IsNullOrEmpty(existingContent))
             {
                 ContentTextBox.Text = existingContent;
                 Title = "编辑备忘录";
             }
-            
+
             // 设置焦点到文本框
             Loaded += (s, e) => ContentTextBox.Focus();
         }
@@ -87,8 +87,8 @@ namespace DesktopMemo.Views
             {
                 OkButton_Click(this, new RoutedEventArgs());
             }
-            
+
             base.OnKeyDown(e);
         }
     }
-} 
+}

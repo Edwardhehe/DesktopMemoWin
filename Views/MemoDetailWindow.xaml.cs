@@ -1,6 +1,6 @@
+using DesktopMemo.Models;
 using System;
 using System.Windows;
-using DesktopMemo.Models;
 
 namespace DesktopMemo.Views
 {
@@ -20,10 +20,10 @@ namespace DesktopMemo.Views
         public MemoDetailWindow(MemoItem memo, Action<MemoItem> editCallback = null)
         {
             InitializeComponent();
-            
+
             _memo = memo;
             _editCallback = editCallback;
-            
+
             LoadMemoDetails();
         }
 
@@ -36,17 +36,17 @@ namespace DesktopMemo.Views
 
             // 设置内容
             ContentTextBlock.Text = _memo.Content;
-            
+
             // 设置日期信息
             CreatedDateTextBlock.Text = _memo.CreatedAt.ToString("yyyy年MM月dd日 HH:mm:ss");
             MemoDateTextBlock.Text = _memo.Date.ToString("yyyy年MM月dd日");
-            
+
             // 设置状态信息
             if (_memo.IsCompleted)
             {
                 StatusTextBlock.Text = "已完成";
                 StatusTextBlock.Foreground = System.Windows.Media.Brushes.Green;
-                
+
                 if (_memo.CompletedAt.HasValue)
                 {
                     CompletedDateTextBlock.Text = $"完成时间：{_memo.CompletedAt.Value:yyyy年MM月dd日 HH:mm:ss}";
@@ -82,7 +82,7 @@ namespace DesktopMemo.Views
                     {
                         _memo.Content = dialog.MemoContent;
                         _memo.Date = dialog.MemoDate;
-                        
+
                         // 重新加载详情
                         LoadMemoDetails();
                     }
@@ -119,8 +119,8 @@ namespace DesktopMemo.Views
             {
                 EditButton_Click(this, new RoutedEventArgs());
             }
-            
+
             base.OnKeyDown(e);
         }
     }
-} 
+}

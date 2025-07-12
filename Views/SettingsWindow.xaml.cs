@@ -1,10 +1,9 @@
+using DesktopMemo.Services;
+using DesktopMemo.ViewModels;
+using Microsoft.Win32;
 using System;
 using System.IO;
 using System.Windows;
-using System.Windows.Media;
-using Microsoft.Win32;
-using DesktopMemo.ViewModels;
-using DesktopMemo.Services;
 
 namespace DesktopMemo.Views
 {
@@ -23,7 +22,7 @@ namespace DesktopMemo.Views
         public SettingsWindow(MainViewModel viewModel)
         {
             InitializeComponent();
-            
+
             _viewModel = viewModel;
             // 使用主视图模型中的数据库服务实例，确保数据一致性
             _databaseService = viewModel.GetDatabaseService();
@@ -81,9 +80,9 @@ namespace DesktopMemo.Views
         private void ImportDataButton_Click(object sender, RoutedEventArgs e)
         {
             var result = MessageBox.Show(
-                "导入数据将覆盖当前所有备忘录数据，是否继续？", 
-                "确认导入", 
-                MessageBoxButton.YesNo, 
+                "导入数据将覆盖当前所有备忘录数据，是否继续？",
+                "确认导入",
+                MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
@@ -101,13 +100,13 @@ namespace DesktopMemo.Views
                     {
                         // 导入数据库
                         _databaseService.ImportDatabase(openFileDialog.FileName);
-                        
+
                         // 重新加载数据库连接
                         _databaseService.ReloadDatabase();
-                        
+
                         // 刷新主界面数据
                         _viewModel.RefreshCalendarData();
-                        
+
                         MessageBox.Show("数据导入成功！界面已刷新。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     catch (Exception ex)
@@ -126,9 +125,9 @@ namespace DesktopMemo.Views
         private void ClearDataButton_Click(object sender, RoutedEventArgs e)
         {
             var result = MessageBox.Show(
-                "清空数据将删除所有备忘录，此操作不可恢复，是否继续？", 
-                "确认清空", 
-                MessageBoxButton.YesNo, 
+                "清空数据将删除所有备忘录，此操作不可恢复，是否继续？",
+                "确认清空",
+                MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
@@ -141,13 +140,13 @@ namespace DesktopMemo.Views
                     {
                         File.Delete(dbPath);
                     }
-                    
+
                     // 重新初始化数据库连接
                     _databaseService.ReloadDatabase();
-                    
+
                     // 刷新主界面数据
                     _viewModel.RefreshCalendarData();
-                    
+
                     MessageBox.Show("数据清空成功！界面已刷新。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
@@ -179,4 +178,4 @@ namespace DesktopMemo.Views
             Close();
         }
     }
-} 
+}

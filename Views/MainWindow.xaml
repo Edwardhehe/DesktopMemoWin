@@ -5,7 +5,7 @@
         x:Name="MemoWindow"
         Title="桌面备忘录" 
         Height="750" 
-        Width="800"
+        Width="850"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
@@ -15,44 +15,14 @@
         Top="0">
     
     <Window.Resources>
-        <!-- 自定义滚动条样式 -->
-        <Style x:Key="ThinScrollBarStyle" TargetType="ScrollBar">
-            <Setter Property="Width" Value="6"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ScrollBar">
-                        <Grid>
-                            <Border Background="#E0E0E0" CornerRadius="3" Opacity="0.5"/>
-                            <Track x:Name="PART_Track" IsDirectionReversed="True">
-                                <Track.Thumb>
-                                    <Thumb Style="{StaticResource ThinScrollBarThumb}"/>
-                                </Track.Thumb>
-                            </Track>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
         
-        <Style x:Key="ThinScrollBarThumb" TargetType="Thumb">
-            <Setter Property="Background" Value="#C0C0C0"/>
-            <Setter Property="Width" Value="4"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Thumb">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="2"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
         
         <!-- 日历格子样式 -->
         <Style x:Key="CalendarDayStyle" TargetType="Border">
             <Setter Property="BorderBrush" Value="#E0E0E0"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Background" Value="White"/>
-            <Setter Property="Margin" Value="1"/>
+            <Setter Property="Margin" Value="0"/>
             <Setter Property="MinHeight" Value="120"/>
             <Setter Property="CornerRadius" Value="6"/>
             <Style.Triggers>
@@ -129,7 +99,7 @@
             </Grid.RowDefinitions>
             
             <!-- 标题栏 -->
-            <Border Grid.Row="0" CornerRadius="12,12,0,0" Height="50">
+            <Border Grid.Row="0" CornerRadius="12,12,0,0" Height="30">
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                         <GradientStop Color="#F8F9FA" Offset="0"/>
@@ -148,10 +118,10 @@
                     </StackPanel>
                     
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
-                        <Button Content="◀" Command="{Binding PreviousMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="35" Height="30" Margin="3" ToolTip="上个月"/>
-                        <Button Content="▶" Command="{Binding NextMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="35" Height="30" Margin="3" ToolTip="下个月"/>
-                        <Button Content="⚙" Click="SettingsButton_Click" Style="{StaticResource ModernButtonStyle}" Width="35" Height="30" Margin="3" ToolTip="设置"/>
-                        <Button Content="✕" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="35" Height="30" Margin="3" ToolTip="关闭"/>
+                        <Button Content="◀" Command="{Binding PreviousMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="30" Height="25" Margin="3" ToolTip="上个月"/>
+                        <Button Content="▶" Command="{Binding NextMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="30" Height="25" Margin="3" ToolTip="下个月"/>
+                        <Button Content="⚙" Click="SettingsButton_Click" Style="{StaticResource ModernButtonStyle}" Width="35" Height="25" Margin="3" ToolTip="设置"/>
+                        <Button Content="✕" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="30" Height="25" Margin="3" ToolTip="关闭"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -212,7 +182,7 @@
                                                    Foreground="{Binding IsCurrentMonth, Converter={StaticResource BoolToForegroundConverter}}"/>
                                         
                                         <!-- 备忘录列表 -->
-                                        <Grid Grid.Row="1" Margin="5">
+                                        <Grid Grid.Row="1" Margin="2">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="*"/>
                                                 <RowDefinition Height="Auto"/>
@@ -220,9 +190,23 @@
                                             
                                             <!-- 备忘录条目 -->
                                             <ScrollViewer Grid.Row="0" 
-                                                          VerticalScrollBarVisibility="Auto" 
+                                                          VerticalScrollBarVisibility="Visible" 
                                                           HorizontalScrollBarVisibility="Disabled"
                                                           MaxHeight="70">
+                                                <ScrollViewer.Resources>
+                                                    <Style TargetType="ScrollBar">
+                                                        <Setter Property="Width" Value="6"/>
+                                                        <Setter Property="Background" Value="#E0E0E0"/>
+                                                        <Setter Property="BorderBrush" Value="#C0C0C0"/>
+                                                        <Setter Property="BorderThickness" Value="1"/>
+                                                        <Setter Property="Opacity" Value="0.6"/>
+                                                        <Style.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Opacity" Value="1"/>
+                                                            </Trigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </ScrollViewer.Resources>
                                                 <ItemsControl ItemsSource="{Binding Memos}">
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
@@ -246,7 +230,7 @@
                                                                                Text="{Binding Content, Converter={StaticResource TextTruncateConverter}, ConverterParameter=8}" 
                                                                                TextWrapping="NoWrap" 
                                                                                TextTrimming="CharacterEllipsis"
-                                                                               FontSize="10"
+                                                                               FontSize="9"
                                                                                VerticalAlignment="Center"
                                                                                ToolTip="{Binding Content}"
                                                                                TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToTextDecorationConverter}}"/>
@@ -255,11 +239,11 @@
                                                                             Content="✓" 
                                                                             Command="{Binding DataContext.MarkCompletedCommand, Source={x:Reference MemoWindow}}" 
                                                                             CommandParameter="{Binding}"
-                                                                            Width="20" 
-                                                                            Height="20" 
-                                                                            FontSize="10" 
+                                                                            Width="11" 
+                                                                            Height="11" 
+                                                                            FontSize="8" 
                                                                             Margin="4,0,0,0"
-                                                                            Background="#28A745"
+                                                                            Background="LightBlue"
                                                                             Foreground="White"
                                                                             BorderThickness="0"
                                                                             ToolTip="标记为完成"
@@ -289,7 +273,7 @@
                                                     FontSize="14" 
                                                     FontWeight="Bold"
                                                     Margin="0,2,0,0"
-                                                    Background="#007ACC"
+                                                    Background="LightBlue"
                                                     Foreground="White"
                                                     BorderThickness="0"
                                                     ToolTip="添加新备忘录"

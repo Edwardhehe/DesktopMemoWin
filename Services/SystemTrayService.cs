@@ -1,15 +1,13 @@
+using DesktopMemo.ViewModels;
+using DesktopMemo.Views;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
-using DesktopMemo.Views;
-using DesktopMemo.ViewModels;
-using FontStyle = System.Drawing.FontStyle;
 using Application = System.Windows.Application;
+using FontStyle = System.Drawing.FontStyle;
 
 namespace DesktopMemo.Services
 {
@@ -45,7 +43,7 @@ namespace DesktopMemo.Services
                 lock (_instances)
                 {
                     var instancesToCleanup = _instances.ToList(); // 创建副本避免并发修改
-                    
+
                     foreach (var instance in instancesToCleanup)
                     {
                         try
@@ -86,7 +84,7 @@ namespace DesktopMemo.Services
 
             // 创建右键菜单
             var contextMenu = new ContextMenuStrip();
-            
+
             // 显示/隐藏主窗口
             var toggleItem = new ToolStripMenuItem("显示/隐藏备忘录")
             {
@@ -142,13 +140,13 @@ namespace DesktopMemo.Services
             using (var graphics = Graphics.FromImage(bitmap))
             {
                 graphics.Clear(Color.Transparent);
-                
+
                 // 绘制一个简单的备忘录图标
                 using (var brush = new SolidBrush(Color.FromArgb(0, 122, 204)))
                 {
                     graphics.FillRectangle(brush, 2, 2, 12, 12);
                 }
-                
+
                 using (var pen = new Pen(Color.White, 1))
                 {
                     graphics.DrawLine(pen, 4, 5, 12, 5);
@@ -381,7 +379,7 @@ namespace DesktopMemo.Services
                     {
                         _instances.Remove(this);
                     }
-                    
+
                     if (_notifyIcon != null)
                     {
                         _notifyIcon.Visible = false;
@@ -408,4 +406,4 @@ namespace DesktopMemo.Services
             Dispose(false);
         }
     }
-} 
+}

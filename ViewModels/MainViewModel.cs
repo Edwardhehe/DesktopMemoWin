@@ -1,11 +1,10 @@
+using DesktopMemo.Models;
+using DesktopMemo.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using DesktopMemo.Models;
-using DesktopMemo.Services;
 
 namespace DesktopMemo.ViewModels
 {
@@ -248,7 +247,7 @@ namespace DesktopMemo.ViewModels
                     };
 
                     _databaseService.AddMemo(memo);
-                    
+
                     // 直接添加到对应的日期视图模型中，而不是重新加载整个日历
                     dayViewModel.Memos.Add(memo);
                 }
@@ -274,9 +273,9 @@ namespace DesktopMemo.ViewModels
 
             try
             {
-            memo.IsCompleted = true;
-            memo.CompletedAt = DateTime.Now;
-            _databaseService.MarkAsCompleted(memo.Id);
+                memo.IsCompleted = true;
+                memo.CompletedAt = DateTime.Now;
+                _databaseService.MarkAsCompleted(memo.Id);
 
                 // 不需要重新加载整个日历，只需要触发属性变化通知
                 // 备忘录的IsCompleted属性变化会自动更新UI
@@ -300,8 +299,8 @@ namespace DesktopMemo.ViewModels
 
             try
             {
-            _databaseService.DeleteMemo(memo.Id);
-                
+                _databaseService.DeleteMemo(memo.Id);
+
                 // 从所有日期视图模型中查找并删除该备忘录
                 foreach (var day in CalendarDays)
                 {
@@ -473,4 +472,4 @@ namespace DesktopMemo.ViewModels
 
         public void Execute(object? parameter) => _execute((T?)parameter);
     }
-} 
+}

@@ -194,7 +194,7 @@ namespace DesktopMemo.Converters
                         return app.Resources[styleKey];
                     }
                 }
-                
+
                 // 如果找不到样式，返回缓存的默认样式
                 return boolValue ? GetCompletedMemoStyle() : GetNormalMemoStyle();
             }
@@ -235,7 +235,7 @@ namespace DesktopMemo.Converters
         private static Style CreateDefaultStyle(bool isCompleted)
         {
             var style = new Style(typeof(Border));
-            
+
             if (isCompleted)
             {
                 style.Setters.Add(new Setter(Border.BackgroundProperty, new SolidColorBrush(Color.FromRgb(232, 245, 232))));
@@ -246,12 +246,12 @@ namespace DesktopMemo.Converters
                 style.Setters.Add(new Setter(Border.BackgroundProperty, new SolidColorBrush(Color.FromRgb(248, 249, 250))));
                 style.Setters.Add(new Setter(Border.BorderBrushProperty, new SolidColorBrush(Color.FromRgb(209, 213, 219))));
             }
-            
+
             style.Setters.Add(new Setter(Border.BorderThicknessProperty, new Thickness(1)));
             style.Setters.Add(new Setter(Border.MarginProperty, new Thickness(2)));
             style.Setters.Add(new Setter(Border.PaddingProperty, new Thickness(6)));
             style.Setters.Add(new Setter(Border.CornerRadiusProperty, new CornerRadius(4)));
-            
+
             return style;
         }
 
@@ -367,13 +367,13 @@ namespace DesktopMemo.Converters
                 {
                     maxLength = paramLength;
                 }
-                
+
                 // 如果文本长度超过最大长度，则截断并添加省略号
                 if (text.Length > maxLength)
                 {
                     return text.Substring(0, maxLength) + "...";
                 }
-                
+
                 return text;
             }
             return value ?? string.Empty;
@@ -392,4 +392,4 @@ namespace DesktopMemo.Converters
             throw new NotImplementedException();
         }
     }
-} 
+}

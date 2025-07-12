@@ -15,7 +15,7 @@ namespace DesktopMemo
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            
+
             // 设置应用程序异常处理
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             DispatcherUnhandledException += App_DispatcherUnhandledException;
@@ -31,12 +31,12 @@ namespace DesktopMemo
             try
             {
                 var exception = e.ExceptionObject as Exception;
-                
+
                 // 记录异常信息到调试输出
                 System.Diagnostics.Debug.WriteLine($"应用程序域发生未处理异常：{exception?.Message}");
                 System.Diagnostics.Debug.WriteLine($"异常堆栈：{exception?.StackTrace}");
                 Console.WriteLine($"应用程序域异常：{exception?.Message}");
-                
+
                 // 检查是否为严重异常
                 if (e.IsTerminating)
                 {
@@ -61,23 +61,23 @@ namespace DesktopMemo
         {
             // 立即标记为已处理，防止异常传播
             e.Handled = true;
-            
+
             try
             {
                 // 记录异常信息到调试输出
                 System.Diagnostics.Debug.WriteLine($"应用程序发生异常：{e.Exception.Message}");
                 System.Diagnostics.Debug.WriteLine($"异常堆栈：{e.Exception.StackTrace}");
-                
+
                 // 检查是否为栈溢出异常
                 if (e.Exception is StackOverflowException)
                 {
                     System.Diagnostics.Debug.WriteLine("检测到栈溢出异常，尝试恢复应用程序状态");
                     return;
                 }
-                
+
                 // 使用简单的控制台输出而不是MessageBox，避免UI线程问题
                 Console.WriteLine($"应用程序发生异常：{e.Exception.Message}");
-                
+
                 // 如果是严重的异常，可以考虑关闭应用程序
                 if (e.Exception is OutOfMemoryException || e.Exception is StackOverflowException)
                 {
@@ -116,7 +116,7 @@ namespace DesktopMemo
                 // 清理事件订阅
                 AppDomain.CurrentDomain.UnhandledException -= CurrentDomain_UnhandledException;
                 DispatcherUnhandledException -= App_DispatcherUnhandledException;
-                
+
                 // 清理系统托盘资源
                 Services.SystemTrayService.CleanupAll();
             }
@@ -131,4 +131,4 @@ namespace DesktopMemo
             }
         }
     }
-} 
+}
