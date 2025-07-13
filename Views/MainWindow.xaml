@@ -36,7 +36,7 @@
             <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Margin" Value="1"/>
             <Setter Property="MinHeight" Value="95"/>
-            <Setter Property="Padding" Value="4"/>
+            <Setter Property="Padding" Value="3"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#99E3F2FD"/>
@@ -52,7 +52,7 @@
             <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Margin" Value="1"/>
             <Setter Property="MinHeight" Value="95"/>
-            <Setter Property="Padding" Value="4"/>
+            <Setter Property="Padding" Value="3"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#CCE3F2FD"/>
@@ -90,7 +90,7 @@
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="CornerRadius" Value="4"/>
             <Setter Property="Margin" Value="1"/>
-            <Setter Property="Padding" Value="3"/>
+            <Setter Property="Padding" Value="2"/>
             <Setter Property="Opacity" Value="0.7"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Style.Triggers>
@@ -113,7 +113,7 @@
             <Setter Property="Background" Value="#66FFFFFF"/>
             <Setter Property="BorderBrush" Value="#00FFFFFF"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Padding" Value="4,4"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
@@ -207,7 +207,7 @@
                                         Opacity="{Binding IsCurrentMonth, Converter={StaticResource BoolToOpacityConverter}}">
                                     <Grid>
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="auto"/>
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
                                         
