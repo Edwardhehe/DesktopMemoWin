@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.IO;
+using System.Windows.Threading;
 
 namespace DesktopMemo.ViewModels
 {
@@ -18,6 +19,7 @@ namespace DesktopMemo.ViewModels
         private readonly DatabaseService _databaseService;
         private readonly DesktopMonitorService _desktopMonitorService;
         private readonly StartupService _startupService;
+        private readonly DispatcherTimer _dateCheckTimer;
 
         private DateTime _currentMonth;
         private bool _isDesktopVisible;
@@ -124,6 +126,7 @@ namespace DesktopMemo.ViewModels
         public void StopDesktopMonitoring()
         {
             _desktopMonitorService?.StopMonitoring();
+            _dateCheckTimer?.Stop();
         }
 
         /// <summary>
@@ -171,6 +174,12 @@ namespace DesktopMemo.ViewModels
 
             // 开始监控桌面状态
             _desktopMonitorService.StartMonitoring();
+
+            // 初始化日期检查定时器
+            _dateCheckTimer = new DispatcherTimer();
+            _dateCheckTimer.Interval = TimeSpan.FromHours(1); // 每小时检查一次
+            _dateCheckTimer.Tick += OnDateCheckTimerTick;
+            _dateCheckTimer.Start();
 
             // 加载日历数据
             LoadCalendarData();
@@ -435,6 +444,43 @@ namespace DesktopMemo.ViewModels
         private void OnDesktopVisibilityChanged(object? sender, bool isVisible)
         {
             IsDesktopVisible = isVisible;
+        }
+
+        /// <summary>
+        /// 日期检查定时器Tick事件处理
+        /// </summary>
+        private void OnDateCheckTimerTick(object? sender, EventArgs e)
+        {
+            // 检查是否需要更新今天的日期状态
+            UpdateTodayStatus();
+            
+            // 如果月份发生变化，更新当前月份
+            if (DateTime.Now.Month != _currentMonth.Month)
+            {
+                CurrentMonth = DateTime.Now;
+            }
+        }
+
+        /// <summary>
+        /// 更新所有日期格子的今天状态
+        /// </summary>
+        private void UpdateTodayStatus()
+        {
+            var today = DateTime.Today;
+            foreach (var day in CalendarDays)
+            {
+                var wasToday = day.IsToday;
+                day.IsToday = day.Date.Date == today;
+                
+                // 如果今天状态发生变化，触发属性变化通知
+                if (wasToday != day.IsToday)
+                {
+                    // 通过重新设置属性来触发通知
+                    var temp = day.IsToday;
+                    day.IsToday = false;
+                    day.IsToday = temp;
+                }
+            }
         }
 
         /// <summary>
