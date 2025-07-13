@@ -154,6 +154,29 @@ namespace DesktopMemo.Views
             }
         }
 
+        /// <summary>
+        /// 日期行点击事件
+        /// </summary>
+        /// <param name="sender">事件发送者</param>
+        /// <param name="e">鼠标按钮事件参数</param>
+        private void DateRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is FrameworkElement element && element.Tag is ViewModels.CalendarDayViewModel dayViewModel)
+            {
+                try
+                {
+                    // 创建当天待办事项窗口
+                    var dailyTasksWindow = new DailyTasksWindow(dayViewModel.Date, _viewModel);
+                    dailyTasksWindow.Show();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"打开当天待办事项窗口时发生异常：{ex.Message}");
+                    MessageBox.Show($"打开当天待办事项失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
 
 
         /// <summary>

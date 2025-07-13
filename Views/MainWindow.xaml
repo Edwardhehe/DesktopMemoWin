@@ -5,7 +5,7 @@
         x:Name="MemoWindow"
         Title="桌面备忘录" 
         Height="800" 
-        Width="850"
+        Width="750"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
@@ -243,14 +243,17 @@
                                                 </Button.Template>
                                             </Button>
                                         
-                                        <!-- 日期数字 -->
+                                                                                <!-- 日期数字 -->
                                             <TextBlock Grid.Column="2" 
                                                    Text="{Binding Date.Day}" 
                                                    HorizontalAlignment="Right" 
                                                        FontSize="11"
-                                                       Margin="0,0,2,0"
-                                                       FontWeight="{Binding IsToday, Converter={StaticResource BoolToFontWeightConverter}}"
-                                                       Foreground="{Binding IsToday, Converter={StaticResource TodayForegroundConverter}}"/>
+                                                   Margin="0,0,2,0"
+                                                   FontWeight="{Binding IsToday, Converter={StaticResource BoolToFontWeightConverter}}"
+                                                   Foreground="{Binding IsToday, Converter={StaticResource TodayForegroundConverter}}"
+                                                   MouseLeftButtonDown="DateRow_MouseLeftButtonDown"
+                                                   Tag="{Binding}"
+                                                   Cursor="Hand"/>
                                         </Grid>
                                         
                                         <!-- 备忘录列表 -->
