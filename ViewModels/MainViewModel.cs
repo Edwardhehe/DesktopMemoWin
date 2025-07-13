@@ -111,6 +111,11 @@ namespace DesktopMemo.ViewModels
         public ICommand MarkCompletedCommand { get; }
 
         /// <summary>
+        /// 标记未完成命令
+        /// </summary>
+        public ICommand MarkUncompletedCommand { get; }
+
+        /// <summary>
         /// 删除备忘录命令
         /// </summary>
         public ICommand DeleteMemoCommand { get; }
@@ -166,6 +171,7 @@ namespace DesktopMemo.ViewModels
             NextMonthCommand = new RelayCommand(NextMonth);
             AddMemoCommand = new RelayCommand<CalendarDayViewModel>(AddMemo);
             MarkCompletedCommand = new RelayCommand<MemoItem>(MarkCompleted);
+            MarkUncompletedCommand = new RelayCommand<MemoItem>(MarkUncompleted);
             DeleteMemoCommand = new RelayCommand<MemoItem>(DeleteMemo);
             ShowMemoDetailCommand = new RelayCommand<MemoItem>(ShowMemoDetail);
 
@@ -314,6 +320,20 @@ namespace DesktopMemo.ViewModels
                 memo.IsCompleted = false;
                 memo.CompletedAt = null;
             }
+        }
+
+        /// <summary>
+        /// 标记为未完成
+        /// </summary>
+        private void MarkUncompleted(MemoItem? memo)
+        {
+            if (memo == null) return;
+            memo.IsCompleted = false;
+            _databaseService.UpdateMemo(memo);
+            // 重新排序，未完成的排前面
+            ReorderMemosInDay(memo);
+            // 通知UI刷新
+            OnPropertyChanged(nameof(CalendarDays));
         }
 
         /// <summary>

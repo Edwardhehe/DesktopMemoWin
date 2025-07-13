@@ -5,127 +5,218 @@
         Height="400" 
         Width="500"
         WindowStartupLocation="CenterOwner"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
     
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Window.Resources>
+        <!-- 阴影效果 -->
+        <DropShadowEffect x:Key="DropShadowEffect" 
+                          Color="Black" 
+                          Direction="270" 
+                          ShadowDepth="3" 
+                          BlurRadius="10" 
+                          Opacity="0.3"/>
         
-        <!-- 标题 -->
-        <TextBlock Grid.Row="0" 
-                   Text="桌面备忘录设置" 
-                   FontSize="18" 
-                   FontWeight="Bold" 
-                   Margin="0,0,0,20"/>
+        <!-- 按钮样式 -->
+        <Style x:Key="ModernButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#66FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#00FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#99E3F2FD"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         
-        <!-- 设置内容 -->
-        <ScrollViewer Grid.Row="1" 
-                      VerticalScrollBarVisibility="Auto">
-            <StackPanel>
-                <!-- 开机启动设置 -->
-                <GroupBox Header="启动设置" Margin="0,0,0,20">
-                    <StackPanel Margin="10">
-                        <CheckBox Content="开机自动启动" 
-                                  IsChecked="{Binding IsStartupEnabled}" 
-                                  Margin="0,5"/>
-                        <TextBlock Text="启用后，系统启动时会自动运行桌面备忘录" 
-                                   FontSize="11" 
-                                   Foreground="#666666" 
-                                   Margin="20,0,0,10"/>
-                    </StackPanel>
-                </GroupBox>
-                
-                <!-- 外观设置 -->
-                <GroupBox Header="外观设置" Margin="0,0,0,20">
-                    <StackPanel Margin="10">
-                        <StackPanel Orientation="Horizontal" Margin="0,5">
-                            <TextBlock Text="背景颜色：" 
-                                       VerticalAlignment="Center" 
-                                       Width="80"/>
-                            <Rectangle Width="30" 
-                                       Height="20" 
-                                       Fill="{Binding BackgroundColor}" 
-                                       Stroke="#CCCCCC" 
-                                       StrokeThickness="1" 
-                                       Margin="0,0,10,0"/>
-                            <Button Content="选择颜色" 
-                                    Click="BackgroundColorButton_Click" 
-                                    Width="80" 
-                                    Height="25"/>
+        <!-- 主要按钮样式 -->
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#4A90E2"/>
+            <Setter Property="BorderBrush" Value="#00FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#5A9FE2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- GroupBox样式 -->
+        <Style x:Key="ModernGroupBoxStyle" TargetType="GroupBox">
+            <Setter Property="Background" Value="#66FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#00FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Margin" Value="0,0,0,15"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" 
+                                           Text="{TemplateBinding Header}" 
+                                           FontWeight="Bold" 
+                                           FontSize="13" 
+                                           Foreground="#2D3748" 
+                                           Margin="0,0,0,10"/>
+                                <ContentPresenter Grid.Row="1" 
+                                                  Content="{TemplateBinding Content}"/>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
+    <Border Background="#AAFFFFFF" CornerRadius="18" BorderBrush="#00FFFFFF" BorderThickness="0" Effect="{StaticResource DropShadowEffect}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <!-- 标题栏 -->
+            <Border Grid.Row="0" CornerRadius="14,14,0,0" Height="34" Background="#66FFFFFF" BorderBrush="#00FFFFFF" BorderThickness="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="⚙ 设置" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" Margin="15,0" Foreground="#2D3748"/>
+                    <Button Grid.Column="1" Content="✕" Click="CancelButton_Click" Style="{StaticResource ModernButtonStyle}" Width="30" Height="25" Margin="0,0,15,0" ToolTip="关闭"/>
+                </Grid>
+            </Border>
+            
+            <!-- 设置内容 -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="15">
+                <StackPanel>
+                    <!-- 开机启动设置 -->
+                    <GroupBox Header="启动设置" Style="{StaticResource ModernGroupBoxStyle}">
+                        <StackPanel>
+                            <CheckBox Content="开机自动启动" 
+                                      IsChecked="{Binding IsStartupEnabled}" 
+                                      Margin="0,5" 
+                                      FontSize="12" 
+                                      Foreground="#495057"/>
+                            <TextBlock Text="启用后，系统启动时会自动运行桌面备忘录" 
+                                       FontSize="11" 
+                                       Foreground="#718096" 
+                                       Margin="20,0,0,10"/>
                         </StackPanel>
-                        <TextBlock Text="设置日历的背景颜色" 
-                                   FontSize="11" 
-                                   Foreground="#666666" 
-                                   Margin="0,0,0,10"/>
-                    </StackPanel>
-                </GroupBox>
-                
-                <!-- 数据管理 -->
-                <GroupBox Header="数据管理" Margin="0,0,0,20">
-                    <StackPanel Margin="10">
-                        <StackPanel Orientation="Horizontal" Margin="0,5">
-                            <Button Content="导出数据" 
-                                    Click="ExportDataButton_Click" 
-                                    Width="80" 
-                                    Height="25" 
-                                    Margin="0,0,10,0"/>
-                            <Button Content="导入数据" 
-                                    Click="ImportDataButton_Click" 
-                                    Width="80" 
-                                    Height="25" 
-                                    Margin="0,0,10,0"/>
-                            <Button Content="清空数据" 
-                                    Click="ClearDataButton_Click" 
-                                    Width="80" 
-                                    Height="25"/>
+                    </GroupBox>
+                    
+                    <!-- 数据管理 -->
+                    <GroupBox Header="数据管理" Style="{StaticResource ModernGroupBoxStyle}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,5">
+                                <Button Content="导出数据" 
+                                        Click="ExportDataButton_Click" 
+                                        Style="{StaticResource ModernButtonStyle}"
+                                        Width="80" 
+                                        Height="25" 
+                                        Margin="0,0,10,0"/>
+                                <Button Content="导入数据" 
+                                        Click="ImportDataButton_Click" 
+                                        Style="{StaticResource ModernButtonStyle}"
+                                        Width="80" 
+                                        Height="25" 
+                                        Margin="0,0,10,0"/>
+                                <Button Content="清空数据" 
+                                        Click="ClearDataButton_Click" 
+                                        Style="{StaticResource ModernButtonStyle}"
+                                        Width="80" 
+                                        Height="25"/>
+                            </StackPanel>
+                            <TextBlock Text="导出数据可以将备忘录备份到其他位置，导入数据可以从备份文件恢复备忘录" 
+                                       FontSize="11" 
+                                       Foreground="#718096" 
+                                       TextWrapping="Wrap" 
+                                       Margin="0,0,0,10"/>
                         </StackPanel>
-                        <TextBlock Text="导出数据可以将备忘录备份到其他位置，导入数据可以从备份文件恢复备忘录" 
-                                   FontSize="11" 
-                                   Foreground="#666666" 
-                                   TextWrapping="Wrap" 
-                                   Margin="0,0,0,10"/>
-                    </StackPanel>
-                </GroupBox>
-                
-                <!-- 关于 -->
-                <GroupBox Header="关于" Margin="0,0,0,20">
-                    <StackPanel Margin="10">
-                        <TextBlock Text="桌面备忘录 v1.0.0" 
-                                   FontWeight="Bold" 
-                                   Margin="0,5"/>
-                        <TextBlock Text="一个简单的桌面背景备忘录软件" 
-                                   FontSize="11" 
-                                   Foreground="#666666" 
-                                   Margin="0,0,0,5"/>
-                        <TextBlock Text="技术栈：.NET 8 WPF + SQLite" 
-                                   FontSize="11" 
-                                   Foreground="#666666" 
-                                   Margin="0,0,0,5"/>
-                        <TextBlock Text="支持Windows 10及以上系统" 
-                                   FontSize="11" 
-                                   Foreground="#666666"/>
-                    </StackPanel>
-                </GroupBox>
-            </StackPanel>
-        </ScrollViewer>
-        
-        <!-- 按钮区域 -->
-        <StackPanel Grid.Row="2" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Right" 
-                    Margin="0,20,0,0">
-            <Button Content="确定" 
-                    Click="OkButton_Click" 
-                    Width="80" 
-                    Height="30" 
-                    Margin="0,0,10,0"/>
-            <Button Content="取消" 
-                    Click="CancelButton_Click" 
-                    Width="80" 
-                    Height="30"/>
-        </StackPanel>
-    </Grid>
+                    </GroupBox>
+                    
+                    <!-- 关于 -->
+                    <GroupBox Header="关于" Style="{StaticResource ModernGroupBoxStyle}">
+                        <StackPanel>
+                            <TextBlock Text="桌面备忘录 v1.0.0" 
+                                       FontWeight="Bold" 
+                                       FontSize="13"
+                                       Foreground="#2D3748"
+                                       Margin="0,5"/>
+                            <TextBlock Text="一个简单的桌面背景备忘录软件" 
+                                       FontSize="11" 
+                                       Foreground="#718096" 
+                                       Margin="0,0,0,5"/>
+                            <TextBlock Text="技术栈：.NET 8 WPF + SQLite" 
+                                       FontSize="11" 
+                                       Foreground="#718096" 
+                                       Margin="0,0,0,5"/>
+                            <TextBlock Text="支持Windows 10及以上系统" 
+                                       FontSize="11" 
+                                       Foreground="#718096"/>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </ScrollViewer>
+            
+            <!-- 按钮区域 -->
+            <Border Grid.Row="2" CornerRadius="0,0,14,14" Height="34" Background="#66FFFFFF" BorderBrush="#00FFFFFF" BorderThickness="0">
+                <StackPanel Orientation="Horizontal" 
+                            HorizontalAlignment="Right" 
+                            VerticalAlignment="Center"
+                            Margin="0,0,15,0">
+                    <Button Content="确定" 
+                            Click="OkButton_Click" 
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Width="80" 
+                            Height="25" 
+                            Margin="0,0,10,0"/>
+                    <Button Content="取消" 
+                            Click="CancelButton_Click" 
+                            Style="{StaticResource ModernButtonStyle}"
+                            Width="80" 
+                            Height="25"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
 </Window> 

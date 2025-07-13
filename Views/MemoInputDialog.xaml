@@ -6,139 +6,143 @@
         Width="400"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="White">
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
     
-    <Border Background="White" 
-            CornerRadius="8" 
-            BorderBrush="#E0E0E0" 
-            BorderThickness="1">
-        <Grid Margin="20">
+    <Window.Resources>
+        <!-- 阴影效果 -->
+        <DropShadowEffect x:Key="DropShadowEffect" 
+                          Color="Black" 
+                          Direction="270" 
+                          ShadowDepth="3" 
+                          BlurRadius="10" 
+                          Opacity="0.3"/>
+        
+        <!-- 按钮样式 -->
+        <Style x:Key="ModernButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#66FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#00FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#99E3F2FD"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- 主要按钮样式 -->
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#4A90E2"/>
+            <Setter Property="BorderBrush" Value="#00FFFFFF"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#5A9FE2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
+    <Border Background="#AAFFFFFF" CornerRadius="18" BorderBrush="#00FFFFFF" BorderThickness="0" Effect="{StaticResource DropShadowEffect}">
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             
-            <!-- 标题 -->
-            <TextBlock Grid.Row="0" 
-                       Text="添加新备忘录" 
-                       FontSize="16" 
-                       FontWeight="Bold" 
-                       Foreground="#333333"
-                       Margin="0,0,0,15"/>
+            <!-- 标题栏 -->
+            <Border Grid.Row="0" CornerRadius="14,14,0,0" Height="34" Background="#66FFFFFF" BorderBrush="#00FFFFFF" BorderThickness="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="✏ 添加新备忘录" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" Margin="15,0" Foreground="#2D3748"/>
+                    <Button Grid.Column="1" Content="✕" Click="CancelButton_Click" Style="{StaticResource ModernButtonStyle}" Width="30" Height="25" Margin="0,0,15,0" ToolTip="关闭"/>
+                </Grid>
+            </Border>
             
-            <!-- 输入区域 -->
-            <StackPanel Grid.Row="1">
-                <TextBlock Text="备忘录内容：" 
-                           FontSize="12" 
-                           Foreground="#666666" 
-                           Margin="0,0,0,5"/>
-                <TextBox x:Name="ContentTextBox" 
-                         Height="80" 
-                         TextWrapping="Wrap" 
-                         AcceptsReturn="True"
-                         VerticalScrollBarVisibility="Auto"
-                         Background="#F8F8F8"
-                         BorderBrush="#D0D0D0"
-                         BorderThickness="1"
-                         Padding="8"
-                         FontSize="12"/>
-            </StackPanel>
-            
-            <!-- 日期显示 -->
-            <TextBlock Grid.Row="2" 
-                       x:Name="DateTextBlock"
-                       FontSize="11" 
-                       Foreground="#888888" 
-                       Margin="0,10,0,0"
-                       HorizontalAlignment="Center"/>
+            <!-- 内容区域 -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="15">
+                <StackPanel>
+                    <!-- 输入区域 -->
+                    <StackPanel>
+                        <TextBlock Text="备忘录内容：" 
+                                   FontSize="12" 
+                                   Foreground="#495057" 
+                                   Margin="0,0,0,5"/>
+                        <TextBox x:Name="ContentTextBox" 
+                                 Height="80" 
+                                 TextWrapping="Wrap" 
+                                 AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto"
+                                 Background="White"
+                                 BorderBrush="#D1D5DB"
+                                 BorderThickness="1"
+                                 Padding="8"
+                                 FontSize="12"
+                                 Foreground="#2D3748"/>
+                    </StackPanel>
+                    
+                    <!-- 日期显示 -->
+                    <TextBlock x:Name="DateTextBlock"
+                               FontSize="11" 
+                               Foreground="#718096" 
+                               Margin="0,10,0,0"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </ScrollViewer>
             
             <!-- 按钮区域 -->
-            <StackPanel Grid.Row="3" 
-                        Orientation="Horizontal" 
-                        HorizontalAlignment="Right" 
-                        Margin="0,15,0,0">
-                <Button Content="确定" 
-                        Click="OkButton_Click" 
-                        Width="80" 
-                        Height="32" 
-                        Margin="0,0,10,0"
-                        Background="#007ACC"
-                        Foreground="White"
-                        BorderThickness="0"
-                        FontSize="12"
-                        Cursor="Hand">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Background" Value="#007ACC"/>
-                            <Setter Property="Foreground" Value="White"/>
-                            <Setter Property="BorderThickness" Value="0"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border Background="{TemplateBinding Background}"
-                                                CornerRadius="4"
-                                                Padding="{TemplateBinding Padding}">
-                                            <ContentPresenter HorizontalAlignment="Center"
-                                                              VerticalAlignment="Center"/>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="#005A9E"/>
-                                            </Trigger>
-                                            <Trigger Property="IsPressed" Value="True">
-                                                <Setter Property="Background" Value="#004578"/>
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </Button.Style>
-                </Button>
-                <Button Content="取消" 
-                        Click="CancelButton_Click" 
-                        Width="80" 
-                        Height="32"
-                        Background="#F0F0F0"
-                        Foreground="#333333"
-                        BorderBrush="#D0D0D0"
-                        BorderThickness="1"
-                        FontSize="12"
-                        Cursor="Hand">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Setter Property="Background" Value="#F0F0F0"/>
-                            <Setter Property="Foreground" Value="#333333"/>
-                            <Setter Property="BorderBrush" Value="#D0D0D0"/>
-                            <Setter Property="BorderThickness" Value="1"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border Background="{TemplateBinding Background}"
-                                                BorderBrush="{TemplateBinding BorderBrush}"
-                                                BorderThickness="{TemplateBinding BorderThickness}"
-                                                CornerRadius="4"
-                                                Padding="{TemplateBinding Padding}">
-                                            <ContentPresenter HorizontalAlignment="Center"
-                                                              VerticalAlignment="Center"/>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="#E0E0E0"/>
-                                            </Trigger>
-                                            <Trigger Property="IsPressed" Value="True">
-                                                <Setter Property="Background" Value="#D0D0D0"/>
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </Button.Style>
-                </Button>
-            </StackPanel>
+            <Border Grid.Row="2" CornerRadius="0,0,14,14" Height="34" Background="#66FFFFFF" BorderBrush="#00FFFFFF" BorderThickness="0">
+                <StackPanel Orientation="Horizontal" 
+                            HorizontalAlignment="Right" 
+                            VerticalAlignment="Center"
+                            Margin="0,0,15,0">
+                    <Button Content="确定" 
+                            Click="OkButton_Click" 
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Width="80" 
+                            Height="25" 
+                            Margin="0,0,10,0"/>
+                    <Button Content="取消" 
+                            Click="CancelButton_Click" 
+                            Style="{StaticResource ModernButtonStyle}"
+                            Width="80" 
+                            Height="25"/>
+                </StackPanel>
+            </Border>
         </Grid>
     </Border>
 </Window> 
