@@ -9,7 +9,7 @@ namespace DesktopMemo.Testing
     /// </summary>
     public class TestStartup
     {
-        public static void Main(string[] args)
+        public static void RunTest(string[] args)
         {
             Console.WriteLine("桌面备忘录 - 开机启动功能测试");
             Console.WriteLine("================================");

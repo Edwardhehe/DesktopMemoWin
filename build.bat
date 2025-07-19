@@ -6,15 +6,15 @@ if exist bin rmdir /s /q bin
 if exist obj rmdir /s /q obj
 
 REM 还原NuGet包
-dotnet restore
+dotnet restore DesktopMemo.csproj
 
 REM 构建应用程序
-dotnet build -c Release
+dotnet build DesktopMemo.csproj -c Release
 
 if %ERRORLEVEL% EQU 0 (
     echo 构建成功！
-    echo 可执行文件位置: bin\Release\net8.0-windows\DesktopMemo.exe
+    echo 可执行文件位置: bin\Release\net8.0-windows\win-x64\DesktopMemo.exe
 ) else (
     echo 构建失败！
     pause
-) 
+)
