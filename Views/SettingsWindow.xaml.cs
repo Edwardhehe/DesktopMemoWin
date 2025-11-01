@@ -107,6 +107,9 @@ namespace DesktopMemo.Views
                         // 刷新主界面数据
                         _viewModel.RefreshCalendarData();
 
+                        // 通知所有打开的窗口刷新数据
+                        NotifyAllWindowsRefresh();
+
                         MessageBox.Show("数据导入成功！界面已刷新。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     catch (Exception ex)
@@ -147,6 +150,9 @@ namespace DesktopMemo.Views
                     // 刷新主界面数据
                     _viewModel.RefreshCalendarData();
 
+                    // 通知所有打开的窗口刷新数据
+                    NotifyAllWindowsRefresh();
+
                     MessageBox.Show("数据清空成功！界面已刷新。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
@@ -176,6 +182,29 @@ namespace DesktopMemo.Views
         {
             DialogResult = false;
             Close();
+        }
+
+        /// <summary>
+        /// 通知所有打开的窗口刷新数据
+        /// </summary>
+        private void NotifyAllWindowsRefresh()
+        {
+            try
+            {
+                // 遍历所有打开的窗口
+                foreach (Window window in System.Windows.Application.Current.Windows)
+                {
+                    if (window is DailyTasksWindow dailyTasksWindow)
+                    {
+                        // 通知DailyTasksWindow刷新
+                        dailyTasksWindow.RefreshData();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"通知窗口刷新时发生异常：{ex.Message}");
+            }
         }
     }
 }

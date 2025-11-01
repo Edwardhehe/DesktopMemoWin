@@ -256,17 +256,8 @@ namespace DesktopMemo.Views
                     // 更新数据库
                     _databaseService.UpdateMemo(memo);
 
-                    // 刷新主界面（同时刷新原日期和新日期）
-                    if (oldDate.Date != memo.Date.Date)
-                    {
-                        // 日期发生了变化，使用专门的刷新方法
-                        _mainViewModel.RefreshMemoDateChange(oldDate, memo.Date);
-                    }
-                    else
-                    {
-                        // 日期没变，只刷新当前日期
-                        _mainViewModel.RefreshCalendar();
-                    }
+                    // 强制刷新主界面和当天任务
+                    _mainViewModel.RefreshCalendar();
 
                     // 重新加载当天待办事项
                     LoadDailyTasks();
@@ -329,8 +320,9 @@ namespace DesktopMemo.Views
             try
             {
                 memo.IsCompleted = true;
-                _databaseService.UpdateMemo(memo);
-                
+                memo.CompletedAt = DateTime.Now;
+                _databaseService.MarkAsCompleted(memo.Id);
+
                 // 重新排序当日待办事项
                 ReorderDailyMemos();
                 
@@ -423,18 +415,34 @@ namespace DesktopMemo.Views
         }
 
         /// <summary>
+        /// 刷新窗口数据（公共方法供外部调用）
+        /// </summary>
+        public void RefreshData()
+        {
+            try
+            {
+                // 重新加载当天任务
+                LoadDailyTasks();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"刷新DailyTasksWindow数据时发生异常：{ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// 窗口关闭事件
         /// </summary>
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-            
+
             // 取消订阅事件
             foreach (var memo in _dailyMemos)
             {
                 memo.PropertyChanged -= OnMemoPropertyChanged;
             }
-            
+
             // 清理资源
             _dailyMemos?.Clear();
         }

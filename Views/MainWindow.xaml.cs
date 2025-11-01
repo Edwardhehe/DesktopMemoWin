@@ -221,19 +221,14 @@ namespace DesktopMemo.Views
                     // 更新数据库
                     _viewModel?.GetDatabaseService()?.UpdateMemo(memo);
 
-                    // 刷新日历显示（同时刷新原日期和新日期）
+                    // 强制刷新主界面和通知所有窗口
                     if (_viewModel != null)
                     {
-                        if (oldDate.Date != memo.Date.Date)
-                        {
-                            // 日期发生了变化，使用专门的刷新方法
-                            _viewModel.RefreshMemoDateChange(oldDate, memo.Date);
-                        }
-                        else
-                        {
-                            // 日期没变，只刷新当前日期
-                            _viewModel.RefreshCalendar();
-                        }
+                        // 强制刷新主界面
+                        _viewModel.RefreshCalendar();
+
+                        // 通知所有打开的窗口刷新
+                        NotifyAllWindowsRefresh();
                     }
                 }
             }
@@ -252,6 +247,29 @@ namespace DesktopMemo.Views
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // 窗口加载完成后的初始化操作
+        }
+
+        /// <summary>
+        /// 通知所有打开的窗口刷新数据
+        /// </summary>
+        private void NotifyAllWindowsRefresh()
+        {
+            try
+            {
+                // 遍历所有打开的窗口
+                foreach (Window window in System.Windows.Application.Current.Windows)
+                {
+                    if (window is DailyTasksWindow dailyTasksWindow)
+                    {
+                        // 通知DailyTasksWindow刷新
+                        dailyTasksWindow.RefreshData();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"通知窗口刷新时发生异常：{ex.Message}");
+            }
         }
     }
 }

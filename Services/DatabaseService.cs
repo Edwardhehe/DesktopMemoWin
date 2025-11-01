@@ -174,15 +174,31 @@ namespace DesktopMemo.Services
         {
             using var connection = new SQLiteConnection(_connectionString);
 
-            var sql = @"
-                UPDATE MemoItems 
-                SET IsCompleted = 1, CompletedAt = @CompletedAt, SortOrder = (SELECT COALESCE(MAX(SortOrder), 0) + 1 FROM MemoItems)
+            // 先获取该备忘录的日期信息
+            var memoSql = "SELECT Date FROM MemoItems WHERE Id = @Id";
+            var memoDate = connection.QueryFirstOrDefault<string>(memoSql, new { Id = id });
+
+            if (string.IsNullOrEmpty(memoDate))
+                return;
+
+            // 获取该日期下已完成项目的最大SortOrder
+            var maxOrderSql = @"
+                SELECT COALESCE(MAX(SortOrder), 0)
+                FROM MemoItems
+                WHERE Date = @Date AND IsCompleted = 1";
+            var maxOrder = connection.QueryFirstOrDefault<int>(maxOrderSql, new { Date = memoDate });
+
+            // 更新备忘录状态和排序
+            var updateSql = @"
+                UPDATE MemoItems
+                SET IsCompleted = 1, CompletedAt = @CompletedAt, SortOrder = @MaxOrder + 1
                 WHERE Id = @Id";
 
-            connection.Execute(sql, new
+            connection.Execute(updateSql, new
             {
                 Id = id,
-                CompletedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+                CompletedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                MaxOrder = maxOrder
             });
         }
 

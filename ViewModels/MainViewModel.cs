@@ -179,11 +179,21 @@ namespace DesktopMemo.ViewModels
                     var memos = _databaseService.GetMemosByDate(date);
                     System.Diagnostics.Debug.WriteLine($"从数据库获取到 {memos.Count} 个备忘录");
 
+                    // 完全重新创建Memos集合，确保数据绑定正确更新
+                    var newMemos = new ObservableCollection<MemoItem>(memos);
                     dayViewModel.Memos.Clear();
-                    foreach (var memo in memos)
+
+                    // 强制通知属性变更
+                    dayViewModel.OnPropertyChanged(nameof(dayViewModel.Memos));
+
+                    // 重新添加备忘录
+                    foreach (var memo in newMemos)
                     {
                         dayViewModel.Memos.Add(memo);
                     }
+
+                    // 再次通知属性变更，确保UI更新
+                    dayViewModel.OnPropertyChanged(nameof(dayViewModel.Memos));
 
                     System.Diagnostics.Debug.WriteLine($"刷新完成，现在有 {dayViewModel.Memos.Count} 个备忘录");
                 }
@@ -718,7 +728,7 @@ namespace DesktopMemo.ViewModels
         /// 触发属性变化事件
         /// </summary>
         /// <param name="propertyName">属性名</param>
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        public virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

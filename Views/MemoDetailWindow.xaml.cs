@@ -88,22 +88,32 @@ namespace DesktopMemo.Views
                         _memo.Content = dialog.MemoContent;
                         _memo.Date = dialog.MemoDate;
 
+                        // 更新数据库
+                        try
+                        {
+                            var databaseService = _mainViewModel?.GetDatabaseService();
+                            if (databaseService != null)
+                            {
+                                databaseService.UpdateMemo(_memo);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"更新备忘录到数据库失败：{ex.Message}");
+                            MessageBox.Show($"更新备忘录失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+
                         // 重新加载详情
                         LoadMemoDetails();
 
-                        // 通知主界面更新（同时刷新原日期和新日期）
+                        // 强制刷新所有界面
                         if (_mainViewModel != null)
                         {
-                            if (oldDate.Date != _memo.Date.Date)
-                            {
-                                // 日期发生了变化，使用专门的刷新方法
-                                _mainViewModel.RefreshMemoDateChange(oldDate, _memo.Date);
-                            }
-                            else
-                            {
-                                // 日期没变，只刷新当前日期
-                                _mainViewModel.RefreshCalendar();
-                            }
+                            // 强制刷新主界面
+                            _mainViewModel.RefreshCalendar();
+
+                            // 通知所有打开的窗口刷新
+                            NotifyAllWindowsRefresh();
                         }
                     }
                 }
@@ -141,6 +151,29 @@ namespace DesktopMemo.Views
             }
 
             base.OnKeyDown(e);
+        }
+
+        /// <summary>
+        /// 通知所有打开的窗口刷新数据
+        /// </summary>
+        private void NotifyAllWindowsRefresh()
+        {
+            try
+            {
+                // 遍历所有打开的窗口
+                foreach (Window window in System.Windows.Application.Current.Windows)
+                {
+                    if (window is DailyTasksWindow dailyTasksWindow)
+                    {
+                        // 通知DailyTasksWindow刷新
+                        dailyTasksWindow.RefreshData();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"通知窗口刷新时发生异常：{ex.Message}");
+            }
         }
     }
 }

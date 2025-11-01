@@ -273,9 +273,13 @@
                                                             </Border.InputBindings>
                                                                 <Border.ContextMenu>
                                                                     <ContextMenu>
-                                                                        <MenuItem Header="删除备忘录" 
+                                                                        <MenuItem Header="删除备忘录"
                                                                                   Command="{Binding DataContext.DeleteMemoCommand, Source={x:Reference MemoWindow}}"
                                                                                   CommandParameter="{Binding}"/>
+                                                                        <MenuItem Header="标记为已完成"
+                                                                                  Command="{Binding DataContext.MarkCompletedCommand, Source={x:Reference MemoWindow}}"
+                                                                                  CommandParameter="{Binding}"
+                                                                                  Visibility="{Binding IsCompleted, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                                                                         <MenuItem Header="标记为未完成"
                                                                                   Command="{Binding DataContext.MarkUncompletedCommand, Source={x:Reference MemoWindow}}"
                                                                                   CommandParameter="{Binding}"
