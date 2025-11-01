@@ -218,7 +218,7 @@ namespace DesktopMemo.Views
                 {
                     try
                     {
-                        var detailWindow = new MemoDetailWindow(memo, EditMemoCallback);
+                        var detailWindow = new MemoDetailWindow(memo, EditMemoCallback, _mainViewModel);
                         detailWindow.Owner = this;
                         detailWindow.Topmost = true; // 设置为最上层
                         detailWindow.ShowDialog();
@@ -245,6 +245,7 @@ namespace DesktopMemo.Views
         {
             try
             {
+                var oldDate = memo.Date; // 保存原日期
                 var dialog = new MemoInputDialog(memo.Date, memo.Content, this);
                 dialog.Topmost = true; // 设置为最上层
                 if (dialog.ShowDialog() == true)
@@ -254,10 +255,19 @@ namespace DesktopMemo.Views
 
                     // 更新数据库
                     _databaseService.UpdateMemo(memo);
-                    
-                    // 刷新主界面
-                    _mainViewModel.RefreshCalendarData();
-                    
+
+                    // 刷新主界面（同时刷新原日期和新日期）
+                    if (oldDate.Date != memo.Date.Date)
+                    {
+                        // 日期发生了变化，使用专门的刷新方法
+                        _mainViewModel.RefreshMemoDateChange(oldDate, memo.Date);
+                    }
+                    else
+                    {
+                        // 日期没变，只刷新当前日期
+                        _mainViewModel.RefreshCalendar();
+                    }
+
                     // 重新加载当天待办事项
                     LoadDailyTasks();
                 }

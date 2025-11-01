@@ -102,25 +102,38 @@
                                    FontSize="12" 
                                    Foreground="#495057" 
                                    Margin="0,0,0,5"/>
-                        <TextBox x:Name="ContentTextBox" 
-                                 Height="80" 
-                                 TextWrapping="Wrap" 
-                                 AcceptsReturn="True"
-                                 VerticalScrollBarVisibility="Auto"
-                                 Background="White"
-                                 BorderBrush="#D1D5DB"
-                                 BorderThickness="1"
-                                 Padding="8"
-                                 FontSize="12"
-                                 Foreground="#2D3748"/>
+                        <RichTextBox x:Name="ContentRichTextBox"
+                                     Height="80"
+                                     VerticalScrollBarVisibility="Auto"
+                                     Background="White"
+                                     BorderBrush="#D1D5DB"
+                                     BorderThickness="1"
+                                     Padding="8"
+                                     FontSize="12"
+                                     Foreground="#2D3748"
+                                     AcceptsReturn="True"
+                                     KeyDown="ContentRichTextBox_KeyDown">
+                            <FlowDocument>
+                                <Paragraph x:Name="ContentParagraph"/>
+                            </FlowDocument>
+                        </RichTextBox>
                     </StackPanel>
                     
-                    <!-- 日期显示 -->
-                    <TextBlock x:Name="DateTextBlock"
-                               FontSize="11" 
-                               Foreground="#718096" 
-                               Margin="0,10,0,0"
-                               HorizontalAlignment="Center"/>
+                    <!-- 日期选择 -->
+                    <StackPanel Orientation="Horizontal"
+                                Margin="0,10,0,0"
+                                HorizontalAlignment="Center">
+                        <TextBlock Text="备忘录日期："
+                                   FontSize="11"
+                                   Foreground="#718096"
+                                   VerticalAlignment="Center"/>
+                        <DatePicker x:Name="DatePicker"
+                                    FontSize="11"
+                                    BorderBrush="#D1D5DB"
+                                    BorderThickness="1"
+                                    Padding="2"
+                                    VerticalAlignment="Center"/>
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
             

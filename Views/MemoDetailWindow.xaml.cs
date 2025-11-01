@@ -1,4 +1,5 @@
 using DesktopMemo.Models;
+using DesktopMemo.ViewModels;
 using System;
 using System.Windows;
 
@@ -11,18 +12,21 @@ namespace DesktopMemo.Views
     {
         private MemoItem _memo;
         private Action<MemoItem> _editCallback;
+        private MainViewModel _mainViewModel;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="memo">备忘录对象</param>
         /// <param name="editCallback">编辑回调函数</param>
-        public MemoDetailWindow(MemoItem memo, Action<MemoItem> editCallback = null)
+        /// <param name="mainViewModel">主视图模型</param>
+        public MemoDetailWindow(MemoItem memo, Action<MemoItem> editCallback = null, MainViewModel mainViewModel = null)
         {
             InitializeComponent();
 
             _memo = memo;
             _editCallback = editCallback;
+            _mainViewModel = mainViewModel;
 
             LoadMemoDetails();
         }
@@ -77,6 +81,7 @@ namespace DesktopMemo.Views
                 else
                 {
                     // 如果没有提供编辑回调，打开编辑对话框
+                    var oldDate = _memo.Date; // 保存原日期
                     var dialog = new MemoInputDialog(_memo.Date, _memo.Content, this.Owner);
                     if (dialog.ShowDialog() == true)
                     {
@@ -85,6 +90,21 @@ namespace DesktopMemo.Views
 
                         // 重新加载详情
                         LoadMemoDetails();
+
+                        // 通知主界面更新（同时刷新原日期和新日期）
+                        if (_mainViewModel != null)
+                        {
+                            if (oldDate.Date != _memo.Date.Date)
+                            {
+                                // 日期发生了变化，使用专门的刷新方法
+                                _mainViewModel.RefreshMemoDateChange(oldDate, _memo.Date);
+                            }
+                            else
+                            {
+                                // 日期没变，只刷新当前日期
+                                _mainViewModel.RefreshCalendar();
+                            }
+                        }
                     }
                 }
             }

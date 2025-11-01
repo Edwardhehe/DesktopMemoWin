@@ -152,6 +152,93 @@ namespace DesktopMemo.ViewModels
         }
 
         /// <summary>
+        /// 刷新日历数据
+        /// </summary>
+        public void RefreshCalendar()
+        {
+            LoadCalendarData();
+        }
+
+        /// <summary>
+        /// 刷新指定日期的日历数据
+        /// </summary>
+        /// <param name="date">要刷新的日期</param>
+        public void RefreshDate(DateTime date)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"刷新日期：{date:yyyy-MM-dd}");
+
+                // 找到指定日期的日历项
+                var dayViewModel = CalendarDays.FirstOrDefault(d => d.Date.Date == date.Date);
+                if (dayViewModel != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"找到日期视图模型，当前有 {dayViewModel.Memos.Count} 个备忘录");
+
+                    // 重新加载该日期的备忘录
+                    var memos = _databaseService.GetMemosByDate(date);
+                    System.Diagnostics.Debug.WriteLine($"从数据库获取到 {memos.Count} 个备忘录");
+
+                    dayViewModel.Memos.Clear();
+                    foreach (var memo in memos)
+                    {
+                        dayViewModel.Memos.Add(memo);
+                    }
+
+                    System.Diagnostics.Debug.WriteLine($"刷新完成，现在有 {dayViewModel.Memos.Count} 个备忘录");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"未找到日期 {date:yyyy-MM-dd} 的视图模型");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"刷新指定日期时发生异常：{ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 刷新备忘录日期变更（原日期和新日期）
+        /// </summary>
+        /// <param name="oldDate">原日期</param>
+        /// <param name="newDate">新日期</param>
+        public void RefreshMemoDateChange(DateTime oldDate, DateTime newDate)
+        {
+            System.Diagnostics.Debug.WriteLine($"刷新备忘录日期变更：从 {oldDate:yyyy-MM-dd} 到 {newDate:yyyy-MM-dd}");
+
+            // 刷新原日期和新日期的日历显示
+            RefreshDate(oldDate);
+            RefreshDate(newDate);
+
+            // 如果新旧日期不在同一个月，刷新整个日历
+            if (oldDate.Year != newDate.Year || oldDate.Month != newDate.Month)
+            {
+                System.Diagnostics.Debug.WriteLine($"日期跨月变更，刷新整个日历");
+                // 检查是否需要切换月份
+                if (newDate.Year == CurrentMonth.Year && newDate.Month == CurrentMonth.Month)
+                {
+                    // 新日期在当前月，不需要切换月份
+                    LoadCalendarData();
+                }
+                else if (oldDate.Year == CurrentMonth.Year && oldDate.Month == CurrentMonth.Month)
+                {
+                    // 原日期在当前月，新日期不在当前月，刷新即可
+                    LoadCalendarData();
+                }
+                else
+                {
+                    // 都不在当前月，也刷新一下确保数据一致性
+                    LoadCalendarData();
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"日期在同一月内变更");
+            }
+        }
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         public MainViewModel()

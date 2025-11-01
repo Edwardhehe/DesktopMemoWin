@@ -191,7 +191,7 @@ namespace DesktopMemo.Views
             {
                 try
                 {
-                    var detailWindow = new Views.MemoDetailWindow(memo, EditMemoCallback);
+                    var detailWindow = new Views.MemoDetailWindow(memo, EditMemoCallback, _viewModel);
                     detailWindow.Owner = this;
                     detailWindow.ShowDialog();
                 }
@@ -211,6 +211,7 @@ namespace DesktopMemo.Views
         {
             try
             {
+                var oldDate = memo.Date; // 保存原日期
                 var dialog = new Views.MemoInputDialog(memo.Date, memo.Content, this);
                 if (dialog.ShowDialog() == true)
                 {
@@ -219,6 +220,21 @@ namespace DesktopMemo.Views
 
                     // 更新数据库
                     _viewModel?.GetDatabaseService()?.UpdateMemo(memo);
+
+                    // 刷新日历显示（同时刷新原日期和新日期）
+                    if (_viewModel != null)
+                    {
+                        if (oldDate.Date != memo.Date.Date)
+                        {
+                            // 日期发生了变化，使用专门的刷新方法
+                            _viewModel.RefreshMemoDateChange(oldDate, memo.Date);
+                        }
+                        else
+                        {
+                            // 日期没变，只刷新当前日期
+                            _viewModel.RefreshCalendar();
+                        }
+                    }
                 }
             }
             catch (Exception ex)
