@@ -135,6 +135,7 @@ namespace DesktopMemo.Services
         public void UpdateMemo(MemoItem memo)
         {
             using var connection = new SQLiteConnection(_connectionString);
+            connection.Open();
 
             var sql = @"
                 UPDATE MemoItems 
@@ -161,6 +162,7 @@ namespace DesktopMemo.Services
         public void DeleteMemo(int id)
         {
             using var connection = new SQLiteConnection(_connectionString);
+            connection.Open();
 
             var sql = "DELETE FROM MemoItems WHERE Id = @Id";
             connection.Execute(sql, new { Id = id });
@@ -173,6 +175,7 @@ namespace DesktopMemo.Services
         public void MarkAsCompleted(int id)
         {
             using var connection = new SQLiteConnection(_connectionString);
+            connection.Open();
 
             // 先获取该备忘录的日期信息
             var memoSql = "SELECT Date FROM MemoItems WHERE Id = @Id";

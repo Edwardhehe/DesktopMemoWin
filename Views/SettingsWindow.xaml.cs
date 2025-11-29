@@ -105,7 +105,7 @@ namespace DesktopMemo.Views
                         _databaseService.ReloadDatabase();
 
                         // 刷新主界面数据
-                        _viewModel.RefreshCalendarData();
+                        _viewModel.RefreshCalendar();
 
                         // 通知所有打开的窗口刷新数据
                         NotifyAllWindowsRefresh();
@@ -148,7 +148,7 @@ namespace DesktopMemo.Views
                     _databaseService.ReloadDatabase();
 
                     // 刷新主界面数据
-                    _viewModel.RefreshCalendarData();
+                    _viewModel.RefreshCalendar();
 
                     // 通知所有打开的窗口刷新数据
                     NotifyAllWindowsRefresh();

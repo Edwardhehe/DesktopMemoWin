@@ -80,40 +80,33 @@ namespace DesktopMemo.Views
                 }
                 else
                 {
-                    // 如果没有提供编辑回调，打开编辑对话框
-                    var oldDate = _memo.Date; // 保存原日期
+                    // 打开编辑对话框
                     var dialog = new MemoInputDialog(_memo.Date, _memo.Content, this.Owner);
                     if (dialog.ShowDialog() == true)
                     {
-                        _memo.Content = dialog.MemoContent;
-                        _memo.Date = dialog.MemoDate;
-
-                        // 更新数据库
                         try
                         {
                             var databaseService = _mainViewModel?.GetDatabaseService();
                             if (databaseService != null)
                             {
+                                // 更新备忘录数据
+                                _memo.Content = dialog.MemoContent;
+                                _memo.Date = dialog.MemoDate;
                                 databaseService.UpdateMemo(_memo);
+
+                                // 刷新详情
+                                LoadMemoDetails();
+
+                                // 刷新主界面
+                                _mainViewModel?.RefreshCalendar();
+
+                                // 通知所有窗口刷新
+                                NotifyAllWindowsRefresh();
                             }
                         }
                         catch (Exception ex)
                         {
-                            System.Diagnostics.Debug.WriteLine($"更新备忘录到数据库失败：{ex.Message}");
                             MessageBox.Show($"更新备忘录失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-
-                        // 重新加载详情
-                        LoadMemoDetails();
-
-                        // 强制刷新所有界面
-                        if (_mainViewModel != null)
-                        {
-                            // 强制刷新主界面
-                            _mainViewModel.RefreshCalendar();
-
-                            // 通知所有打开的窗口刷新
-                            NotifyAllWindowsRefresh();
                         }
                     }
                 }
@@ -151,6 +144,15 @@ namespace DesktopMemo.Views
             }
 
             base.OnKeyDown(e);
+        }
+
+        /// <summary>
+        /// 窗口关闭事件
+        /// </summary>
+        /// <param name="e">事件参数</param>
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
         }
 
         /// <summary>

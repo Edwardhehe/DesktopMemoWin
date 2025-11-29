@@ -135,14 +135,6 @@ namespace DesktopMemo.ViewModels
         }
 
         /// <summary>
-        /// 刷新日历数据
-        /// </summary>
-        public void RefreshCalendarData()
-        {
-            LoadCalendarData();
-        }
-
-        /// <summary>
         /// 获取数据库服务实例
         /// </summary>
         /// <returns>数据库服务实例</returns>
@@ -179,21 +171,17 @@ namespace DesktopMemo.ViewModels
                     var memos = _databaseService.GetMemosByDate(date);
                     System.Diagnostics.Debug.WriteLine($"从数据库获取到 {memos.Count} 个备忘录");
 
-                    // 完全重新创建Memos集合，确保数据绑定正确更新
-                    var newMemos = new ObservableCollection<MemoItem>(memos);
+                    // 优化集合操作：减少UI更新次数
                     dayViewModel.Memos.Clear();
 
-                    // 强制通知属性变更
-                    dayViewModel.OnPropertyChanged(nameof(dayViewModel.Memos));
-
-                    // 重新添加备忘录
-                    foreach (var memo in newMemos)
+                    // 批量添加新备忘录
+                    foreach (var memo in memos)
                     {
                         dayViewModel.Memos.Add(memo);
                     }
 
-                    // 再次通知属性变更，确保UI更新
-                    dayViewModel.OnPropertyChanged(nameof(dayViewModel.Memos));
+                    // 通知UI更新（只需要一次通知）
+                    dayViewModel.NotifyPropertyChanged(nameof(dayViewModel.Memos));
 
                     System.Diagnostics.Debug.WriteLine($"刷新完成，现在有 {dayViewModel.Memos.Count} 个备忘录");
                 }
@@ -295,6 +283,8 @@ namespace DesktopMemo.ViewModels
         {
             try
             {
+                System.Diagnostics.Debug.WriteLine("开始重新加载日历数据");
+
                 // 暂停UI更新以提高性能
                 var collection = CalendarDays;
                 collection.Clear();
@@ -328,6 +318,11 @@ namespace DesktopMemo.ViewModels
                     var dayViewModel = new CalendarDayViewModel(date, false);
                     collection.Add(dayViewModel);
                 }
+
+                // 强制通知UI更新
+                OnPropertyChanged(nameof(CalendarDays));
+
+                System.Diagnostics.Debug.WriteLine($"日历数据重新加载完成，共 {collection.Count} 个日期格子");
             }
             catch (Exception ex)
             {
@@ -608,9 +603,19 @@ namespace DesktopMemo.ViewModels
         {
             try
             {
+                // 确保配置目录存在
+                var configDir = Path.GetDirectoryName(_configPath);
+                if (!string.IsNullOrEmpty(configDir) && !Directory.Exists(configDir))
+                {
+                    Directory.CreateDirectory(configDir);
+                }
+
                 File.WriteAllText(_configPath, color);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"保存配置文件失败: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -624,7 +629,10 @@ namespace DesktopMemo.ViewModels
                 if (File.Exists(_configPath))
                     return File.ReadAllText(_configPath).Trim();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"读取配置文件失败: {ex.Message}");
+            }
             return "#FFFFFF";
         }
 
@@ -640,6 +648,15 @@ namespace DesktopMemo.ViewModels
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// <summary>
+        /// 公开的属性变更通知方法（供外部调用）
+        /// </summary>
+        /// <param name="propertyName">属性名</param>
+        public void NotifyPropertyChanged(string? propertyName = null)
+        {
+            OnPropertyChanged(propertyName);
         }
     }
 
@@ -728,9 +745,18 @@ namespace DesktopMemo.ViewModels
         /// 触发属性变化事件
         /// </summary>
         /// <param name="propertyName">属性名</param>
-        public virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// <summary>
+        /// 公开的属性变更通知方法（供外部调用）
+        /// </summary>
+        /// <param name="propertyName">属性名</param>
+        public void NotifyPropertyChanged(string? propertyName = null)
+        {
+            OnPropertyChanged(propertyName);
         }
     }
 

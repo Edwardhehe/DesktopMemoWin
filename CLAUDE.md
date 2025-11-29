@@ -6,32 +6,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Build and Run
 ```bash
-# Build using the provided script (recommended)
-.\build.bat
-
 # Build using dotnet CLI
 dotnet build DesktopMemo.csproj -c Release
 
 # Run the application
 dotnet run
 
-# Create installer package
-.\create_installer.bat
-```
-
-### Development Workflow
-```bash
-# Restore dependencies
-dotnet restore
+# Build for self-contained release
+dotnet build -c Release --self-contained -r win-x64
 
 # Clean build artifacts
 dotnet clean
 
-# Build in debug mode
-dotnet build -c Debug
+# Restore dependencies
+dotnet restore
 
-# Build for release
-dotnet build -c Release --self-contained -r win-x64
+# Run in debug mode
+dotnet build -c Debug
+dotnet run --project DesktopMemo.csproj
+```
+
+### Database and Configuration
+```bash
+# Database location: %USERPROFILE%\DesktopMemo\memo.db
+# Config file location: %USERPROFILE%\DesktopMemo\config.txt
+# Debug output goes to System.Diagnostics.Debug.WriteLine()
 ```
 
 ## Architecture Overview
@@ -98,6 +97,18 @@ This is a **WPF desktop memo application** built with .NET 8 that displays a cal
 - SQLite database with automatic schema initialization
 - Backup/restore functionality through DatabaseService
 - Configuration persistence in user profile directory
+
+### Database Schema
+The application uses a single SQLite table `MemoItems` with the following structure:
+- `Id` (INTEGER PRIMARY KEY AUTOINCREMENT): Unique identifier
+- `Content` (TEXT NOT NULL): Memo content
+- `Date` (TEXT NOT NULL): Memo date in yyyy-MM-dd format
+- `IsCompleted` (INTEGER NOT NULL DEFAULT 0): Completion status (0=uncompleted, 1=completed)
+- `CreatedAt` (TEXT NOT NULL): Creation timestamp in yyyy-MM-dd HH:mm:ss format
+- `CompletedAt` (TEXT): Completion timestamp, NULL when uncompleted
+- `SortOrder` (INTEGER NOT NULL DEFAULT 0): Display order within each date
+
+See [README.md](README.md) for complete database format documentation and integration examples for other applications.
 
 ## Development Guidelines
 

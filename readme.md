@@ -1,276 +1,299 @@
-# 桌面备忘录
+# 桌面备忘录数据库格式说明
 
-一个基于.NET 8 WPF的桌面背景备忘录软件，支持日历形式展示、系统托盘运行和智能桌面显示。
+## 概述
 
-## 功能特性
+桌面备忘录应用程序使用SQLite数据库存储所有备忘录数据。本文档详细说明了数据库结构、字段定义和数据格式，以便其他UI程序能够正确读取和操作数据。
 
-### 核心功能
-- 🖥️ **智能桌面显示**：在桌面右上角显示，仅当用户返回桌面时可见，避免干扰工作
-- 📅 **日历形式展示**：以日历格子形式展示备忘录，支持月份切换，直观查看每日任务
-- ✅ **任务管理**：支持标记任务完成，完成后自动排序到最后，清晰区分完成状态
-- 📋 **备忘录详情**：支持双击查看备忘录详细内容，包含创建时间、完成时间等信息
-- 📝 **日常任务窗口**：点击日期可打开专门的任务管理窗口，集中管理当日待办事项
+## 数据库信息
 
-### 系统集成
-- 🔔 **系统托盘**：支持最小化到系统托盘，后台运行不占用任务栏空间
-- 🚀 **开机启动**：支持设置开机自动启动，开机即可使用
-- 🎨 **自定义外观**：支持自定义背景颜色和日历样式，个性化界面
-- 🔍 **备忘录搜索**：支持快速搜索备忘录内容，快速定位所需信息
+- **数据库类型**: SQLite 3
+- **数据库文件位置**: `%USERPROFILE%\DesktopMemo\memo.db`
+- **数据库名称**: 无特定名称，使用文件名作为标识
+- **编码**: UTF-8
 
-### 数据管理
-- 💾 **本地存储**：使用SQLite数据库，数据安全存储在用户文件夹
-- 🔄 **数据迁移**：支持导出/导入数据库文件，实现数据备份和迁移
-- 🛡️ **异常处理**：完善的异常处理机制，确保程序稳定运行
+## 数据库表结构
 
-## 系统要求
+### MemoItems 表
 
-- Windows 10 及以上版本
-- .NET 8 Runtime
+存储所有备忘录项目的主表。
 
-## 技术栈
+#### 表结构定义
 
-- **前端框架**：WPF (.NET 8)
-- **数据库**：SQLite
-- **ORM**：Dapper
-- **架构模式**：MVVM
-
-## 项目结构
-
-```
-DesktopMemo/
-├── Models/                      # 数据模型层
-│   └── MemoItem.cs             # 备忘录项目数据模型
-├── Services/                    # 服务层
-│   ├── DatabaseService.cs      # SQLite数据库操作服务
-│   ├── DesktopMonitorService.cs # 桌面状态监控服务
-│   ├── StartupService.cs       # 开机启动管理服务
-│   └── SystemTrayService.cs    # 系统托盘管理服务
-├── ViewModels/                  # 视图模型层
-│   └── MainViewModel.cs        # 主视图模型，实现MVVM模式
-├── Views/                       # 视图层
-│   ├── MainWindow.xaml         # 主窗口界面（日历视图）
-│   ├── MainWindow.xaml.cs      # 主窗口逻辑
-│   ├── DailyTasksWindow.xaml   # 日常任务管理窗口界面
-│   ├── DailyTasksWindow.xaml.cs # 日常任务窗口逻辑
-│   ├── MemoDetailWindow.xaml   # 备忘录详情窗口界面
-│   ├── MemoDetailWindow.xaml.cs # 备忘录详情窗口逻辑
-│   ├── MemoInputDialog.xaml    # 备忘录输入对话框界面
-│   ├── MemoInputDialog.xaml.cs # 备忘录输入对话框逻辑
-│   ├── SettingsWindow.xaml     # 设置窗口界面
-│   └── SettingsWindow.xaml.cs  # 设置窗口逻辑
-├── Converters/                  # 值转换器
-│   └── ValueConverters.cs      # WPF数据绑定值转换器
-├── App.xaml                    # 应用程序配置
-├── App.xaml.cs                 # 应用程序启动逻辑和异常处理
-├── DesktopMemo.csproj          # 项目配置文件
-├── build.bat                   # 构建脚本
-├── create_installer.bat        # 安装包创建脚本
-└── memo.ico                    # 应用程序图标
+```sql
+CREATE TABLE IF NOT EXISTS MemoItems (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Content TEXT NOT NULL,
+    Date TEXT NOT NULL,
+    IsCompleted INTEGER NOT NULL DEFAULT 0,
+    CreatedAt TEXT NOT NULL,
+    CompletedAt TEXT,
+    SortOrder INTEGER NOT NULL DEFAULT 0
+);
 ```
 
-## 构建和运行
+#### 字段详细说明
 
-### 方法一：使用构建脚本（推荐）
+| 字段名 | 数据类型 | 约束 | 说明 |
+|--------|----------|------|------|
+| `Id` | INTEGER | PRIMARY KEY AUTOINCREMENT | 备忘录唯一标识符，自增主键 |
+| `Content` | TEXT | NOT NULL | 备忘录内容文本 |
+| `Date` | TEXT | NOT NULL | 备忘录日期，格式：`yyyy-MM-dd` |
+| `IsCompleted` | INTEGER | NOT NULL DEFAULT 0 | 完成状态：0=未完成，1=已完成 |
+| `CreatedAt` | TEXT | NOT NULL | 创建时间，格式：`yyyy-MM-dd HH:mm:ss` |
+| `CompletedAt` | TEXT | NULL | 完成时间，格式：`yyyy-MM-dd HH:mm:ss`，未完成时为NULL |
+| `SortOrder` | INTEGER | NOT NULL DEFAULT 0 | 排序顺序，用于控制备忘录显示顺序 |
 
-1. 双击运行 `build.bat`
-2. 构建成功后，可执行文件位于 `bin\Release\net8.0-windows\DesktopMemo.exe`
+## 数据格式规范
 
-### 方法二：使用命令行
+### 日期时间格式
 
-```bash
-# 还原依赖包
-dotnet restore
+- **日期字段**: `Date` - `yyyy-MM-dd` 格式
+  - 示例：`2024-01-15`
 
-# 构建项目
-dotnet build -c Release
+- **时间字段**: `CreatedAt`, `CompletedAt` - `yyyy-MM-dd HH:mm:ss` 格式
+  - 示例：`2024-01-15 14:30:25`
 
-# 运行项目
-dotnet run
+### 布尔值处理
+
+- `IsCompleted` 字段使用 INTEGER 类型：
+  - `0` = 未完成 (false)
+  - `1` = 已完成 (true)
+
+### 排序规则
+
+备忘录按以下规则排序：
+1. **完成状态优先**：未完成项目在前，已完成项目在后
+2. **排序顺序**：相同状态下，按 `SortOrder` 升序排列
+3. **创建时间**：相同排序顺序下，按 `CreatedAt` 升序排列
+
+## SQL 查询示例
+
+### 基础查询
+
+```sql
+-- 获取所有备忘录
+SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
+FROM MemoItems
+ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC;
 ```
 
-### 方法三：创建安装包
+### 按日期查询
 
-1. 双击运行 `create_installer.bat`
-2. 安装包将在 `DesktopMemo_Installer` 目录中生成
-3. 包含独立可执行文件和安装说明
+```sql
+-- 获取指定日期的所有备忘录
+SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
+FROM MemoItems
+WHERE Date = '2024-01-15'
+ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC;
+```
 
-## 使用说明
+### 获取今日备忘录
 
-### 基本操作
+```sql
+-- 获取今日所有备忘录
+SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
+FROM MemoItems
+WHERE Date = date('now')
+ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC;
+```
 
-1. **启动应用**：运行 `DesktopMemo.exe`，程序会自动添加到系统托盘
-2. **添加备忘录**：点击日历格子中的 "+" 按钮，或在日常任务窗口中添加
-3. **标记完成**：点击备忘录前的 "✓" 按钮，完成的任务会自动排序到最后
-4. **删除备忘录**：点击备忘录前的 "✕" 按钮
-5. **切换月份**：使用 "◀" 和 "▶" 按钮浏览不同月份
-6. **查看详情**：双击备忘录项查看详细内容，包含创建时间、完成时间等信息
-7. **日常任务管理**：点击日期可打开专门的任务管理窗口，集中管理当日待办事项
-8. **搜索备忘录**：使用搜索框快速查找备忘录内容
+### 获取本周备忘录
 
-### 系统托盘功能
+```sql
+-- 获取本周所有备忘录
+SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
+FROM MemoItems
+WHERE Date >= date('now', 'weekday 0', '-6 days')
+AND Date <= date('now', 'weekday 0')
+ORDER BY Date ASC, IsCompleted ASC, SortOrder ASC;
+```
 
-- **双击托盘图标**：显示/隐藏主窗口
-- **右键托盘图标**：打开上下文菜单
-  - 显示/隐藏备忘录
-  - 设置
-  - 关于
-  - 退出
+### 获取未完成备忘录
 
-### 设置功能
+```sql
+-- 获取所有未完成的备忘录
+SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
+FROM MemoItems
+WHERE IsCompleted = 0
+ORDER BY Date ASC, SortOrder ASC, CreatedAt ASC;
+```
 
-点击主窗口右上角的 "⚙" 按钮或托盘菜单中的"设置"打开设置窗口：
+## 数据操作示例
 
-- **启动设置**：开机自动启动配置
-- **外观设置**：自定义日历背景颜色
-- **数据管理**：导出/导入/清空备忘录数据
+### 插入新备忘录
 
-### 数据存储与备份
+```sql
+INSERT INTO MemoItems (Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder)
+VALUES ('完成项目报告', '2024-01-15', 0, '2024-01-15 09:00:00', NULL, 0);
+```
 
-- **数据库位置**：`%USERPROFILE%\DesktopMemo\memo.db`
-- **数据导出**：支持导出 `.db` 文件到指定位置进行备份
-- **数据导入**：支持从备份文件导入数据，实现数据迁移
-- **数据安全**：导入时会自动备份原数据库，失败时自动恢复
+### 更新备忘录内容
 
-## 开发说明
+```sql
+UPDATE MemoItems
+SET Content = '完成季度财务报告'
+WHERE Id = 1;
+```
 
-### 架构设计
+### 标记备忘录为已完成
 
-项目采用MVVM架构模式：
+```sql
+UPDATE MemoItems
+SET IsCompleted = 1, CompletedAt = '2024-01-15 16:30:00'
+WHERE Id = 1;
+```
 
-- **Model**：数据模型层，定义备忘录数据结构
-- **View**：视图层，使用XAML定义用户界面
-- **ViewModel**：视图模型层，处理业务逻辑和数据绑定
+### 删除备忘录
 
-### 核心服务
+```sql
+DELETE FROM MemoItems
+WHERE Id = 1;
+```
 
-1. **DatabaseService**：负责SQLite数据库的CRUD操作，支持数据导入导出和备份恢复
-2. **DesktopMonitorService**：智能监控桌面状态，仅在用户返回桌面时显示窗口
-3. **StartupService**：管理Windows开机启动注册表设置
-4. **SystemTrayService**：完整的系统托盘功能，包括图标、菜单和通知
+### 更新排序顺序
 
-### 窗口管理
+```sql
+-- 批量更新排序顺序
+UPDATE MemoItems
+SET SortOrder = CASE Id
+    WHEN 1 THEN 0
+    WHEN 2 THEN 1
+    WHEN 3 THEN 2
+    ELSE SortOrder
+END
+WHERE Id IN (1, 2, 3);
+```
 
-1. **MainWindow**：主日历视图窗口，支持月份切换和备忘录管理
-2. **DailyTasksWindow**：专门的日常任务管理窗口，集中显示和管理单日任务
-3. **MemoDetailWindow**：备忘录详情查看窗口，显示完整的备忘录信息
-4. **MemoInputDialog**：备忘录输入对话框，支持新建和编辑
-5. **SettingsWindow**：设置窗口，管理应用程序配置
+## 编程语言示例
 
-### 数据绑定与UI
+### C# 示例
 
-- **MVVM模式**：严格遵循MVVM架构，分离视图和业务逻辑
-- **数据绑定**：使用 `INotifyPropertyChanged` 接口实现双向数据绑定
-- **值转换器**：自定义转换器处理数据格式转换和样式绑定
-- **命令模式**：使用 `ICommand` 接口处理用户交互
-- **异常处理**：完善的异常处理机制，确保程序稳定性
+```csharp
+using System.Data.SQLite;
 
-## 安装和部署
+// 读取备忘录
+string connectionString = "Data Source=memo.db;Version=3;";
+using (var connection = new SQLiteConnection(connectionString))
+{
+    connection.Open();
 
-### 独立部署
-项目配置为自包含部署，生成的可执行文件包含所有必要的运行时：
-- 无需安装.NET 8 Runtime
-- 单文件部署，便于分发
-- 支持Windows x64平台
+    string sql = @"
+        SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
+        FROM MemoItems
+        ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC";
 
-### 系统要求
-- **操作系统**：Windows 10 版本 1809 或更高版本
-- **架构**：x64
-- **内存**：建议 100MB 可用内存
-- **磁盘空间**：约 150MB（包含运行时）
+    using (var command = new SQLiteCommand(sql, connection))
+    using (var reader = command.ExecuteReader())
+    {
+        while (reader.Read())
+        {
+            int id = reader.GetInt32(0);
+            string content = reader.GetString(1);
+            DateTime date = DateTime.Parse(reader.GetString(2));
+            bool isCompleted = reader.GetInt32(3) == 1;
+            DateTime createdAt = DateTime.Parse(reader.GetString(4));
+            DateTime? completedAt = reader.IsDBNull(5) ? (DateTime?)null : DateTime.Parse(reader.GetString(5));
+            int sortOrder = reader.GetInt32(6);
 
-## 故障排除
+            Console.WriteLine($"ID: {id}, 内容: {content}, 日期: {date:yyyy-MM-dd}, 完成: {isCompleted}");
+        }
+    }
+}
+```
 
-### 常见问题
+### Python 示例
 
-1. **程序无法启动**
-   - 确保Windows版本符合要求
-   - 检查是否有杀毒软件阻止运行
-   - 尝试以管理员身份运行
+```python
+import sqlite3
+from datetime import datetime
 
-2. **数据库相关错误**
-   - 检查用户目录权限：`%USERPROFILE%\DesktopMemo\`
-   - 尝试删除损坏的数据库文件，程序会自动重建
-   - 使用数据导入功能恢复备份数据
+# 连接数据库
+conn = sqlite3.connect('memo.db')
+cursor = conn.cursor()
 
-3. **系统托盘图标不显示**
-   - 检查Windows通知区域设置
-   - 重启程序或重新登录Windows
+# 查询备忘录
+cursor.execute("""
+    SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
+    FROM MemoItems
+    ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC
+""")
 
-4. **开机启动不生效**
-   - 检查是否有足够权限修改注册表
-   - 手动检查注册表项：`HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Run`
+for row in cursor.fetchall():
+    id, content, date_str, is_completed, created_at_str, completed_at_str, sort_order = row
 
-### 日志和调试
-- 程序运行时的调试信息会输出到Visual Studio输出窗口
-- 异常信息会记录到Windows事件日志
-- 可以通过任务管理器查看程序运行状态
+    # 转换数据类型
+    date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    created_at = datetime.strptime(created_at_str, '%Y-%m-%d %H:%M:%S')
+    completed_at = datetime.strptime(completed_at_str, '%Y-%m-%d %H:%M:%S') if completed_at_str else None
 
-## 更新日志
+    print(f"ID: {id}, 内容: {content}, 日期: {date}, 完成: {bool(is_completed)}")
 
-### v1.2.0 (当前版本)
-- ✨ **新增日常任务窗口**：点击日期可打开专门的任务管理窗口
-- ✨ **新增备忘录详情窗口**：双击备忘录查看详细信息，包含创建时间、完成时间等
-- ✨ **新增备忘录输入对话框**：统一的备忘录输入界面，支持新建和编辑
-- 🔧 **完善系统托盘功能**：右键菜单、双击切换、托盘图标优化
-- 🔧 **增强异常处理**：应用程序级异常处理，提高程序稳定性
-- 🔧 **优化数据导入导出**：增加数据验证和自动备份恢复机制
-- 🎨 **改进UI设计**：所有窗口采用统一的现代化设计风格
-- 🐛 **修复已知问题**：修复多个稳定性和用户体验问题
+conn.close()
+```
 
-### v1.1.0
-- ✨ 新增备忘录搜索功能
-- ✨ 支持双击查看备忘录详情
-- 🎨 优化备忘录样式，增加鼠标悬停效果
-- ✨ 增加系统托盘功能，支持最小化到托盘
+### JavaScript (Node.js) 示例
 
-### v1.0.1
-- 🔧 修复桌面显示逻辑，现在仅在用户返回桌面时显示
-- 🔧 改进桌面监控服务，使用更准确的桌面状态检测
-- 🔧 移除窗口的Topmost属性，避免始终置顶
-- 🔧 优化窗口显示控制机制
+```javascript
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('memo.db');
 
-### v1.0.0
-- 🎉 初始版本发布
-- ✨ 实现基本的备忘录功能
-- ✨ 支持日历形式展示
-- ✨ 支持桌面背景显示
-- ✨ 支持数据导入导出
+// 查询备忘录
+db.all(`
+    SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
+    FROM MemoItems
+    ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC
+`, (err, rows) => {
+    if (err) {
+        console.error(err);
+        return;
+    }
 
-## 贡献指南
+    rows.forEach(row => {
+        const memo = {
+            id: row.Id,
+            content: row.Content,
+            date: row.Date,
+            isCompleted: row.IsCompleted === 1,
+            createdAt: row.CreatedAt,
+            completedAt: row.CompletedAt,
+            sortOrder: row.SortOrder
+        };
+        console.log(memo);
+    });
+});
 
-欢迎贡献代码和建议！
+db.close();
+```
 
-### 开发环境设置
-1. 安装 Visual Studio 2022 或 Visual Studio Code
-2. 安装 .NET 8 SDK
-3. 克隆项目到本地
-4. 运行 `dotnet restore` 恢复依赖包
+## 注意事项
 
-### 代码规范
-- 遵循C#编码规范
-- 使用MVVM架构模式
-- 添加适当的注释和文档
-- 确保异常处理完善
+1. **数据库访问**: 数据库文件可能被桌面备忘录应用程序锁定，建议在访问前确保应用程序已关闭
+2. **并发访问**: 不建议多个程序同时写入数据库，可能导致数据损坏
+3. **备份**: 在进行任何数据操作前，建议先备份数据库文件
+4. **字符编码**: 所有文本数据使用UTF-8编码
+5. **事务处理**: 对于重要操作，建议使用数据库事务确保数据一致性
 
-### 提交流程
-1. Fork 项目
-2. 创建功能分支
-3. 提交代码并添加详细说明
-4. 创建 Pull Request
+## 数据库验证
 
-## 技术支持
+检查数据库文件是否有效的SQL：
 
-如果您在使用过程中遇到问题或有改进建议，请：
+```sql
+-- 检查表是否存在
+SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='MemoItems';
 
-1. 查看本README的故障排除章节
-2. 检查是否已有相关的Issue
-3. 创建新的Issue并详细描述问题
-4. 提供系统信息和错误日志
+-- 检查表结构
+PRAGMA table_info(MemoItems);
 
-## 许可证
+-- 检查数据完整性
+SELECT COUNT(*) FROM MemoItems;
+```
 
-本项目采用 MIT 许可证。详见 [LICENSE.txt](LICENSE.txt) 文件。
+## 版本历史
+
+- **v1.0.0**: 初始版本，包含基本的备忘录功能
+- **v1.1.0**: 添加排序功能 (SortOrder字段)
+- **v1.2.0**: 添加完成时间跟踪 (CompletedAt字段)
 
 ---
 
-**桌面备忘录** - 让您的桌面更加高效有序！ 🚀
+如有任何疑问或需要进一步的数据库信息，请联系开发者。

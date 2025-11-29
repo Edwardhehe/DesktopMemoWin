@@ -187,7 +187,7 @@ namespace DesktopMemo.Views
                     LoadDailyTasks();
 
                     // 通知主界面刷新
-                    _mainViewModel.RefreshCalendarData();
+                    _mainViewModel.RefreshCalendar();
                 }
             }
             catch (Exception ex)
@@ -330,7 +330,7 @@ namespace DesktopMemo.Views
                 UpdateStatus();
                 
                 // 通知主界面刷新
-                _mainViewModel.RefreshCalendarData();
+                _mainViewModel.RefreshCalendar();
             }
             catch (Exception ex)
             {
@@ -359,7 +359,7 @@ namespace DesktopMemo.Views
                 UpdateStatus();
                 
                 // 通知主界面刷新
-                _mainViewModel.RefreshCalendarData();
+                _mainViewModel.RefreshCalendar();
             }
             catch (Exception ex)
             {
@@ -409,7 +409,7 @@ namespace DesktopMemo.Views
             if (e.PropertyName == nameof(MemoItem.IsCompleted))
             {
                 // 当完成状态变化时，刷新主界面
-                _mainViewModel.RefreshCalendarData();
+                _mainViewModel.RefreshCalendar();
                 UpdateStatus();
             }
         }
@@ -448,46 +448,4 @@ namespace DesktopMemo.Views
         }
     }
 
-    /// <summary>
-    /// 简单的中继命令实现
-    /// </summary>
-    /// <typeparam name="T">命令参数类型</typeparam>
-    public class RelayCommand<T> : ICommand
-    {
-        private readonly Action<T?> _execute;
-        private readonly Func<T?, bool>? _canExecute;
-
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="execute">执行方法</param>
-        /// <param name="canExecute">是否可以执行</param>
-        public RelayCommand(Action<T?> execute, Func<T?, bool>? canExecute = null)
-        {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
-        }
-
-        /// <summary>
-        /// 是否可以执行
-        /// </summary>
-        /// <param name="parameter">参数</param>
-        /// <returns>是否可以执行</returns>
-        public bool CanExecute(object? parameter) => _canExecute?.Invoke((T?)parameter) ?? true;
-
-        /// <summary>
-        /// 执行命令
-        /// </summary>
-        /// <param name="parameter">参数</param>
-        public void Execute(object? parameter) => _execute((T?)parameter);
-
-        /// <summary>
-        /// 可执行性变化事件
-        /// </summary>
-        public event EventHandler? CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
-        }
-    }
-} 
+  } 

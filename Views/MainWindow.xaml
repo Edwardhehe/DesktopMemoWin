@@ -266,22 +266,21 @@
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
                                                             <Border Style="{Binding IsCompleted, Converter={StaticResource BoolToMemoStyleConverter}}"
-                                                                    MouseLeftButtonDown="MemoItem_MouseLeftButtonDown"
-                                                                    Tag="{Binding}">
+                                                                                                                                        Tag="{Binding}">
                                                             <Border.InputBindings>
-                                                                <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.ShowMemoDetailCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}"/>
+                                                                <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.ShowMemoDetailCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" CommandParameter="{Binding}"/>
                                                             </Border.InputBindings>
                                                                 <Border.ContextMenu>
                                                                     <ContextMenu>
                                                                         <MenuItem Header="删除备忘录"
-                                                                                  Command="{Binding DataContext.DeleteMemoCommand, Source={x:Reference MemoWindow}}"
+                                                                                  Command="{Binding DataContext.DeleteMemoCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
                                                                                   CommandParameter="{Binding}"/>
                                                                         <MenuItem Header="标记为已完成"
-                                                                                  Command="{Binding DataContext.MarkCompletedCommand, Source={x:Reference MemoWindow}}"
+                                                                                  Command="{Binding DataContext.MarkCompletedCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
                                                                                   CommandParameter="{Binding}"
                                                                                   Visibility="{Binding IsCompleted, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                                                                         <MenuItem Header="标记为未完成"
-                                                                                  Command="{Binding DataContext.MarkUncompletedCommand, Source={x:Reference MemoWindow}}"
+                                                                                  Command="{Binding DataContext.MarkUncompletedCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
                                                                                   CommandParameter="{Binding}"
                                                                                   Visibility="{Binding IsCompleted, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                                                     </ContextMenu>

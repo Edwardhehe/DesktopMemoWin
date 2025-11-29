@@ -145,15 +145,7 @@ namespace DesktopMemo.Views
         /// </summary>
         /// <param name="sender">事件发送者</param>
         /// <param name="e">鼠标按钮事件参数</param>
-        private void MemoItem_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (sender is FrameworkElement element && element.Tag is Models.MemoItem memo)
-            {
-                // 可以在这里添加编辑备忘录的功能
-                // 例如打开编辑对话框
-            }
-        }
-
+    
         /// <summary>
         /// 日期行点击事件
         /// </summary>
@@ -244,11 +236,7 @@ namespace DesktopMemo.Views
         /// </summary>
         /// <param name="sender">事件发送者</param>
         /// <param name="e">路由事件参数</param>
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            // 窗口加载完成后的初始化操作
-        }
-
+    
         /// <summary>
         /// 通知所有打开的窗口刷新数据
         /// </summary>
