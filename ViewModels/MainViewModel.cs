@@ -151,6 +151,24 @@ namespace DesktopMemo.ViewModels
             LoadCalendarData();
         }
 
+        private void NotifyOpenDailyTaskWindows()
+        {
+            try
+            {
+                foreach (System.Windows.Window window in System.Windows.Application.Current.Windows)
+                {
+                    if (window is Views.DailyTasksWindow dailyTasksWindow)
+                    {
+                        dailyTasksWindow.RefreshData();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"通知当日任务窗口刷新失败：{ex.Message}");
+            }
+        }
+
         /// <summary>
         /// 刷新指定日期的日历数据
         /// </summary>
@@ -258,6 +276,7 @@ namespace DesktopMemo.ViewModels
             MarkCompletedCommand = new RelayCommand<MemoItem>(MarkCompleted);
             MarkUncompletedCommand = new RelayCommand<MemoItem>(MarkUncompleted);
             DeleteMemoCommand = new RelayCommand<MemoItem>(DeleteMemo);
+
             ShowMemoDetailCommand = new RelayCommand<MemoItem>(ShowMemoDetail);
 
             // 订阅桌面可见性变化事件
@@ -373,8 +392,18 @@ namespace DesktopMemo.ViewModels
 
                     _databaseService.AddMemo(memo);
 
-                    // 直接添加到对应的日期视图模型中，而不是重新加载整个日历
-                    dayViewModel.Memos.Add(memo);
+                    if (memo.Date.Date == dayViewModel.Date.Date)
+                    {
+                        dayViewModel.Memos.Add(memo);
+                        ReorderMemosInDay(memo);
+                    }
+                    else
+                    {
+                        RefreshDate(dayViewModel.Date);
+                        RefreshDate(memo.Date);
+                    }
+
+                    NotifyOpenDailyTaskWindows();
                 }
             }
             catch (Exception ex)
@@ -404,6 +433,7 @@ namespace DesktopMemo.ViewModels
 
                 // 重新排序备忘录列表，将已完成的放到未完成的后面
                 ReorderMemosInDay(memo);
+                NotifyOpenDailyTaskWindows();
             }
             catch (Exception ex)
             {
@@ -421,11 +451,13 @@ namespace DesktopMemo.ViewModels
         {
             if (memo == null) return;
             memo.IsCompleted = false;
+            memo.CompletedAt = null;
             _databaseService.UpdateMemo(memo);
             // 重新排序，未完成的排前面
             ReorderMemosInDay(memo);
             // 通知UI刷新
             OnPropertyChanged(nameof(CalendarDays));
+            NotifyOpenDailyTaskWindows();
         }
 
         /// <summary>
@@ -447,10 +479,14 @@ namespace DesktopMemo.ViewModels
 
                     // 清空并重新添加排序后的备忘录
                     day.Memos.Clear();
-                    foreach (var sortedMemo in sortedMemos)
+                    for (int index = 0; index < sortedMemos.Count; index++)
                     {
+                        var sortedMemo = sortedMemos[index];
+                        sortedMemo.SortOrder = index;
                         day.Memos.Add(sortedMemo);
                     }
+
+                    _databaseService.UpdateMemoSortOrders(sortedMemos);
                     break;
                 }
             }
@@ -493,15 +529,31 @@ namespace DesktopMemo.ViewModels
         {
             try
             {
+                var oldDate = memo.Date; // 保存原日期
                 var mainWindow = System.Windows.Application.Current.MainWindow;
                 var dialog = new Views.MemoInputDialog(memo.Date, memo.Content, mainWindow);
                 if (dialog.ShowDialog() == true)
                 {
+                    var newDate = dialog.MemoDate;
                     memo.Content = dialog.MemoContent;
-                    memo.Date = dialog.MemoDate;
+                    memo.Date = newDate;
 
                     // 更新数据库
                     _databaseService.UpdateMemo(memo);
+
+                    // 刷新UI：检查日期是否改变
+                    if (oldDate != newDate)
+                    {
+                        // 日期改变，需要刷新原日期和新日期
+                        RefreshMemoDateChange(oldDate, newDate);
+                    }
+                    else
+                    {
+                        // 日期未变，只需刷新当前日期
+                        RefreshDate(oldDate);
+                    }
+
+                    NotifyOpenDailyTaskWindows();
                 }
             }
             catch (Exception ex)
@@ -536,6 +588,8 @@ namespace DesktopMemo.ViewModels
                         break;
                     }
                 }
+
+                NotifyOpenDailyTaskWindows();
             }
             catch (Exception ex)
             {

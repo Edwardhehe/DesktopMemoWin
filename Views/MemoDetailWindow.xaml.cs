@@ -77,10 +77,12 @@ namespace DesktopMemo.Views
                 if (_editCallback != null)
                 {
                     _editCallback(_memo);
+                    LoadMemoDetails();
                 }
                 else
                 {
                     // 打开编辑对话框
+                    var oldDate = _memo.Date; // 保存原日期
                     var dialog = new MemoInputDialog(_memo.Date, _memo.Content, this.Owner);
                     if (dialog.ShowDialog() == true)
                     {
@@ -89,16 +91,24 @@ namespace DesktopMemo.Views
                             var databaseService = _mainViewModel?.GetDatabaseService();
                             if (databaseService != null)
                             {
+                                var newDate = dialog.MemoDate;
                                 // 更新备忘录数据
                                 _memo.Content = dialog.MemoContent;
-                                _memo.Date = dialog.MemoDate;
+                                _memo.Date = newDate;
                                 databaseService.UpdateMemo(_memo);
 
                                 // 刷新详情
                                 LoadMemoDetails();
 
-                                // 刷新主界面
-                                _mainViewModel?.RefreshCalendar();
+                                // 根据日期是否改变来刷新
+                                if (oldDate != newDate)
+                                {
+                                    _mainViewModel?.RefreshMemoDateChange(oldDate, newDate);
+                                }
+                                else
+                                {
+                                    _mainViewModel?.RefreshDate(oldDate);
+                                }
 
                                 // 通知所有窗口刷新
                                 NotifyAllWindowsRefresh();

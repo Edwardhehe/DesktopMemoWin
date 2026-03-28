@@ -4,6 +4,7 @@ using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace DesktopMemo.Views
 {
@@ -29,6 +30,7 @@ namespace DesktopMemo.Views
 
             _viewModel = new MainViewModel();
             DataContext = _viewModel;
+            ApplyBackgroundColor(_viewModel.BackgroundColor);
 
             // 初始化系统托盘服务
             _systemTrayService = new SystemTrayService();
@@ -64,6 +66,24 @@ namespace DesktopMemo.Views
                 {
                     Hide();
                 }
+            }
+            else if (e.PropertyName == nameof(MainViewModel.BackgroundColor))
+            {
+                ApplyBackgroundColor(_viewModel.BackgroundColor);
+            }
+        }
+
+        private void ApplyBackgroundColor(string colorValue)
+        {
+            try
+            {
+                var color = (Color)ColorConverter.ConvertFromString(colorValue);
+                MainWindowSurface.Background = new SolidColorBrush(Color.FromArgb(0xAA, color.R, color.G, color.B));
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"应用背景色失败: {ex.Message}");
+                MainWindowSurface.Background = new SolidColorBrush(Color.FromArgb(0xAA, 0xFF, 0xFF, 0xFF));
             }
         }
 

@@ -15,6 +15,31 @@
         Top="0">
     
     <Window.Resources>
+        <LinearGradientBrush x:Key="WindowGlowBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#F4EEF2" Offset="0"/>
+            <GradientStop Color="#EEE7EC" Offset="0.56"/>
+            <GradientStop Color="#E6DAD9" Offset="1"/>
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="PanelBrush" Color="#CFF4EFF3"/>
+        <SolidColorBrush x:Key="PanelStrongBrush" Color="#D8E8EDF5"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#9F8FBEF5"/>
+        <SolidColorBrush x:Key="AccentHoverBrush" Color="#B5A5CDF8"/>
+        <SolidColorBrush x:Key="AccentSoftBrush" Color="#BFE6F0FB"/>
+        <SolidColorBrush x:Key="SuccessBrush" Color="#39A66A"/>
+        <SolidColorBrush x:Key="SuccessSoftBrush" Color="#E6F6EA"/>
+        <DropShadowEffect x:Key="DropShadowEffect"
+                          Color="#35557C"
+                          Direction="270"
+                          ShadowDepth="12"
+                          BlurRadius="28"
+                          Opacity="0.14"/>
+        <DropShadowEffect x:Key="SoftShadowEffect"
+                          Color="#4B6E97"
+                          Direction="270"
+                          ShadowDepth="4"
+                          BlurRadius="14"
+                          Opacity="0.12"/>
+
         <!-- 转换器 -->
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <local:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
@@ -30,54 +55,58 @@
         
         <!-- 日历格子样式 -->
         <Style x:Key="CalendarDayStyle" TargetType="Border">
-            <Setter Property="Background" Value="#66FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#00FFFFFF"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Margin" Value="1"/>
-            <Setter Property="MinHeight" Value="95"/>
-            <Setter Property="Padding" Value="3"/>
+            <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
+            <Setter Property="BorderBrush" Value="#D6CBD2"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="MinHeight" Value="108"/>
+            <Setter Property="Padding" Value="7"/>
+            <Setter Property="Effect" Value="{StaticResource SoftShadowEffect}"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#99E3F2FD"/>
+                    <Setter Property="Background" Value="#F4EEF3"/>
+                    <Setter Property="BorderBrush" Value="#CDBBC5"/>
+                    <Setter Property="BorderThickness" Value="1.5"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
         
         <!-- 当天日期格子样式 -->
         <Style x:Key="TodayCalendarDayStyle" TargetType="Border">
-            <Setter Property="Background" Value="#B3E3F2FD"/>
-            <Setter Property="BorderBrush" Value="#4A90E2"/>
+            <Setter Property="Background" Value="{StaticResource PanelStrongBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
             <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Margin" Value="1"/>
-            <Setter Property="MinHeight" Value="95"/>
-            <Setter Property="Padding" Value="3"/>
+            <Setter Property="CornerRadius" Value="18"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="MinHeight" Value="108"/>
+            <Setter Property="Padding" Value="7"/>
+            <Setter Property="Effect" Value="{StaticResource SoftShadowEffect}"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#CCE3F2FD"/>
-                    <Setter Property="BorderBrush" Value="#5A9FE2"/>
+                    <Setter Property="Background" Value="#DFE5F0"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource AccentHoverBrush}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
         
         <!-- 备忘录项样式 -->
         <Style x:Key="MemoItemStyle" TargetType="Border">
-            <Setter Property="Background" Value="#B3F8F9FA"/>
-            <Setter Property="BorderBrush" Value="#00FFFFFF"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="CornerRadius" Value="6"/>
-            <Setter Property="Margin" Value="1"/>
-            <Setter Property="Padding" Value="4"/>
+            <Setter Property="Background" Value="#CFEFF7EA"/>
+            <Setter Property="BorderBrush" Value="#84F08A"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Padding" Value="5,4"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#CCE3F2FD"/>
-                    <Setter Property="BorderBrush" Value="#4A90E2"/>
+                    <Setter Property="Background" Value="#F0F8ED"/>
+                    <Setter Property="BorderBrush" Value="#78E87E"/>
                     <Setter Property="BorderThickness" Value="1"/>
                     <Setter Property="Effect">
                         <Setter.Value>
-                            <DropShadowEffect Color="#4A90E2" Direction="270" ShadowDepth="2" BlurRadius="4" Opacity="0.6"/>
+                            <DropShadowEffect Color="#7FA2D1" Direction="270" ShadowDepth="3" BlurRadius="8" Opacity="0.2"/>
                         </Setter.Value>
                     </Setter>
                 </Trigger>
@@ -85,23 +114,23 @@
         </Style>
         
         <Style x:Key="CompletedMemoStyle" TargetType="Border">
-            <Setter Property="Background" Value="#B3E8F5E8"/>
-            <Setter Property="BorderBrush" Value="#00FFFFFF"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="Margin" Value="1"/>
-            <Setter Property="Padding" Value="2"/>
-            <Setter Property="Opacity" Value="0.7"/>
+            <Setter Property="Background" Value="#D8F8FAFE"/>
+            <Setter Property="BorderBrush" Value="#C8D7E9"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Padding" Value="5,4"/>
+            <Setter Property="Opacity" Value="0.84"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#CCE8F5E8"/>
-                    <Setter Property="BorderBrush" Value="#28A745"/>
+                    <Setter Property="Background" Value="#F3F6FB"/>
+                    <Setter Property="BorderBrush" Value="#C9D7EA"/>
                     <Setter Property="BorderThickness" Value="1"/>
-                    <Setter Property="Opacity" Value="0.9"/>
+                    <Setter Property="Opacity" Value="0.96"/>
                     <Setter Property="Effect">
                         <Setter.Value>
-                            <DropShadowEffect Color="#28A745" Direction="270" ShadowDepth="2" BlurRadius="4" Opacity="0.4"/>
+                            <DropShadowEffect Color="#72BC8F" Direction="270" ShadowDepth="3" BlurRadius="8" Opacity="0.18"/>
                         </Setter.Value>
                     </Setter>
                 </Trigger>
@@ -110,23 +139,31 @@
         
         <!-- 按钮样式 -->
         <Style x:Key="ModernButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#66FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#00FFFFFF"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="4,4"/>
+            <Setter Property="Background" Value="#BFF8FAFD"/>
+            <Setter Property="BorderBrush" Value="#D5D9E2"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,6"/>
             <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
+            <Setter Property="Foreground" Value="#23415F"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}"
-                                CornerRadius="6"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#99E3F2FD"/>
+                                <Setter Property="Background" Value="#D8F5F8FC"/>
+                                <Setter Property="BorderBrush" Value="#DDE4EE"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#CBEFF3F8"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -135,7 +172,7 @@
         </Style>
     </Window.Resources>
     
-    <Border Background="#AAFFFFFF" CornerRadius="18" BorderBrush="#00FFFFFF" BorderThickness="0" Effect="{StaticResource DropShadowEffect}">
+    <Border x:Name="MainWindowSurface" Background="{StaticResource WindowGlowBrush}" CornerRadius="28" BorderBrush="#D8CFD6" BorderThickness="1.2" Opacity="0.98" Effect="{StaticResource DropShadowEffect}">
         
         <Grid>
             <Grid.RowDefinitions>
@@ -145,35 +182,41 @@
             </Grid.RowDefinitions>
             
             <!-- 标题栏 -->
-            <Border Grid.Row="0" CornerRadius="14,14,0,0" Height="34" Background="#66FFFFFF" BorderBrush="#00FFFFFF" BorderThickness="0">
+            <Border Grid.Row="0" CornerRadius="27,27,0,0" Height="46" Background="#DDF3EEF5" BorderBrush="#CFC6CF" BorderThickness="0,0,0,1">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
-                        <TextBlock Text="📝 桌面备忘录" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" Foreground="#2D3748"/>
-                        <TextBlock Text="{Binding CurrentMonth, StringFormat='yyyy年MM月'}" Margin="15,0,0,0" VerticalAlignment="Center" FontSize="12" Foreground="#718096"/>
+                        <Border Width="28" Height="28" CornerRadius="14" Background="#C9F4F7FB" Margin="0,0,10,0">
+                            <TextBlock Text="📝" FontSize="13" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                        <StackPanel>
+                            <TextBlock Text="桌面备忘录" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" Foreground="#214162"/>
+                            <TextBlock Text="{Binding CurrentMonth, StringFormat='yyyy年MM月'}" VerticalAlignment="Center" FontSize="11" Foreground="#70839A"/>
+                        </StackPanel>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
-                        <Button Content="◀" Command="{Binding PreviousMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="30" Height="25" Margin="3" ToolTip="上个月"/>
-                        <Button Content="▶" Command="{Binding NextMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="30" Height="25" Margin="3" ToolTip="下个月"/>
-                        <Button Content="⚙" Click="SettingsButton_Click" Style="{StaticResource ModernButtonStyle}" Width="35" Height="25" Margin="3" ToolTip="设置"/>
-                        <Button Content="✕" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="30" Height="25" Margin="3" ToolTip="关闭"/>
+                        <Button Content="◀" Command="{Binding PreviousMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="34" Height="28" Margin="3" ToolTip="上个月"/>
+                        <Button Content="▶" Command="{Binding NextMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="34" Height="28" Margin="3" ToolTip="下个月"/>
+                        <Button Content="⚙" Click="SettingsButton_Click" Style="{StaticResource ModernButtonStyle}" Width="38" Height="28" Margin="3" ToolTip="设置"/>
+                        <Button Content="✕" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="34" Height="28" Margin="3" ToolTip="关闭"/>
                     </StackPanel>
                 </Grid>
             </Border>
             
             <!-- 日历内容 -->
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
-                <Grid Margin="10">
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="0">
+                <Grid Margin="14,12,14,10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     
                     <!-- 星期标题 -->
-                    <Grid Grid.Row="0" Margin="0,0,0,5">
+                    <Border Grid.Row="0" Background="#D7F3EEF2" CornerRadius="16" BorderBrush="#D5CAD2" BorderThickness="1" Padding="8,6" Margin="4,0,4,8">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
@@ -184,14 +227,15 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         
-                        <TextBlock Grid.Column="0" Text="日" HorizontalAlignment="Center" FontWeight="Bold"/>
-                        <TextBlock Grid.Column="1" Text="一" HorizontalAlignment="Center" FontWeight="Bold"/>
-                        <TextBlock Grid.Column="2" Text="二" HorizontalAlignment="Center" FontWeight="Bold"/>
-                        <TextBlock Grid.Column="3" Text="三" HorizontalAlignment="Center" FontWeight="Bold"/>
-                        <TextBlock Grid.Column="4" Text="四" HorizontalAlignment="Center" FontWeight="Bold"/>
-                        <TextBlock Grid.Column="5" Text="五" HorizontalAlignment="Center" FontWeight="Bold"/>
-                        <TextBlock Grid.Column="6" Text="六" HorizontalAlignment="Center" FontWeight="Bold"/>
+                        <TextBlock Grid.Column="0" Text="日" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#7D4C4C"/>
+                        <TextBlock Grid.Column="1" Text="一" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A"/>
+                        <TextBlock Grid.Column="2" Text="二" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A"/>
+                        <TextBlock Grid.Column="3" Text="三" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A"/>
+                        <TextBlock Grid.Column="4" Text="四" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A"/>
+                        <TextBlock Grid.Column="5" Text="五" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A"/>
+                        <TextBlock Grid.Column="6" Text="六" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#3F73B0"/>
                     </Grid>
+                    </Border>
                     
                     <!-- 日历网格 -->
                     <ItemsControl Grid.Row="1" ItemsSource="{Binding CalendarDays}">
@@ -224,21 +268,26 @@
                                                     Content="+" 
                                                     Command="{Binding DataContext.AddMemoCommand, Source={x:Reference MemoWindow}}" 
                                                     CommandParameter="{Binding}"
-                                                    Width="18" 
-                                                    Height="18" 
-                                                    FontSize="11" 
+                                                    Width="20" 
+                                                    Height="20" 
+                                                    FontSize="12" 
                                                     FontWeight="Bold"
-                                                    Margin="0,0,1,0"
-                                                    Background="LightBlue"
+                                                    Margin="0,0,4,0"
+                                                    Background="{StaticResource AccentBrush}"
                                                     Foreground="White"
                                                     BorderThickness="0"
                                                     ToolTip="添加新备忘录"
                                                     Visibility="{Binding IsCurrentMonth, Converter={StaticResource BoolToVisibilityConverter}}">
                                                 <Button.Template>
                                                     <ControlTemplate TargetType="Button">
-                                                        <Border Background="{TemplateBinding Background}" CornerRadius="2">
+                                                        <Border Background="{TemplateBinding Background}" CornerRadius="10">
                                                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                         </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="{StaticResource AccentHoverBrush}"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
                                                     </ControlTemplate>
                                                 </Button.Template>
                                             </Button>
@@ -247,8 +296,8 @@
                                             <TextBlock Grid.Column="2" 
                                                    Text="{Binding Date.Day}" 
                                                    HorizontalAlignment="Right" 
-                                                       FontSize="11"
-                                                   Margin="0,0,2,0"
+                                                       FontSize="12"
+                                                   Margin="0,0,4,0"
                                                    FontWeight="{Binding IsToday, Converter={StaticResource BoolToFontWeightConverter}}"
                                                    Foreground="{Binding IsToday, Converter={StaticResource TodayForegroundConverter}}"
                                                    MouseLeftButtonDown="DateRow_MouseLeftButtonDown"
@@ -260,8 +309,8 @@
                                         <ScrollViewer Grid.Row="1" 
                                                       VerticalScrollBarVisibility="Hidden" 
                                                           HorizontalScrollBarVisibility="Disabled"
-                                                      MaxHeight="68"
-                                                      Margin="0,1,0,2">
+                                                      MaxHeight="76"
+                                                      Margin="0,5,0,0">
                                                 <ItemsControl ItemsSource="{Binding Memos}">
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
@@ -271,16 +320,16 @@
                                                                 <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.ShowMemoDetailCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" CommandParameter="{Binding}"/>
                                                             </Border.InputBindings>
                                                                 <Border.ContextMenu>
-                                                                    <ContextMenu>
+                                                                    <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
                                                                         <MenuItem Header="删除备忘录"
-                                                                                  Command="{Binding DataContext.DeleteMemoCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                                                                  Command="{Binding DataContext.DeleteMemoCommand, Source={x:Reference MemoWindow}}"
                                                                                   CommandParameter="{Binding}"/>
                                                                         <MenuItem Header="标记为已完成"
-                                                                                  Command="{Binding DataContext.MarkCompletedCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                                                                  Command="{Binding DataContext.MarkCompletedCommand, Source={x:Reference MemoWindow}}"
                                                                                   CommandParameter="{Binding}"
                                                                                   Visibility="{Binding IsCompleted, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                                                                         <MenuItem Header="标记为未完成"
-                                                                                  Command="{Binding DataContext.MarkUncompletedCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"
+                                                                                  Command="{Binding DataContext.MarkUncompletedCommand, Source={x:Reference MemoWindow}}"
                                                                                   CommandParameter="{Binding}"
                                                                                   Visibility="{Binding IsCompleted, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                                                     </ContextMenu>
@@ -295,16 +344,16 @@
                                                                                Text="{Binding Content, Converter={StaticResource TextTruncateConverter}, ConverterParameter=8}" 
                                                                                TextWrapping="NoWrap" 
                                                                                TextTrimming="CharacterEllipsis"
-                                                                               FontSize="9"
+                                                                               FontSize="9.5"
                                                                                VerticalAlignment="Center"
-                                                                               Margin="0,0,1,0"
+                                                                               Margin="0,0,3,0"
                                                                                ToolTip="{Binding Content}"
                                                                                TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToTextDecorationConverter}}"
                                                                                Foreground="#2D3748">
                                                                         <TextBlock.Style>
                                                                             <Style TargetType="TextBlock">
                                                                                 <Style.Triggers>
-                                                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Border}, Path=IsMouseOver}" Value="True">
+                                                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Border}, Path=IsMouseOver}" Value="True">
                                                                                         <Setter Property="Foreground" Value="#1A365D"/>
                                                                                         <Setter Property="FontWeight" Value="SemiBold"/>
                                                                                     </DataTrigger>
@@ -317,26 +366,26 @@
                                                                             Content="✓" 
                                                                             Command="{Binding DataContext.MarkCompletedCommand, Source={x:Reference MemoWindow}}" 
                                                                             CommandParameter="{Binding}"
-                                                                            Width="10" 
-                                                                            Height="10" 
-                                                                            FontSize="7" 
-                                                                            Margin="1,0,0,0"
-                                                                            Background="LightBlue"
+                                                                            Width="14" 
+                                                                            Height="14" 
+                                                                            FontSize="8" 
+                                                                            Margin="2,0,0,0"
+                                                                            Background="{StaticResource AccentBrush}"
                                                                             Foreground="White"
                                                                             BorderThickness="0"
                                                                             ToolTip="标记为完成"
                                                                             Visibility="{Binding IsCompleted, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                                                                         <Button.Template>
                                                                             <ControlTemplate TargetType="Button">
-                                                                                <Border Background="{TemplateBinding Background}" CornerRadius="1">
+                                                                                <Border Background="{TemplateBinding Background}" CornerRadius="7">
                                                                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                                                 </Border>
                                                                                 <ControlTemplate.Triggers>
                                                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                                                        <Setter Property="Background" Value="#28A745"/>
+                                                                                        <Setter Property="Background" Value="{StaticResource SuccessBrush}"/>
                                                                                         <Setter Property="Effect">
                                                                                             <Setter.Value>
-                                                                                                <DropShadowEffect Color="#28A745" Direction="270" ShadowDepth="1" BlurRadius="2" Opacity="0.6"/>
+                                                                                                <DropShadowEffect Color="#28A745" Direction="270" ShadowDepth="1" BlurRadius="3" Opacity="0.35"/>
                                                                                             </Setter.Value>
                                                                                         </Setter>
                                                                                     </Trigger>
@@ -359,18 +408,18 @@
             </ScrollViewer>
             
             <!-- 状态栏 -->
-            <Border Grid.Row="2" CornerRadius="0,0,14,14" Height="34" Background="#66FFFFFF" BorderBrush="#00FFFFFF" BorderThickness="0">
+            <Border Grid.Row="2" CornerRadius="0,0,27,27" Height="46" Background="#D9F2ECEF" BorderBrush="#D5CCD4" BorderThickness="1,1,1,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
-                        <Ellipse Width="8" Height="8" Fill="#28A745" Margin="0,0,8,0"/>
-                        <TextBlock Text="桌面备忘录正在运行中" VerticalAlignment="Center" FontSize="11" Foreground="#495057"/>
+                        <Ellipse Width="9" Height="9" Fill="{StaticResource SuccessBrush}" Margin="0,0,8,0"/>
+                        <TextBlock Text="桌面备忘录正在运行中" VerticalAlignment="Center" FontSize="11" Foreground="#36516D"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
-                        <CheckBox Content="开机启动" IsChecked="{Binding IsStartupEnabled}" VerticalAlignment="Center" FontSize="11" Foreground="#495057"/>
+                        <CheckBox Content="开机启动" IsChecked="{Binding IsStartupEnabled}" VerticalAlignment="Center" FontSize="11" Foreground="#36516D"/>
                     </StackPanel>
                 </Grid>
             </Border>

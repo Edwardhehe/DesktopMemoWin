@@ -2,52 +2,88 @@ using DesktopMemo.Services;
 using DesktopMemo.ViewModels;
 using Microsoft.Win32;
 using System;
+using System.ComponentModel;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Media;
 
 namespace DesktopMemo.Views
 {
     /// <summary>
     /// SettingsWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class SettingsWindow : Window
+    public partial class SettingsWindow : Window, INotifyPropertyChanged
     {
-        private MainViewModel _viewModel;
-        private DatabaseService _databaseService;
+        private readonly MainViewModel _viewModel;
+        private readonly DatabaseService _databaseService;
+        private bool _startupEnabled;
+        private string _selectedBackgroundColor = "#FFFFFF";
+
+        public bool StartupEnabled
+        {
+            get => _startupEnabled;
+            set
+            {
+                _startupEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string SelectedBackgroundColor
+        {
+            get => _selectedBackgroundColor;
+            set
+            {
+                _selectedBackgroundColor = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(BackgroundPreviewBrush));
+            }
+        }
+
+        public Brush BackgroundPreviewBrush
+        {
+            get
+            {
+                try
+                {
+                    return (Brush)new BrushConverter().ConvertFromString(SelectedBackgroundColor);
+                }
+                catch
+                {
+                    return Brushes.White;
+                }
+            }
+        }
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="viewModel">主视图模型</param>
         public SettingsWindow(MainViewModel viewModel)
         {
             InitializeComponent();
 
             _viewModel = viewModel;
-            // 使用主视图模型中的数据库服务实例，确保数据一致性
             _databaseService = viewModel.GetDatabaseService();
-            DataContext = _viewModel;
+            StartupEnabled = viewModel.IsStartupEnabled;
+            SelectedBackgroundColor = viewModel.BackgroundColor;
+            DataContext = this;
         }
 
         /// <summary>
         /// 背景颜色按钮点击事件
         /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">路由事件参数</param>
         private void BackgroundColorButton_Click(object sender, RoutedEventArgs e)
         {
-            // 使用简单的颜色选择方式
             var colors = new[] { "#FFFFFF", "#F0F0F0", "#E8F5E8", "#E6F3FF", "#FFF8E1", "#F3E5F5" };
-            var currentIndex = Array.IndexOf(colors, _viewModel.BackgroundColor);
+            var currentIndex = Array.IndexOf(colors, SelectedBackgroundColor);
             var nextIndex = (currentIndex + 1) % colors.Length;
-            _viewModel.BackgroundColor = colors[nextIndex];
+            SelectedBackgroundColor = colors[nextIndex];
         }
 
         /// <summary>
         /// 导出数据按钮点击事件
         /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">路由事件参数</param>
         private void ExportDataButton_Click(object sender, RoutedEventArgs e)
         {
             var saveFileDialog = new SaveFileDialog
@@ -63,7 +99,7 @@ namespace DesktopMemo.Views
                 try
                 {
                     _databaseService.ExportDatabase(saveFileDialog.FileName);
-                    MessageBox.Show("数据导出成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("数据导出成功。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
@@ -75,8 +111,6 @@ namespace DesktopMemo.Views
         /// <summary>
         /// 导入数据按钮点击事件
         /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">路由事件参数</param>
         private void ImportDataButton_Click(object sender, RoutedEventArgs e)
         {
             var result = MessageBox.Show(
@@ -98,19 +132,12 @@ namespace DesktopMemo.Views
                 {
                     try
                     {
-                        // 导入数据库
                         _databaseService.ImportDatabase(openFileDialog.FileName);
-
-                        // 重新加载数据库连接
                         _databaseService.ReloadDatabase();
-
-                        // 刷新主界面数据
                         _viewModel.RefreshCalendar();
-
-                        // 通知所有打开的窗口刷新数据
                         NotifyAllWindowsRefresh();
 
-                        MessageBox.Show("数据导入成功！界面已刷新。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("数据导入成功，界面已刷新。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                     catch (Exception ex)
                     {
@@ -123,8 +150,6 @@ namespace DesktopMemo.Views
         /// <summary>
         /// 清空数据按钮点击事件
         /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">路由事件参数</param>
         private void ClearDataButton_Click(object sender, RoutedEventArgs e)
         {
             var result = MessageBox.Show(
@@ -137,23 +162,17 @@ namespace DesktopMemo.Views
             {
                 try
                 {
-                    // 删除数据库文件
                     var dbPath = _databaseService.GetDatabasePath();
                     if (File.Exists(dbPath))
                     {
                         File.Delete(dbPath);
                     }
 
-                    // 重新初始化数据库连接
                     _databaseService.ReloadDatabase();
-
-                    // 刷新主界面数据
                     _viewModel.RefreshCalendar();
-
-                    // 通知所有打开的窗口刷新数据
                     NotifyAllWindowsRefresh();
 
-                    MessageBox.Show("数据清空成功！界面已刷新。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("数据清空成功，界面已刷新。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
@@ -165,10 +184,10 @@ namespace DesktopMemo.Views
         /// <summary>
         /// 确定按钮点击事件
         /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">路由事件参数</param>
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.IsStartupEnabled = StartupEnabled;
+            _viewModel.BackgroundColor = SelectedBackgroundColor;
             DialogResult = true;
             Close();
         }
@@ -176,27 +195,20 @@ namespace DesktopMemo.Views
         /// <summary>
         /// 取消按钮点击事件
         /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">路由事件参数</param>
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
             Close();
         }
 
-        /// <summary>
-        /// 通知所有打开的窗口刷新数据
-        /// </summary>
         private void NotifyAllWindowsRefresh()
         {
             try
             {
-                // 遍历所有打开的窗口
-                foreach (Window window in System.Windows.Application.Current.Windows)
+                foreach (Window window in Application.Current.Windows)
                 {
                     if (window is DailyTasksWindow dailyTasksWindow)
                     {
-                        // 通知DailyTasksWindow刷新
                         dailyTasksWindow.RefreshData();
                     }
                 }
@@ -205,6 +217,13 @@ namespace DesktopMemo.Views
             {
                 System.Diagnostics.Debug.WriteLine($"通知窗口刷新时发生异常：{ex.Message}");
             }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

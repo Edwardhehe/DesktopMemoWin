@@ -76,7 +76,7 @@ namespace DesktopMemo.Services
                     SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
                     FROM MemoItems 
                     WHERE Date = @Date 
-                    ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC";
+                    ORDER BY IsCompleted ASC, CreatedAt ASC, SortOrder ASC";
 
                 var memos = connection.Query<MemoItemDto>(sql, new { Date = dateStr }).Select(dto => new MemoItem
                 {
@@ -110,9 +110,10 @@ namespace DesktopMemo.Services
 
                 var sql = @"
                     INSERT INTO MemoItems (Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder)
-                    VALUES (@Content, @Date, @IsCompleted, @CreatedAt, @CompletedAt, @SortOrder)";
+                    VALUES (@Content, @Date, @IsCompleted, @CreatedAt, @CompletedAt, @SortOrder);
+                    SELECT last_insert_rowid();";
 
-                connection.Execute(sql, new
+                var newId = connection.ExecuteScalar<long>(sql, new
                 {
                     memo.Content,
                     Date = memo.Date.ToString("yyyy-MM-dd"),
@@ -121,6 +122,8 @@ namespace DesktopMemo.Services
                     CompletedAt = memo.CompletedAt?.ToString("yyyy-MM-dd HH:mm:ss"),
                     memo.SortOrder
                 });
+
+                memo.Id = (int)newId;
             }
             catch (Exception ex)
             {
@@ -153,6 +156,25 @@ namespace DesktopMemo.Services
                 CompletedAt = memo.CompletedAt?.ToString("yyyy-MM-dd HH:mm:ss"),
                 memo.SortOrder
             });
+        }
+
+        public void UpdateMemoSortOrders(IEnumerable<MemoItem> memos)
+        {
+            using var connection = new SQLiteConnection(_connectionString);
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+
+            const string sql = @"
+                UPDATE MemoItems
+                SET SortOrder = @SortOrder
+                WHERE Id = @Id";
+
+            foreach (var memo in memos.Where(m => m.Id > 0))
+            {
+                connection.Execute(sql, new { memo.Id, memo.SortOrder }, transaction);
+            }
+
+            transaction.Commit();
         }
 
         /// <summary>

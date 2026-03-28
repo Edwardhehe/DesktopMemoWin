@@ -62,7 +62,7 @@ namespace DesktopMemo.Views
             // 设置标题
             TitleTextBlock.Text = $"📅 {selectedDate:yyyy年MM月dd日} 待办事项";
             
-            // 设置DataContext以便命令绑定
+            // 设置DataContext以便窗口级命令绑定
             this.DataContext = this;
             
             // 绑定数据源
@@ -74,8 +74,6 @@ namespace DesktopMemo.Views
             // 更新状态
             UpdateStatus();
             
-            // 订阅备忘录状态变化事件
-            SubscribeToMemoChanges();
         }
 
         /// <summary>
@@ -119,6 +117,7 @@ namespace DesktopMemo.Views
         {
             try
             {
+                UnsubscribeFromMemoChanges();
                 _dailyMemos.Clear();
                 
                 // 从数据库获取当天所有备忘录
@@ -131,6 +130,8 @@ namespace DesktopMemo.Views
                 {
                     _dailyMemos.Add(memo);
                 }
+
+                SubscribeToMemoChanges();
                 
                 UpdateStatus();
             }
@@ -188,6 +189,7 @@ namespace DesktopMemo.Views
 
                     // 通知主界面刷新
                     _mainViewModel.RefreshCalendar();
+                    NotifySiblingDailyWindows();
                 }
             }
             catch (Exception ex)
@@ -261,6 +263,7 @@ namespace DesktopMemo.Views
 
                     // 重新加载当天待办事项
                     LoadDailyTasks();
+                    NotifySiblingDailyWindows();
                 }
             }
             catch (Exception ex)
@@ -289,18 +292,9 @@ namespace DesktopMemo.Views
                     _dailyMemos.Remove(memo);
                 }
 
-                // 从主界面日历数据中删除
-                foreach (var day in _mainViewModel.CalendarDays)
-                {
-                    if (day.Memos.Contains(memo))
-                    {
-                        day.Memos.Remove(memo);
-                        break;
-                    }
-                }
-
-                // 更新状态
+                _mainViewModel.RefreshCalendar();
                 UpdateStatus();
+                NotifySiblingDailyWindows();
             }
             catch (Exception ex)
             {
@@ -331,6 +325,7 @@ namespace DesktopMemo.Views
                 
                 // 通知主界面刷新
                 _mainViewModel.RefreshCalendar();
+                NotifySiblingDailyWindows();
             }
             catch (Exception ex)
             {
@@ -350,6 +345,7 @@ namespace DesktopMemo.Views
             try
             {
                 memo.IsCompleted = false;
+                memo.CompletedAt = null;
                 _databaseService.UpdateMemo(memo);
                 
                 // 重新排序当日待办事项
@@ -360,6 +356,7 @@ namespace DesktopMemo.Views
                 
                 // 通知主界面刷新
                 _mainViewModel.RefreshCalendar();
+                NotifySiblingDailyWindows();
             }
             catch (Exception ex)
             {
@@ -375,10 +372,14 @@ namespace DesktopMemo.Views
         {
             var sortedMemos = _dailyMemos.OrderBy(m => m.IsCompleted).ThenBy(m => m.CreatedAt).ToList();
             _dailyMemos.Clear();
-            foreach (var memo in sortedMemos)
+            for (int index = 0; index < sortedMemos.Count; index++)
             {
+                var memo = sortedMemos[index];
+                memo.SortOrder = index;
                 _dailyMemos.Add(memo);
             }
+
+            _databaseService.UpdateMemoSortOrders(sortedMemos);
         }
 
         /// <summary>
@@ -398,6 +399,14 @@ namespace DesktopMemo.Views
             foreach (var memo in _dailyMemos)
             {
                 memo.PropertyChanged += OnMemoPropertyChanged;
+            }
+        }
+
+        private void UnsubscribeFromMemoChanges()
+        {
+            foreach (var memo in _dailyMemos)
+            {
+                memo.PropertyChanged -= OnMemoPropertyChanged;
             }
         }
 
@@ -430,6 +439,24 @@ namespace DesktopMemo.Views
             }
         }
 
+        private void NotifySiblingDailyWindows()
+        {
+            try
+            {
+                foreach (Window window in Application.Current.Windows)
+                {
+                    if (window is DailyTasksWindow dailyTasksWindow && !ReferenceEquals(dailyTasksWindow, this))
+                    {
+                        dailyTasksWindow.RefreshData();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"通知其他当天任务窗口刷新失败：{ex.Message}");
+            }
+        }
+
         /// <summary>
         /// 窗口关闭事件
         /// </summary>
@@ -438,10 +465,7 @@ namespace DesktopMemo.Views
             base.OnClosed(e);
 
             // 取消订阅事件
-            foreach (var memo in _dailyMemos)
-            {
-                memo.PropertyChanged -= OnMemoPropertyChanged;
-            }
+            UnsubscribeFromMemoChanges();
 
             // 清理资源
             _dailyMemos?.Clear();

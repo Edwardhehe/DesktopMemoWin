@@ -410,3 +410,10 @@ $RECYCLE.BIN/
 # 构建脚本生成的临时文件
 build_temp/
 installer_temp/
+
+# Local tool artifacts
+.codex-build/
+.claude/settings.local.json
+
+# Accidental local files
+nul
