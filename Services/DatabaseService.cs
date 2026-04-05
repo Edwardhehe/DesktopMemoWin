@@ -158,6 +158,41 @@ namespace DesktopMemo.Services
             });
         }
 
+        public MemoItem? GetMemoById(int id)
+        {
+            try
+            {
+                using var connection = new SQLiteConnection(_connectionString);
+                connection.Open();
+
+                const string sql = @"
+                    SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
+                    FROM MemoItems
+                    WHERE Id = @Id";
+
+                var dto = connection.QueryFirstOrDefault<MemoItemDto>(sql, new { Id = id });
+                if (dto == null)
+                {
+                    return null;
+                }
+
+                return new MemoItem
+                {
+                    Id = dto.Id,
+                    Content = dto.Content,
+                    Date = DateTime.Parse(dto.Date),
+                    IsCompleted = dto.IsCompleted == 1,
+                    CreatedAt = DateTime.Parse(dto.CreatedAt),
+                    CompletedAt = string.IsNullOrEmpty(dto.CompletedAt) ? null : DateTime.Parse(dto.CompletedAt),
+                    SortOrder = dto.SortOrder
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"获取备忘录详情失败: {ex.Message}", ex);
+            }
+        }
+
         public void UpdateMemoSortOrders(IEnumerable<MemoItem> memos)
         {
             using var connection = new SQLiteConnection(_connectionString);
@@ -188,6 +223,17 @@ namespace DesktopMemo.Services
 
             var sql = "DELETE FROM MemoItems WHERE Id = @Id";
             connection.Execute(sql, new { Id = id });
+        }
+
+        public void ClearAllMemos()
+        {
+            using var connection = new SQLiteConnection(_connectionString);
+            connection.Open();
+
+            using var transaction = connection.BeginTransaction();
+            connection.Execute("DELETE FROM MemoItems", transaction: transaction);
+            connection.Execute("DELETE FROM sqlite_sequence WHERE name = 'MemoItems'", transaction: transaction);
+            transaction.Commit();
         }
 
         /// <summary>

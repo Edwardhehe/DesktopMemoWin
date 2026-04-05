@@ -188,7 +188,7 @@ namespace DesktopMemo.Views
                     LoadDailyTasks();
 
                     // 通知主界面刷新
-                    _mainViewModel.RefreshCalendar();
+                    _mainViewModel.RefreshAllViews();
                     NotifySiblingDailyWindows();
                 }
             }
@@ -259,7 +259,7 @@ namespace DesktopMemo.Views
                     _databaseService.UpdateMemo(memo);
 
                     // 强制刷新主界面和当天任务
-                    _mainViewModel.RefreshCalendar();
+                    _mainViewModel.RefreshAllViews();
 
                     // 重新加载当天待办事项
                     LoadDailyTasks();
@@ -292,7 +292,7 @@ namespace DesktopMemo.Views
                     _dailyMemos.Remove(memo);
                 }
 
-                _mainViewModel.RefreshCalendar();
+                _mainViewModel.RefreshAllViews();
                 UpdateStatus();
                 NotifySiblingDailyWindows();
             }
@@ -324,7 +324,7 @@ namespace DesktopMemo.Views
                 UpdateStatus();
                 
                 // 通知主界面刷新
-                _mainViewModel.RefreshCalendar();
+                _mainViewModel.RefreshAllViews();
                 NotifySiblingDailyWindows();
             }
             catch (Exception ex)
@@ -355,7 +355,7 @@ namespace DesktopMemo.Views
                 UpdateStatus();
                 
                 // 通知主界面刷新
-                _mainViewModel.RefreshCalendar();
+                _mainViewModel.RefreshAllViews();
                 NotifySiblingDailyWindows();
             }
             catch (Exception ex)
@@ -418,7 +418,7 @@ namespace DesktopMemo.Views
             if (e.PropertyName == nameof(MemoItem.IsCompleted))
             {
                 // 当完成状态变化时，刷新主界面
-                _mainViewModel.RefreshCalendar();
+                _mainViewModel.RefreshAllViews();
                 UpdateStatus();
             }
         }

@@ -237,7 +237,7 @@ namespace DesktopMemo.Views
                     if (_viewModel != null)
                     {
                         // 强制刷新主界面
-                        _viewModel.RefreshCalendar();
+                        _viewModel.RefreshAllViews();
 
                         // 通知所有打开的窗口刷新
                         NotifyAllWindowsRefresh();
@@ -271,6 +271,10 @@ namespace DesktopMemo.Views
                     {
                         // 通知DailyTasksWindow刷新
                         dailyTasksWindow.RefreshData();
+                    }
+                    else if (window is MemoDetailWindow memoDetailWindow)
+                    {
+                        memoDetailWindow.RefreshData();
                     }
                 }
             }

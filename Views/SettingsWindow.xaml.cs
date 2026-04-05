@@ -134,7 +134,7 @@ namespace DesktopMemo.Views
                     {
                         _databaseService.ImportDatabase(openFileDialog.FileName);
                         _databaseService.ReloadDatabase();
-                        _viewModel.RefreshCalendar();
+                        _viewModel.RefreshAllViews();
                         NotifyAllWindowsRefresh();
 
                         MessageBox.Show("数据导入成功，界面已刷新。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -162,14 +162,8 @@ namespace DesktopMemo.Views
             {
                 try
                 {
-                    var dbPath = _databaseService.GetDatabasePath();
-                    if (File.Exists(dbPath))
-                    {
-                        File.Delete(dbPath);
-                    }
-
-                    _databaseService.ReloadDatabase();
-                    _viewModel.RefreshCalendar();
+                    _databaseService.ClearAllMemos();
+                    _viewModel.RefreshAllViews();
                     NotifyAllWindowsRefresh();
 
                     MessageBox.Show("数据清空成功，界面已刷新。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -210,6 +204,10 @@ namespace DesktopMemo.Views
                     if (window is DailyTasksWindow dailyTasksWindow)
                     {
                         dailyTasksWindow.RefreshData();
+                    }
+                    else if (window is MemoDetailWindow memoDetailWindow)
+                    {
+                        memoDetailWindow.RefreshData();
                     }
                 }
             }

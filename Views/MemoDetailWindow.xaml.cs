@@ -65,6 +65,32 @@ namespace DesktopMemo.Views
             }
         }
 
+        public void RefreshData()
+        {
+            if (_mainViewModel == null || _memo == null || _memo.Id <= 0)
+            {
+                LoadMemoDetails();
+                return;
+            }
+
+            try
+            {
+                var latestMemo = _mainViewModel.GetDatabaseService().GetMemoById(_memo.Id);
+                if (latestMemo == null)
+                {
+                    Close();
+                    return;
+                }
+
+                _memo = latestMemo;
+                LoadMemoDetails();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"刷新备忘录详情失败: {ex.Message}");
+            }
+        }
+
         /// <summary>
         /// 编辑按钮点击事件
         /// </summary>
@@ -77,7 +103,7 @@ namespace DesktopMemo.Views
                 if (_editCallback != null)
                 {
                     _editCallback(_memo);
-                    LoadMemoDetails();
+                    RefreshData();
                 }
                 else
                 {
@@ -98,7 +124,7 @@ namespace DesktopMemo.Views
                                 databaseService.UpdateMemo(_memo);
 
                                 // 刷新详情
-                                LoadMemoDetails();
+                                RefreshData();
 
                                 // 根据日期是否改变来刷新
                                 if (oldDate != newDate)
@@ -179,6 +205,10 @@ namespace DesktopMemo.Views
                     {
                         // 通知DailyTasksWindow刷新
                         dailyTasksWindow.RefreshData();
+                    }
+                    else if (window is MemoDetailWindow memoDetailWindow && !ReferenceEquals(memoDetailWindow, this))
+                    {
+                        memoDetailWindow.RefreshData();
                     }
                 }
             }

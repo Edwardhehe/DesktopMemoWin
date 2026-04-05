@@ -4,8 +4,8 @@
         xmlns:local="clr-namespace:DesktopMemo.Converters"
         x:Name="MemoWindow"
         Title="桌面备忘录" 
-        Height="800" 
-        Width="750"
+        Height="880" 
+        Width="825"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
@@ -60,7 +60,7 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="16"/>
             <Setter Property="Margin" Value="4"/>
-            <Setter Property="MinHeight" Value="108"/>
+            <Setter Property="MinHeight" Value="119"/>
             <Setter Property="Padding" Value="7"/>
             <Setter Property="Effect" Value="{StaticResource SoftShadowEffect}"/>
             <Style.Triggers>
@@ -79,7 +79,7 @@
             <Setter Property="BorderThickness" Value="2"/>
             <Setter Property="CornerRadius" Value="18"/>
             <Setter Property="Margin" Value="4"/>
-            <Setter Property="MinHeight" Value="108"/>
+            <Setter Property="MinHeight" Value="119"/>
             <Setter Property="Padding" Value="7"/>
             <Setter Property="Effect" Value="{StaticResource SoftShadowEffect}"/>
             <Style.Triggers>
@@ -96,7 +96,7 @@
             <Setter Property="BorderBrush" Value="#84F08A"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="10"/>
-            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Margin" Value="2,1"/>
             <Setter Property="Padding" Value="5,4"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Style.Triggers>
@@ -118,7 +118,7 @@
             <Setter Property="BorderBrush" Value="#C8D7E9"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="10"/>
-            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Margin" Value="2,1"/>
             <Setter Property="Padding" Value="5,4"/>
             <Setter Property="Opacity" Value="0.84"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -142,8 +142,8 @@
             <Setter Property="Background" Value="#BFF8FAFD"/>
             <Setter Property="BorderBrush" Value="#D5D9E2"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="10,6"/>
-            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="9,6"/>
+            <Setter Property="FontSize" Value="11"/>
             <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
             <Setter Property="Foreground" Value="#23415F"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -189,33 +189,33 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
-                        <Border Width="28" Height="28" CornerRadius="14" Background="#C9F4F7FB" Margin="0,0,10,0">
-                            <TextBlock Text="📝" FontSize="13" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <Border Width="26" Height="26" CornerRadius="13" Background="#C9F4F7FB" Margin="0,0,9,0">
+                            <TextBlock Text="📝" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         </Border>
                         <StackPanel>
-                            <TextBlock Text="桌面备忘录" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" Foreground="#214162"/>
-                            <TextBlock Text="{Binding CurrentMonth, StringFormat='yyyy年MM月'}" VerticalAlignment="Center" FontSize="11" Foreground="#70839A"/>
+                            <TextBlock Text="桌面备忘录" FontWeight="Bold" FontSize="13.5" VerticalAlignment="Center" Foreground="#214162"/>
+                            <TextBlock Text="{Binding CurrentMonth, StringFormat='yyyy年MM月'}" VerticalAlignment="Center" FontSize="10" Foreground="#70839A"/>
                         </StackPanel>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
-                        <Button Content="◀" Command="{Binding PreviousMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="34" Height="28" Margin="3" ToolTip="上个月"/>
-                        <Button Content="▶" Command="{Binding NextMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="34" Height="28" Margin="3" ToolTip="下个月"/>
-                        <Button Content="⚙" Click="SettingsButton_Click" Style="{StaticResource ModernButtonStyle}" Width="38" Height="28" Margin="3" ToolTip="设置"/>
-                        <Button Content="✕" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="34" Height="28" Margin="3" ToolTip="关闭"/>
+                        <Button Content="◀" Command="{Binding PreviousMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="33" Height="29" Margin="2.5" ToolTip="上个月"/>
+                        <Button Content="▶" Command="{Binding NextMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="33" Height="29" Margin="2.5" ToolTip="下个月"/>
+                        <Button Content="⚙" Click="SettingsButton_Click" Style="{StaticResource ModernButtonStyle}" Width="37" Height="29" Margin="2.5" ToolTip="设置"/>
+                        <Button Content="✕" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="33" Height="29" Margin="2.5" ToolTip="关闭"/>
                     </StackPanel>
                 </Grid>
             </Border>
             
             <!-- 日历内容 -->
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" Padding="0">
-                <Grid Margin="14,12,14,10">
+                <Grid Margin="14,11,14,9">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     
                     <!-- 星期标题 -->
-                    <Border Grid.Row="0" Background="#D7F3EEF2" CornerRadius="16" BorderBrush="#D5CAD2" BorderThickness="1" Padding="8,6" Margin="4,0,4,8">
+                    <Border Grid.Row="0" Background="Transparent" CornerRadius="16" BorderBrush="Transparent" BorderThickness="1" Padding="9,6" Margin="4,0,4,8">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -227,13 +227,13 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         
-                        <TextBlock Grid.Column="0" Text="日" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#7D4C4C"/>
-                        <TextBlock Grid.Column="1" Text="一" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A"/>
-                        <TextBlock Grid.Column="2" Text="二" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A"/>
-                        <TextBlock Grid.Column="3" Text="三" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A"/>
-                        <TextBlock Grid.Column="4" Text="四" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A"/>
-                        <TextBlock Grid.Column="5" Text="五" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A"/>
-                        <TextBlock Grid.Column="6" Text="六" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#3F73B0"/>
+                        <TextBlock Grid.Column="0" Text="日" HorizontalAlignment="Center" FontWeight="Bold" FontSize="11" Foreground="#7D4C4C"/>
+                        <TextBlock Grid.Column="1" Text="一" HorizontalAlignment="Center" FontWeight="Bold" FontSize="11" Foreground="#58708A"/>
+                        <TextBlock Grid.Column="2" Text="二" HorizontalAlignment="Center" FontWeight="Bold" FontSize="11" Foreground="#58708A"/>
+                        <TextBlock Grid.Column="3" Text="三" HorizontalAlignment="Center" FontWeight="Bold" FontSize="11" Foreground="#58708A"/>
+                        <TextBlock Grid.Column="4" Text="四" HorizontalAlignment="Center" FontWeight="Bold" FontSize="11" Foreground="#58708A"/>
+                        <TextBlock Grid.Column="5" Text="五" HorizontalAlignment="Center" FontWeight="Bold" FontSize="11" Foreground="#58708A"/>
+                        <TextBlock Grid.Column="6" Text="六" HorizontalAlignment="Center" FontWeight="Bold" FontSize="11" Foreground="#3F73B0"/>
                     </Grid>
                     </Border>
                     
@@ -256,7 +256,7 @@
                                         </Grid.RowDefinitions>
                                         
                                         <!-- 日期行 -->
-                                        <Grid Grid.Row="0" Margin="2,2,2,1">
+                                        <Grid Grid.Row="0" Margin="1,1,1,0">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto"/>
                                                 <ColumnDefinition Width="*"/>
@@ -270,7 +270,7 @@
                                                     CommandParameter="{Binding}"
                                                     Width="20" 
                                                     Height="20" 
-                                                    FontSize="12" 
+                                                    FontSize="11" 
                                                     FontWeight="Bold"
                                                     Margin="0,0,4,0"
                                                     Background="{StaticResource AccentBrush}"
@@ -296,7 +296,7 @@
                                             <TextBlock Grid.Column="2" 
                                                    Text="{Binding Date.Day}" 
                                                    HorizontalAlignment="Right" 
-                                                       FontSize="12"
+                                                       FontSize="11"
                                                    Margin="0,0,4,0"
                                                    FontWeight="{Binding IsToday, Converter={StaticResource BoolToFontWeightConverter}}"
                                                    Foreground="{Binding IsToday, Converter={StaticResource TodayForegroundConverter}}"
@@ -308,9 +308,10 @@
                                         <!-- 备忘录列表 -->
                                         <ScrollViewer Grid.Row="1" 
                                                       VerticalScrollBarVisibility="Hidden" 
-                                                          HorizontalScrollBarVisibility="Disabled"
-                                                      MaxHeight="76"
-                                                      Margin="0,5,0,0">
+                                                      HorizontalScrollBarVisibility="Disabled"
+                                                      VerticalAlignment="Top"
+                                                      MaxHeight="81"
+                                                      Margin="0,1,0,0">
                                                 <ItemsControl ItemsSource="{Binding Memos}">
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
@@ -344,7 +345,7 @@
                                                                                Text="{Binding Content, Converter={StaticResource TextTruncateConverter}, ConverterParameter=8}" 
                                                                                TextWrapping="NoWrap" 
                                                                                TextTrimming="CharacterEllipsis"
-                                                                               FontSize="9.5"
+                                                                               FontSize="8.8"
                                                                                VerticalAlignment="Center"
                                                                                Margin="0,0,3,0"
                                                                                ToolTip="{Binding Content}"
@@ -368,7 +369,7 @@
                                                                             CommandParameter="{Binding}"
                                                                             Width="14" 
                                                                             Height="14" 
-                                                                            FontSize="8" 
+                                                                            FontSize="7.5" 
                                                                             Margin="2,0,0,0"
                                                                             Background="{StaticResource AccentBrush}"
                                                                             Foreground="White"
@@ -408,7 +409,7 @@
             </ScrollViewer>
             
             <!-- 状态栏 -->
-            <Border Grid.Row="2" CornerRadius="0,0,27,27" Height="46" Background="#D9F2ECEF" BorderBrush="#D5CCD4" BorderThickness="1,1,1,0">
+            <Border Grid.Row="2" CornerRadius="0,0,27,27" Height="44" Background="#D9F2ECEF" BorderBrush="#D5CCD4" BorderThickness="1,1,1,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -416,10 +417,10 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
                         <Ellipse Width="9" Height="9" Fill="{StaticResource SuccessBrush}" Margin="0,0,8,0"/>
-                        <TextBlock Text="桌面备忘录正在运行中" VerticalAlignment="Center" FontSize="11" Foreground="#36516D"/>
+                        <TextBlock Text="桌面备忘录正在运行中" VerticalAlignment="Center" FontSize="10" Foreground="#36516D"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
-                        <CheckBox Content="开机启动" IsChecked="{Binding IsStartupEnabled}" VerticalAlignment="Center" FontSize="11" Foreground="#36516D"/>
+                        <CheckBox Content="开机启动" IsChecked="{Binding IsStartupEnabled}" VerticalAlignment="Center" FontSize="10" Foreground="#36516D"/>
                     </StackPanel>
                 </Grid>
             </Border>

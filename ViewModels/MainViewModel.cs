@@ -20,6 +20,8 @@ namespace DesktopMemo.ViewModels
         private readonly DesktopMonitorService _desktopMonitorService;
         private readonly StartupService _startupService;
         private readonly DispatcherTimer _dateCheckTimer;
+        private readonly DispatcherTimer _databaseRefreshTimer;
+        private readonly FileSystemWatcher? _databaseWatcher;
 
         private DateTime _currentMonth;
         private bool _isDesktopVisible;
@@ -132,6 +134,13 @@ namespace DesktopMemo.ViewModels
         {
             _desktopMonitorService?.StopMonitoring();
             _dateCheckTimer?.Stop();
+            _databaseRefreshTimer?.Stop();
+
+            if (_databaseWatcher != null)
+            {
+                _databaseWatcher.EnableRaisingEvents = false;
+                _databaseWatcher.Dispose();
+            }
         }
 
         /// <summary>
@@ -151,7 +160,13 @@ namespace DesktopMemo.ViewModels
             LoadCalendarData();
         }
 
-        private void NotifyOpenDailyTaskWindows()
+        public void RefreshAllViews()
+        {
+            LoadCalendarData();
+            NotifyOpenChildWindows();
+        }
+
+        private void NotifyOpenChildWindows()
         {
             try
             {
@@ -160,6 +175,10 @@ namespace DesktopMemo.ViewModels
                     if (window is Views.DailyTasksWindow dailyTasksWindow)
                     {
                         dailyTasksWindow.RefreshData();
+                    }
+                    else if (window is Views.MemoDetailWindow memoDetailWindow)
+                    {
+                        memoDetailWindow.RefreshData();
                     }
                 }
             }
@@ -291,6 +310,12 @@ namespace DesktopMemo.ViewModels
             _dateCheckTimer.Tick += OnDateCheckTimerTick;
             _dateCheckTimer.Start();
 
+            _databaseRefreshTimer = new DispatcherTimer();
+            _databaseRefreshTimer.Interval = TimeSpan.FromMilliseconds(600);
+            _databaseRefreshTimer.Tick += OnDatabaseRefreshTimerTick;
+
+            _databaseWatcher = CreateDatabaseWatcher();
+
             // 加载日历数据
             LoadCalendarData();
         }
@@ -298,6 +323,54 @@ namespace DesktopMemo.ViewModels
         /// <summary>
         /// 加载日历数据
         /// </summary>
+        private FileSystemWatcher? CreateDatabaseWatcher()
+        {
+            try
+            {
+                var databasePath = _databaseService.GetDatabasePath();
+                var directory = Path.GetDirectoryName(databasePath);
+                var fileName = Path.GetFileName(databasePath);
+
+                if (string.IsNullOrWhiteSpace(directory) || string.IsNullOrWhiteSpace(fileName))
+                {
+                    return null;
+                }
+
+                var watcher = new FileSystemWatcher(directory, fileName);
+                watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.CreationTime;
+                watcher.IncludeSubdirectories = false;
+                watcher.Changed += OnDatabaseFileChanged;
+                watcher.Created += OnDatabaseFileChanged;
+                watcher.Renamed += OnDatabaseFileChanged;
+                watcher.EnableRaisingEvents = true;
+                return watcher;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"创建数据库文件监听失败: {ex.Message}");
+                return null;
+            }
+        }
+
+        private void OnDatabaseFileChanged(object sender, FileSystemEventArgs e)
+        {
+            try
+            {
+                _databaseRefreshTimer.Stop();
+                _databaseRefreshTimer.Start();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"处理数据库变更事件失败: {ex.Message}");
+            }
+        }
+
+        private void OnDatabaseRefreshTimerTick(object? sender, EventArgs e)
+        {
+            _databaseRefreshTimer.Stop();
+            RefreshAllViews();
+        }
+
         private void LoadCalendarData()
         {
             try
@@ -403,7 +476,7 @@ namespace DesktopMemo.ViewModels
                         RefreshDate(memo.Date);
                     }
 
-                    NotifyOpenDailyTaskWindows();
+                    NotifyOpenChildWindows();
                 }
             }
             catch (Exception ex)
@@ -433,7 +506,7 @@ namespace DesktopMemo.ViewModels
 
                 // 重新排序备忘录列表，将已完成的放到未完成的后面
                 ReorderMemosInDay(memo);
-                NotifyOpenDailyTaskWindows();
+                NotifyOpenChildWindows();
             }
             catch (Exception ex)
             {
@@ -457,7 +530,7 @@ namespace DesktopMemo.ViewModels
             ReorderMemosInDay(memo);
             // 通知UI刷新
             OnPropertyChanged(nameof(CalendarDays));
-            NotifyOpenDailyTaskWindows();
+            NotifyOpenChildWindows();
         }
 
         /// <summary>
@@ -502,7 +575,7 @@ namespace DesktopMemo.ViewModels
 
             try
             {
-                var detailWindow = new Views.MemoDetailWindow(memo, EditMemoCallback);
+                var detailWindow = new Views.MemoDetailWindow(memo, EditMemoCallback, this);
                 var mainWindow = System.Windows.Application.Current.MainWindow;
                 if (mainWindow != null)
                 {
@@ -553,7 +626,7 @@ namespace DesktopMemo.ViewModels
                         RefreshDate(oldDate);
                     }
 
-                    NotifyOpenDailyTaskWindows();
+                    NotifyOpenChildWindows();
                 }
             }
             catch (Exception ex)
@@ -589,7 +662,7 @@ namespace DesktopMemo.ViewModels
                     }
                 }
 
-                NotifyOpenDailyTaskWindows();
+                NotifyOpenChildWindows();
             }
             catch (Exception ex)
             {
