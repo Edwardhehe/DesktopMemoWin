@@ -4,8 +4,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="当日任务"
         FontFamily="Microsoft YaHei UI"
-        Height="420"
-        Width="520"
+        Height="380"
+        Width="480"
         WindowStartupLocation="Manual"
         ResizeMode="NoResize"
         WindowStyle="None"
@@ -43,26 +43,26 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" CornerRadius="27,27,0,0" Height="56" Background="#DDF3EEF5" BorderBrush="#CFC6CF" BorderThickness="0,0,0,1">
+            <Border Grid.Row="0" CornerRadius="27,27,0,0" Height="48" Background="#DDF3EEF5" BorderBrush="#CFC6CF" BorderThickness="0,0,0,1">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" x:Name="TitleTextBlock" Text="当日任务" FontWeight="Bold" FontSize="16" VerticalAlignment="Center" Margin="18,0" Foreground="#214162"/>
-                    <Button Grid.Column="1" Content="×" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="34" Height="32" Margin="0,0,15,0"/>
+                    <TextBlock Grid.Column="0" x:Name="TitleTextBlock" Text="当日任务" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" Margin="16,0" Foreground="#214162"/>
+                    <Button Grid.Column="1" Content="×" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="32" Height="28" Margin="0,0,14,0"/>
                 </Grid>
             </Border>
 
-            <Border Grid.Row="1" Background="#D7F3EEF2" Margin="18,14,18,8" CornerRadius="18" Padding="12" BorderBrush="#D7CDD4" BorderThickness="1">
-                <Button Content="添加新任务" Click="AddTaskButton_Click" Background="{StaticResource AccentBrush}" Foreground="White" Height="38" FontSize="12" FontWeight="SemiBold"/>
+            <Border Grid.Row="1" Background="#D7F3EEF2" Margin="16,12,16,6" CornerRadius="16" Padding="10" BorderBrush="#D7CDD4" BorderThickness="1">
+                <Button Content="添加新任务" Click="AddTaskButton_Click" Background="{StaticResource AccentBrush}" Foreground="White" Height="34" FontSize="11" FontWeight="SemiBold"/>
             </Border>
 
-            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="18,6,18,14">
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="16,4,16,10">
                 <ItemsControl x:Name="TasksItemsControl">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderBrush="#CBD7E5" BorderThickness="1" CornerRadius="12" Margin="0,0,0,8" Padding="10,9" MouseLeftButtonDown="TaskItem_MouseLeftButtonDown" Tag="{Binding}">
+                            <Border BorderBrush="#CBD7E5" BorderThickness="1" CornerRadius="12" Margin="0,0,0,6" Padding="10,8" MouseLeftButtonDown="TaskItem_MouseLeftButtonDown" Tag="{Binding}">
                                 <Border.Style>
                                     <Style TargetType="Border">
                                         <Setter Property="Background" Value="#D8F8FAFE"/>
@@ -96,7 +96,7 @@
                                         <TextBlock Text="★" FontSize="10.5" Foreground="#C97D2D" Margin="0,0,6,0" Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                         <TextBlock Text="{Binding PriorityText}" FontSize="10.5" Foreground="#B45A3C"/>
                                     </StackPanel>
-                                    <TextBlock Grid.Column="1" Text="{Binding Content}" TextWrapping="Wrap" FontSize="12" Margin="0,0,10,0" ToolTip="{Binding Content}" TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToTextDecorationConverter}}">
+                                    <TextBlock Grid.Column="1" Text="{Binding Content}" TextWrapping="Wrap" FontSize="11.5" Margin="0,0,10,0" ToolTip="{Binding Content}" TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToTextDecorationConverter}}">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
                                                 <Setter Property="Foreground" Value="#2D3748"/>
@@ -116,10 +116,10 @@
                 </ItemsControl>
             </ScrollViewer>
 
-            <Border Grid.Row="3" CornerRadius="0,0,27,27" Height="46" Background="#D9F2ECEF" BorderBrush="#D5CCD4" BorderThickness="1,1,1,0">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,18,0">
+            <Border Grid.Row="3" CornerRadius="0,0,27,27" Height="42" Background="#D9F2ECEF" BorderBrush="#D5CCD4" BorderThickness="1,1,1,0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,16,0">
                     <TextBlock x:Name="StatusTextBlock" Text="共 0 条" VerticalAlignment="Center" FontSize="10.5" Foreground="#36516D" Margin="0,0,15,0"/>
-                    <Button Content="关闭" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="72" Height="30"/>
+                    <Button Content="关闭" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="68" Height="28"/>
                 </StackPanel>
             </Border>
         </Grid>

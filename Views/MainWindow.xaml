@@ -49,7 +49,7 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="16"/>
             <Setter Property="Margin" Value="1.5"/>
-            <Setter Property="MinHeight" Value="108"/>
+            <Setter Property="MinHeight" Value="92"/>
             <Setter Property="Padding" Value="4"/>
         </Style>
 
@@ -116,9 +116,9 @@
                     </UniformGrid>
                 </Border>
 
-                    <ItemsControl Grid.Row="2" ItemsSource="{Binding CalendarDays}" Visibility="{Binding IsMonthView, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <ItemsControl Grid.Row="2" ItemsSource="{Binding CalendarDays}" Visibility="{Binding IsMonthView, Converter={StaticResource BoolToVisibilityConverter}}" VerticalAlignment="Top" Margin="0,0,0,4">
                         <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate><UniformGrid Columns="7"/></ItemsPanelTemplate>
+                            <ItemsPanelTemplate><UniformGrid Columns="7" Rows="6"/></ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -139,11 +139,11 @@
                                             </Button>
                                             <TextBlock Grid.Column="2" Text="{Binding Date.Day}" HorizontalAlignment="Right" FontSize="11.5" Margin="0,0,4,0" FontWeight="{Binding IsToday, Converter={StaticResource BoolToFontWeightConverter}}" Foreground="{Binding IsToday, Converter={StaticResource TodayForegroundConverter}}" MouseLeftButtonDown="DateRow_MouseLeftButtonDown" Tag="{Binding}" Cursor="Hand"/>
                                         </Grid>
-                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" VerticalAlignment="Top" MaxHeight="84" Margin="0,1,0,0">
+                                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" VerticalAlignment="Top" MaxHeight="74" Margin="0,1,0,0">
                                             <ItemsControl ItemsSource="{Binding Memos}">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
-                                                        <Border Tag="{Binding}" BorderThickness="1" CornerRadius="10" Margin="0.5,0.5" Padding="5,4">
+                                                        <Border Tag="{Binding}" BorderThickness="1" CornerRadius="10" Margin="0,0,0,1.5" Padding="4,2">
                                                             <Border.Style>
                                                                 <Style TargetType="Border">
                                                                     <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
@@ -174,7 +174,7 @@
                                                             <DockPanel>
                                                                 <TextBlock Text="★" FontSize="8.5" Foreground="#C97D2D" Margin="0,0,3,0" Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibilityConverter}}" DockPanel.Dock="Left"/>
                                                                 <TextBlock Text="{Binding PriorityBadge}" FontSize="8" Foreground="#B45A3C" Margin="3,0,0,0" DockPanel.Dock="Right"/>
-                                                                <TextBlock Text="{Binding Content, Converter={StaticResource TextTruncateConverter}, ConverterParameter=8}" FontSize="9.5" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding Content}" TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToTextDecorationConverter}}">
+                                                                <TextBlock Text="{Binding Content, Converter={StaticResource TextTruncateConverter}, ConverterParameter=8}" FontSize="9.2" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding Content}" TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToTextDecorationConverter}}">
                                                                     <TextBlock.Style>
                                                                         <Style TargetType="TextBlock">
                                                                             <Setter Property="Foreground" Value="#2D3748"/>

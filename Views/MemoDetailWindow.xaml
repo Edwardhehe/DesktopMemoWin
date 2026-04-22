@@ -3,15 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="备忘录详情"
         FontFamily="Microsoft YaHei UI"
-        Height="360"
-        Width="560"
+        Height="330"
+        Width="520"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResize"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
-        MinHeight="300"
-        MinWidth="440">
+        MinHeight="280"
+        MinWidth="420">
 
     <Window.Resources>
         <LinearGradientBrush x:Key="DialogSurfaceBrush" StartPoint="0,0" EndPoint="1,1">
@@ -94,28 +94,28 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" CornerRadius="27,27,0,0" Height="56" Background="#DDF3EEF5" BorderBrush="#CFC6CF" BorderThickness="0,0,0,1">
+            <Border Grid.Row="0" CornerRadius="27,27,0,0" Height="48" Background="#DDF3EEF5" BorderBrush="#CFC6CF" BorderThickness="0,0,0,1">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="备忘录详情" FontWeight="Bold" FontSize="16" VerticalAlignment="Center" Margin="18,0" Foreground="#214162"/>
-                    <Button Grid.Column="1" Content="×" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="34" Height="32" Margin="0,0,15,0" ToolTip="关闭"/>
+                    <TextBlock Grid.Column="0" Text="备忘录详情" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" Margin="16,0" Foreground="#214162"/>
+                    <Button Grid.Column="1" Content="×" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="32" Height="28" Margin="0,0,14,0" ToolTip="关闭"/>
                 </Grid>
             </Border>
 
             <ScrollViewer Grid.Row="1"
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled"
-                          Margin="18,16,18,14">
+                          Margin="16,12,16,10">
                 <StackPanel>
                     <Border Background="#FFFFFF"
                             BorderBrush="#D7CDD4"
                             BorderThickness="1"
-                            CornerRadius="20"
-                            Padding="18"
-                            Margin="0,0,0,14">
+                            CornerRadius="18"
+                            Padding="16"
+                            Margin="0,0,0,10">
                         <TextBlock x:Name="ContentTextBlock"
                                    TextWrapping="Wrap"
                                    FontSize="13"
@@ -126,8 +126,8 @@
                     <Border Background="#D7F3EEF2"
                             BorderBrush="#D7CDD4"
                             BorderThickness="1"
-                            CornerRadius="18"
-                            Padding="16">
+                            CornerRadius="16"
+                            Padding="14">
                         <StackPanel>
                             <TextBlock Text="信息概览"
                                        FontSize="13"
@@ -183,23 +183,23 @@
                 </StackPanel>
             </ScrollViewer>
 
-            <Border Grid.Row="2" CornerRadius="0,0,27,27" Height="48" Background="#D9F2ECEF" BorderBrush="#D5CCD4" BorderThickness="1,1,1,0">
+            <Border Grid.Row="2" CornerRadius="0,0,27,27" Height="42" Background="#D9F2ECEF" BorderBrush="#D5CCD4" BorderThickness="1,1,1,0">
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
-                            Margin="0,0,18,0">
+                            Margin="0,0,16,0">
                     <Button Content="编辑"
                             x:Name="EditButton"
                             Click="EditButton_Click"
                             Style="{StaticResource PrimaryButtonStyle}"
-                            Width="84"
-                            Height="32"
-                            Margin="0,0,10,0"/>
+                            Width="78"
+                            Height="28"
+                            Margin="0,0,8,0"/>
                     <Button Content="关闭"
                             Click="CloseButton_Click"
                             Style="{StaticResource ModernButtonStyle}"
-                            Width="84"
-                            Height="32"/>
+                            Width="78"
+                            Height="28"/>
                 </StackPanel>
             </Border>
         </Grid>

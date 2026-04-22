@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="设置"
         FontFamily="Microsoft YaHei UI"
-        Height="480"
-        Width="560"
+        Height="450"
+        Width="530"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         WindowStyle="None"
@@ -37,18 +37,18 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" CornerRadius="27,27,0,0" Height="56" Background="#DDF3EEF5" BorderBrush="#CFC6CF" BorderThickness="0,0,0,1">
+            <Border Grid.Row="0" CornerRadius="27,27,0,0" Height="48" Background="#DDF3EEF5" BorderBrush="#CFC6CF" BorderThickness="0,0,0,1">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="设置" FontWeight="Bold" FontSize="16" VerticalAlignment="Center" Margin="18,0" Foreground="#214162"/>
-                    <Button Grid.Column="1" Content="×" Click="CancelButton_Click" Style="{StaticResource ModernButtonStyle}" Width="34" Height="32" Margin="0,0,15,0"/>
+                    <TextBlock Grid.Column="0" Text="设置" FontWeight="Bold" FontSize="14" VerticalAlignment="Center" Margin="16,0" Foreground="#214162"/>
+                    <Button Grid.Column="1" Content="×" Click="CancelButton_Click" Style="{StaticResource ModernButtonStyle}" Width="32" Height="28" Margin="0,0,14,0"/>
                 </Grid>
             </Border>
 
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="18,16,18,14">
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="16,12,16,10">
                 <StackPanel>
                     <Border Background="#D7F3EEF2" BorderBrush="#D7CDD4" BorderThickness="1" CornerRadius="18" Padding="18" Margin="0,0,0,14">
                         <StackPanel>
@@ -89,10 +89,10 @@
                 </StackPanel>
             </ScrollViewer>
 
-            <Border Grid.Row="2" CornerRadius="0,0,27,27" Height="48" Background="#D9F2ECEF" BorderBrush="#D5CCD4" BorderThickness="1,1,1,0">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,18,0">
-                    <Button Content="确定" Click="OkButton_Click" Background="{StaticResource AccentBrush}" Foreground="White" Width="84" Height="32" FontSize="11" Margin="0,0,10,0"/>
-                    <Button Content="取消" Click="CancelButton_Click" Style="{StaticResource ModernButtonStyle}" Width="84" Height="32"/>
+            <Border Grid.Row="2" CornerRadius="0,0,27,27" Height="42" Background="#D9F2ECEF" BorderBrush="#D5CCD4" BorderThickness="1,1,1,0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,16,0">
+                    <Button Content="确定" Click="OkButton_Click" Background="{StaticResource AccentBrush}" Foreground="White" Width="78" Height="28" FontSize="11" Margin="0,0,8,0"/>
+                    <Button Content="取消" Click="CancelButton_Click" Style="{StaticResource ModernButtonStyle}" Width="78" Height="28"/>
                 </StackPanel>
             </Border>
         </Grid>

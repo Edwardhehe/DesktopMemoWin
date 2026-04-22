@@ -96,12 +96,12 @@ namespace DesktopMemo.Views
         {
             var workArea = SystemParameters.WorkArea;
             var targetWidth = Math.Min(780, Math.Max(560, workArea.Width * 0.62));
-            var targetHeight = Math.Max(700, workArea.Height - 2);
+            var targetHeight = Math.Min(Math.Max(620, workArea.Height * 0.76), workArea.Height - 2);
 
             Width = targetWidth;
             Height = targetHeight;
             MaxWidth = Math.Max(560, workArea.Width - 8);
-            MaxHeight = Math.Max(700, workArea.Height - 2);
+            MaxHeight = Math.Max(620, workArea.Height - 2);
             Left = Math.Max(0, workArea.Right - Width);
             Top = Math.Max(0, workArea.Top);
         }
