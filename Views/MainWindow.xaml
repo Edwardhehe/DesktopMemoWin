@@ -4,6 +4,7 @@
         xmlns:local="clr-namespace:DesktopMemo.Converters"
         x:Name="MemoWindow"
         Title="桌面备忘录"
+        FontFamily="Microsoft YaHei UI"
         Height="820"
         Width="780"
         WindowStyle="None"
@@ -37,7 +38,7 @@
             <Setter Property="Background" Value="#BFF8FAFD"/>
             <Setter Property="BorderBrush" Value="#D5D9E2"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="9,6"/>
+            <Setter Property="Padding" Value="7,4"/>
             <Setter Property="FontSize" Value="11"/>
             <Setter Property="Foreground" Value="#23415F"/>
         </Style>
@@ -70,51 +71,50 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" CornerRadius="27,27,0,0" Height="58" Background="#DDF3EEF5" BorderBrush="#CFC6CF" BorderThickness="0,0,0,1">
+            <Border Grid.Row="0" CornerRadius="27,27,0,0" Height="40" Background="#DDF3EEF5" BorderBrush="#CFC6CF" BorderThickness="0,0,0,1">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <WrapPanel Margin="15,0" VerticalAlignment="Center">
-                        <TextBlock Text="桌面备忘录" FontWeight="Bold" FontSize="13.5" Foreground="#214162"/>
-                        <TextBlock Text="{Binding CurrentMonth, StringFormat='  {0:yyyy年MM月}'}" FontSize="10" Foreground="#70839A" VerticalAlignment="Bottom" Margin="0,0,16,0"/>
-                        <TextBlock Text="视图" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#425B75" Margin="0,0,8,0"/>
-                        <ComboBox Width="100" Height="28" Margin="0,0,12,0" ItemsSource="{Binding ViewModes}" SelectedItem="{Binding SelectedViewMode}" VerticalContentAlignment="Center"/>
-                        <TextBlock Text="筛选" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#425B75" Margin="0,0,8,0"/>
-                        <ComboBox Width="100" Height="28" Margin="0,0,12,0" ItemsSource="{Binding StatusFilters}" SelectedItem="{Binding SelectedStatusFilter}" VerticalContentAlignment="Center"/>
-                        <Button Content="清空回收站" Command="{Binding EmptyRecycleBinCommand}" Style="{StaticResource ModernButtonStyle}" Width="92" Height="28" Margin="0,0,12,0" Visibility="{Binding IsRecycleBinView, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    <WrapPanel Margin="10,0" VerticalAlignment="Center">
+                        <TextBlock Text="桌面备忘录" FontWeight="Bold" FontSize="13" Foreground="#214162"/>
+                        <TextBlock Text="{Binding CurrentMonth, StringFormat='  {0:yyyy年MM月}'}" FontSize="10.5" Foreground="#70839A" VerticalAlignment="Bottom" Margin="0,0,10,0"/>
+                        <TextBlock Text="视图" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#425B75" Margin="0,0,4,0" FontSize="10.5"/>
+                        <ComboBox Width="84" Height="22" Margin="0,0,8,0" ItemsSource="{Binding ViewModes}" SelectedItem="{Binding SelectedViewMode}" VerticalContentAlignment="Center" FontSize="10.5"/>
+                        <TextBlock Text="筛选" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#425B75" Margin="0,0,4,0" FontSize="10.5"/>
+                        <ComboBox Width="84" Height="22" Margin="0,0,8,0" ItemsSource="{Binding StatusFilters}" SelectedItem="{Binding SelectedStatusFilter}" VerticalContentAlignment="Center" FontSize="10.5"/>
+                        <Button Content="清空回收站" Command="{Binding EmptyRecycleBinCommand}" Style="{StaticResource ModernButtonStyle}" Width="78" Height="22" Margin="0,0,8,0" Visibility="{Binding IsRecycleBinView, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     </WrapPanel>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
-                        <Button Content="◀" Command="{Binding PreviousMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="33" Height="29" Margin="2.5"/>
-                        <Button Content="▶" Command="{Binding NextMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="33" Height="29" Margin="2.5"/>
-                        <Button Content="⚙" Click="SettingsButton_Click" Style="{StaticResource ModernButtonStyle}" Width="37" Height="29" Margin="2.5"/>
-                        <Button Content="×" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="33" Height="29" Margin="2.5"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,10,0">
+                        <Button Content="◀" Command="{Binding PreviousMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="28" Height="22" Margin="1.5"/>
+                        <Button Content="▶" Command="{Binding NextMonthCommand}" Style="{StaticResource ModernButtonStyle}" Width="28" Height="22" Margin="1.5"/>
+                        <Button Content="⚙" Click="SettingsButton_Click" Style="{StaticResource ModernButtonStyle}" Width="30" Height="22" Margin="1.5"/>
+                        <Button Content="×" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="28" Height="22" Margin="1.5"/>
                     </StackPanel>
                 </Grid>
             </Border>
 
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                <Grid Margin="14,11,14,9">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+            <Grid Grid.Row="1" Margin="6,2,6,1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                    <TextBox Grid.Row="0" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Height="0" Width="0" Padding="0" Visibility="Collapsed" IsHitTestVisible="False"/>
+                <TextBox Grid.Row="0" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Height="0" Width="0" Padding="0" Visibility="Collapsed" IsHitTestVisible="False"/>
 
-                    <Border Grid.Row="1" Background="Transparent" Padding="9,6" Margin="4,0,4,8" Visibility="{Binding IsMonthView, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <UniformGrid Columns="7">
-                            <TextBlock Text="日" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#7D4C4C"/>
-                            <TextBlock Text="一" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A"/>
-                            <TextBlock Text="二" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A"/>
-                            <TextBlock Text="三" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A"/>
-                            <TextBlock Text="四" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A"/>
-                            <TextBlock Text="五" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A"/>
-                            <TextBlock Text="六" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#3F73B0"/>
-                        </UniformGrid>
-                    </Border>
+                <Border Grid.Row="1" Background="Transparent" Padding="3,1" Margin="1,0,1,2" Visibility="{Binding IsMonthView, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <UniformGrid Columns="7">
+                        <TextBlock Text="日" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#7D4C4C" FontSize="11"/>
+                        <TextBlock Text="一" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A" FontSize="11"/>
+                        <TextBlock Text="二" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A" FontSize="11"/>
+                        <TextBlock Text="三" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A" FontSize="11"/>
+                        <TextBlock Text="四" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A" FontSize="11"/>
+                        <TextBlock Text="五" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#58708A" FontSize="11"/>
+                        <TextBlock Text="六" HorizontalAlignment="Center" FontWeight="Bold" Foreground="#3F73B0" FontSize="11"/>
+                    </UniformGrid>
+                </Border>
 
                     <ItemsControl Grid.Row="2" ItemsSource="{Binding CalendarDays}" Visibility="{Binding IsMonthView, Converter={StaticResource BoolToVisibilityConverter}}">
                         <ItemsControl.ItemsPanel>
@@ -137,7 +137,7 @@
                                             <Button Grid.Column="0" Command="{Binding DataContext.AddMemoCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}" Width="18" Height="18" Margin="0,0,4,0" Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0" FontFamily="Microsoft YaHei UI" FontWeight="Bold" FontSize="12" Padding="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Visibility="{Binding IsCurrentMonth, Converter={StaticResource BoolToVisibilityConverter}}">
                                                 <TextBlock Text="+" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-1,0,0"/>
                                             </Button>
-                                            <TextBlock Grid.Column="2" Text="{Binding Date.Day}" HorizontalAlignment="Right" FontSize="11" Margin="0,0,4,0" FontWeight="{Binding IsToday, Converter={StaticResource BoolToFontWeightConverter}}" Foreground="{Binding IsToday, Converter={StaticResource TodayForegroundConverter}}" MouseLeftButtonDown="DateRow_MouseLeftButtonDown" Tag="{Binding}" Cursor="Hand"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding Date.Day}" HorizontalAlignment="Right" FontSize="11.5" Margin="0,0,4,0" FontWeight="{Binding IsToday, Converter={StaticResource BoolToFontWeightConverter}}" Foreground="{Binding IsToday, Converter={StaticResource TodayForegroundConverter}}" MouseLeftButtonDown="DateRow_MouseLeftButtonDown" Tag="{Binding}" Cursor="Hand"/>
                                         </Grid>
                                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" VerticalAlignment="Top" MaxHeight="84" Margin="0,1,0,0">
                                             <ItemsControl ItemsSource="{Binding Memos}">
@@ -161,20 +161,20 @@
                                                             </Border.InputBindings>
                                                             <Border.ContextMenu>
                                                                 <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
-                                                                    <MenuItem Header="鍒犻櫎鍒板洖鏀剁珯" Command="{Binding DataContext.DeleteMemoCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}"/>
-                                                                    <MenuItem Header="鏍囪涓哄凡瀹屾垚" Command="{Binding DataContext.MarkCompletedCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}" Visibility="{Binding IsCompleted, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-                                                                    <MenuItem Header="鏍囪涓烘湭瀹屾垚" Command="{Binding DataContext.MarkUncompletedCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}" Visibility="{Binding IsCompleted, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                                                    <MenuItem Header="删除到回收站" Command="{Binding DataContext.DeleteMemoCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}"/>
+                                                                    <MenuItem Header="标记为已完成" Command="{Binding DataContext.MarkCompletedCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}" Visibility="{Binding IsCompleted, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                                                    <MenuItem Header="标记为未完成" Command="{Binding DataContext.MarkUncompletedCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}" Visibility="{Binding IsCompleted, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                                                     <Separator/>
-                                                                    <MenuItem Header="缃《/鍙栨秷缃《" Command="{Binding DataContext.TogglePinCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}"/>
-                                                                    <MenuItem Header="浼樺厛绾т綆" Command="{Binding DataContext.SetLowPriorityCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}"/>
-                                                                    <MenuItem Header="浼樺厛绾т腑" Command="{Binding DataContext.SetMediumPriorityCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}"/>
-                                                                    <MenuItem Header="浼樺厛绾ч珮" Command="{Binding DataContext.SetHighPriorityCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}"/>
+                                                                    <MenuItem Header="置顶/取消置顶" Command="{Binding DataContext.TogglePinCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}"/>
+                                                                    <MenuItem Header="优先级低" Command="{Binding DataContext.SetLowPriorityCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}"/>
+                                                                    <MenuItem Header="优先级中" Command="{Binding DataContext.SetMediumPriorityCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}"/>
+                                                                    <MenuItem Header="优先级高" Command="{Binding DataContext.SetHighPriorityCommand, Source={x:Reference MemoWindow}}" CommandParameter="{Binding}"/>
                                                                 </ContextMenu>
                                                             </Border.ContextMenu>
                                                             <DockPanel>
-                                                                <TextBlock Text="★" FontSize="8" Foreground="#C97D2D" Margin="0,0,3,0" Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibilityConverter}}" DockPanel.Dock="Left"/>
-                                                                <TextBlock Text="{Binding PriorityBadge}" FontSize="7.5" Foreground="#B45A3C" Margin="3,0,0,0" DockPanel.Dock="Right"/>
-                                                                <TextBlock Text="{Binding Content, Converter={StaticResource TextTruncateConverter}, ConverterParameter=8}" FontSize="8.8" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding Content}" TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToTextDecorationConverter}}">
+                                                                <TextBlock Text="★" FontSize="8.5" Foreground="#C97D2D" Margin="0,0,3,0" Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibilityConverter}}" DockPanel.Dock="Left"/>
+                                                                <TextBlock Text="{Binding PriorityBadge}" FontSize="8" Foreground="#B45A3C" Margin="3,0,0,0" DockPanel.Dock="Right"/>
+                                                                <TextBlock Text="{Binding Content, Converter={StaticResource TextTruncateConverter}, ConverterParameter=8}" FontSize="9.5" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding Content}" TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToTextDecorationConverter}}">
                                                                     <TextBlock.Style>
                                                                         <Style TargetType="TextBlock">
                                                                             <Setter Property="Foreground" Value="#2D3748"/>
@@ -198,7 +198,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <Grid Grid.Row="2" Visibility="{Binding IsListView, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid Grid.Row="2" Visibility="{Binding IsListView, Converter={StaticResource BoolToVisibilityConverter}}">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
@@ -207,14 +207,14 @@
                         <Border Grid.Row="0" Background="#D7F3EEF2" BorderBrush="#D7CDD4" BorderThickness="1" CornerRadius="16" Padding="12" Margin="4,0,4,10">
                             <StackPanel>
                                 <TextBlock Text="{Binding ListSummary}" FontWeight="SemiBold" Foreground="#36516D"/>
-                                <TextBlock Text="{Binding ListDescription}" Margin="0,5,0,0" FontSize="10.5" Foreground="#71849A" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding ListDescription}" Margin="0,5,0,0" FontSize="11" Foreground="#71849A" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Border>
 
                         <Border Grid.Row="1" Background="#D7F3EEF2" BorderBrush="#D7CDD4" BorderThickness="1" CornerRadius="18" Padding="22" Margin="0,0,0,10" Visibility="{Binding IsFilteredMemosEmpty, Converter={StaticResource BoolToVisibilityConverter}}">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding EmptyStateTitle}" FontSize="16" FontWeight="SemiBold" Foreground="#2D4968" HorizontalAlignment="Center"/>
-                                <TextBlock Text="{Binding EmptyStateMessage}" Margin="0,8,0,0" FontSize="11.5" Foreground="#73869C" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="360"/>
+                                <TextBlock Text="{Binding EmptyStateTitle}" FontSize="15" FontWeight="SemiBold" Foreground="#2D4968" HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding EmptyStateMessage}" Margin="0,8,0,0" FontSize="11" Foreground="#73869C" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="360"/>
                             </StackPanel>
                         </Border>
 
@@ -254,16 +254,16 @@
                                                 <WrapPanel>
                                                     <TextBlock Text="{Binding Date, StringFormat='{}{0:MM月dd日}'}" FontSize="11" Foreground="#6A7D92" Margin="0,0,10,0"/>
                                                     <Border Background="#F8E7D7" CornerRadius="9" Padding="6,2" Margin="0,0,8,0" Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibilityConverter}}">
-                                                        <TextBlock Text="置顶" FontSize="10" Foreground="#9A5B2E"/>
+                                                        <TextBlock Text="置顶" FontSize="10.5" Foreground="#9A5B2E"/>
                                                     </Border>
                                                     <Border Background="#FDE9D9" CornerRadius="9" Padding="6,2" Margin="0,0,8,0">
-                                                        <TextBlock Text="{Binding PriorityText, StringFormat=优先级：{0}}" FontSize="10" Foreground="#B45A3C"/>
+                                                        <TextBlock Text="{Binding PriorityText, StringFormat=优先级：{0}}" FontSize="10.5" Foreground="#B45A3C"/>
                                                     </Border>
                                                     <Border Background="#E6F6EA" CornerRadius="9" Padding="6,2" Visibility="{Binding IsCompleted, Converter={StaticResource BoolToVisibilityConverter}}">
-                                                        <TextBlock Text="已完成" FontSize="10" Foreground="#3B7E5B"/>
+                                                        <TextBlock Text="已完成" FontSize="10.5" Foreground="#3B7E5B"/>
                                                     </Border>
                                                 </WrapPanel>
-                                                <TextBlock Text="{Binding Content}" Margin="0,10,0,0" TextWrapping="Wrap" FontSize="12.5" LineHeight="21" TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToTextDecorationConverter}}">
+                                                <TextBlock Text="{Binding Content}" Margin="0,10,0,0" TextWrapping="Wrap" FontSize="12" LineHeight="20" TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToTextDecorationConverter}}">
                                                     <TextBlock.Style>
                                                         <Style TargetType="TextBlock">
                                                             <Setter Property="Foreground" Value="#24415F"/>
@@ -282,21 +282,20 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </ScrollViewer>
-                    </Grid>
                 </Grid>
-            </ScrollViewer>
+            </Grid>
 
-            <Border Grid.Row="2" CornerRadius="0,0,27,27" Height="44" Background="#D9F2ECEF" BorderBrush="#D5CCD4" BorderThickness="1,1,1,0">
+            <Border Grid.Row="2" CornerRadius="0,0,27,27" Height="24" Background="#D9F2ECEF" BorderBrush="#D5CCD4" BorderThickness="1,1,1,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
-                        <Ellipse Width="9" Height="9" Fill="{StaticResource SuccessBrush}" Margin="0,0,8,0"/>
-                        <TextBlock Text="{Binding ListSummary}" VerticalAlignment="Center" FontSize="10" Foreground="#36516D"/>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0">
+                        <Ellipse Width="6" Height="6" Fill="{StaticResource SuccessBrush}" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding ListSummary}" VerticalAlignment="Center" FontSize="9.5" Foreground="#36516D"/>
                     </StackPanel>
-                    <CheckBox Grid.Column="1" Content="开机启动" IsChecked="{Binding IsStartupEnabled}" VerticalAlignment="Center" FontSize="10" Foreground="#36516D" Margin="0,0,15,0"/>
+                    <CheckBox Grid.Column="1" Content="开机启动" IsChecked="{Binding IsStartupEnabled}" VerticalAlignment="Center" FontSize="9.5" Foreground="#36516D" Margin="0,0,8,0"/>
                 </Grid>
             </Border>
         </Grid>

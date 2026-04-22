@@ -9,7 +9,7 @@ using System.Windows.Media;
 namespace DesktopMemo.Views
 {
     /// <summary>
-    /// MainWindow.xaml 的交互逻辑
+    /// MainWindow.xaml 的交互逻辑。
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -17,12 +17,12 @@ namespace DesktopMemo.Views
         private SystemTrayService _systemTrayService;
 
         /// <summary>
-        /// 获取系统托盘服务
+        /// 获取系统托盘服务。
         /// </summary>
         public SystemTrayService SystemTrayService => _systemTrayService;
 
         /// <summary>
-        /// 构造函数
+        /// 构造函数。
         /// </summary>
         public MainWindow()
         {
@@ -32,35 +32,30 @@ namespace DesktopMemo.Views
             DataContext = _viewModel;
             ApplyBackgroundColor(_viewModel.BackgroundColor);
 
-            // 初始化系统托盘服务
             _systemTrayService = new SystemTrayService();
-
-            // 订阅桌面可见性变化事件
             _viewModel.PropertyChanged += ViewModel_PropertyChanged;
-
-            // 窗口加载完成后初始化托盘
             Loaded += MainWindow_Loaded;
-
-            // 处理窗口关闭事件
             Closing += MainWindow_Closing;
         }
 
         /// <summary>
-        /// 视图模型属性变化事件处理
+        /// 处理视图模型属性变化。
         /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">属性变化事件参数</param>
-        private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(MainViewModel.IsDesktopVisible))
             {
-                // 根据桌面可见性控制窗口显示
                 if (_viewModel.IsDesktopVisible)
                 {
                     Show();
-                    // 设置窗口为最顶层，但不使用Topmost属性
-                    SetWindowPos(new System.Windows.Interop.WindowInteropHelper(this).Handle,
-                                new IntPtr(-1), 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0004);
+                    SetWindowPos(
+                        new System.Windows.Interop.WindowInteropHelper(this).Handle,
+                        new IntPtr(-1),
+                        0,
+                        0,
+                        0,
+                        0,
+                        0x0001 | 0x0002 | 0x0004);
                 }
                 else
                 {
@@ -82,142 +77,89 @@ namespace DesktopMemo.Views
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"应用背景色失败: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"应用背景颜色失败：{ex.Message}");
                 MainWindowSurface.Background = new SolidColorBrush(Color.FromArgb(0xAA, 0xFF, 0xFF, 0xFF));
             }
         }
 
-        /// <summary>
-        /// 设置窗口位置的Windows API
-        /// </summary>
-        /// <param name="hWnd">窗口句柄</param>
-        /// <param name="hWndInsertAfter">插入位置</param>
-        /// <param name="X">X坐标</param>
-        /// <param name="Y">Y坐标</param>
-        /// <param name="cx">宽度</param>
-        /// <param name="cy">高度</param>
-        /// <param name="uFlags">标志</param>
-        /// <returns>是否成功</returns>
         [System.Runtime.InteropServices.DllImport("user32.dll")]
-        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
 
-        /// <summary>
-        /// 主窗口加载完成事件
-        /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">路由事件参数</param>
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            // 初始化系统托盘
             _systemTrayService.Initialize(this, _viewModel);
-
-            // 强制显示窗口并设置位置
             ApplyResponsiveWindowLayout();
-            this.Show();
+            Show();
         }
 
         private void ApplyResponsiveWindowLayout()
         {
             var workArea = SystemParameters.WorkArea;
             var targetWidth = Math.Min(780, Math.Max(560, workArea.Width * 0.62));
-            var targetHeight = Math.Min(820, Math.Max(620, workArea.Height * 0.86));
+            var targetHeight = Math.Max(700, workArea.Height - 2);
 
             Width = targetWidth;
             Height = targetHeight;
-            MaxWidth = Math.Max(560, workArea.Width - 16);
-            MaxHeight = Math.Max(620, workArea.Height - 16);
+            MaxWidth = Math.Max(560, workArea.Width - 8);
+            MaxHeight = Math.Max(700, workArea.Height - 2);
             Left = Math.Max(0, workArea.Right - Width);
             Top = Math.Max(0, workArea.Top);
         }
 
-        /// <summary>
-        /// 窗口关闭事件
-        /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">取消事件参数</param>
         private void MainWindow_Closing(object? sender, CancelEventArgs e)
         {
             try
             {
-                // 停止桌面监控服务
                 _viewModel?.StopDesktopMonitoring();
-
-                // 清理系统托盘资源
                 _systemTrayService?.Dispose();
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"窗口关闭时发生异常: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"窗口关闭时发生异常：{ex.Message}");
             }
         }
 
-        /// <summary>
-        /// 关闭按钮点击事件（最小化到托盘）
-        /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">路由事件参数</param>
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             _systemTrayService.HideToTray();
         }
 
-        /// <summary>
-        /// 设置按钮点击事件
-        /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">路由事件参数</param>
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            var settingsWindow = new SettingsWindow(_viewModel);
-            settingsWindow.Owner = this;
+            var settingsWindow = new SettingsWindow(_viewModel)
+            {
+                Owner = this
+            };
             settingsWindow.ShowDialog();
         }
 
-        /// <summary>
-        /// 备忘录项目鼠标左键点击事件
-        /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">鼠标按钮事件参数</param>
-    
-        /// <summary>
-        /// 日期行点击事件
-        /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">鼠标按钮事件参数</param>
         private void DateRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (sender is FrameworkElement element && element.Tag is ViewModels.CalendarDayViewModel dayViewModel)
+            if (sender is FrameworkElement element && element.Tag is CalendarDayViewModel dayViewModel)
             {
                 try
                 {
-                    // 创建当天待办事项窗口
                     var dailyTasksWindow = new DailyTasksWindow(dayViewModel.Date, _viewModel);
                     dailyTasksWindow.Show();
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"打开当天待办事项窗口时发生异常：{ex.Message}");
-                    MessageBox.Show($"打开当天待办事项失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    System.Diagnostics.Debug.WriteLine($"打开当日任务窗口时发生异常：{ex.Message}");
+                    MessageBox.Show($"打开当日任务失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
 
-
-
-        /// <summary>
-        /// 备忘录文本鼠标左键点击事件
-        /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">鼠标按钮事件参数</param>
-        private void MemoTextBlock_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void MemoTextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            // 判断是否为双击
             if (e.ClickCount == 2 && sender is FrameworkElement element && element.Tag is Models.MemoItem memo)
             {
                 try
                 {
-                    var detailWindow = new Views.MemoDetailWindow(memo, EditMemoCallback, _viewModel);
-                    detailWindow.Owner = this;
+                    var detailWindow = new MemoDetailWindow(memo, EditMemoCallback, _viewModel)
+                    {
+                        Owner = this
+                    };
                     detailWindow.ShowDialog();
                 }
                 catch (Exception ex)
@@ -228,16 +170,12 @@ namespace DesktopMemo.Views
             }
         }
 
-        /// <summary>
-        /// 编辑备忘录回调
-        /// </summary>
-        /// <param name="memo">要编辑的备忘录</param>
         private void EditMemoCallback(Models.MemoItem memo)
         {
             try
             {
-                var oldDate = memo.Date; // 保存原日期
-                var dialog = new Views.MemoInputDialog(memo.Date, memo.Content, this, memo.Priority, memo.IsPinned);
+                var oldDate = memo.Date;
+                var dialog = new MemoInputDialog(memo.Date, memo.Content, this, memo.Priority, memo.IsPinned);
                 if (dialog.ShowDialog() == true)
                 {
                     memo.Content = dialog.MemoContent;
@@ -245,16 +183,11 @@ namespace DesktopMemo.Views
                     memo.Priority = dialog.MemoPriority;
                     memo.IsPinned = dialog.MemoIsPinned;
 
-                    // 更新数据库
                     _viewModel?.GetDatabaseService()?.UpdateMemo(memo);
 
-                    // 强制刷新主界面和通知所有窗口
                     if (_viewModel != null)
                     {
-                        // 强制刷新主界面
                         _viewModel.RefreshAllViews();
-
-                        // 通知所有打开的窗口刷新
                         NotifyAllWindowsRefresh();
                     }
                 }
@@ -266,25 +199,14 @@ namespace DesktopMemo.Views
             }
         }
 
-        /// <summary>
-        /// 窗口加载完成事件
-        /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">路由事件参数</param>
-    
-        /// <summary>
-        /// 通知所有打开的窗口刷新数据
-        /// </summary>
         private void NotifyAllWindowsRefresh()
         {
             try
             {
-                // 遍历所有打开的窗口
-                foreach (Window window in System.Windows.Application.Current.Windows)
+                foreach (Window window in Application.Current.Windows)
                 {
                     if (window is DailyTasksWindow dailyTasksWindow)
                     {
-                        // 通知DailyTasksWindow刷新
                         dailyTasksWindow.RefreshData();
                     }
                     else if (window is MemoDetailWindow memoDetailWindow)

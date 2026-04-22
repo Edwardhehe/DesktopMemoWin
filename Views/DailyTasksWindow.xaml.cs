@@ -46,7 +46,7 @@ namespace DesktopMemo.Views
             SetHighPriorityCommand = new RelayCommand<MemoItem>(memo => SetPriority(memo, 2));
 
             SetWindowPosition();
-            TitleTextBlock.Text = $"当日任务 {_selectedDate:yyyy年MM月dd日}";
+            TitleTextBlock.Text = $"当日任务 {_selectedDate:yyyy年M月d日}";
             DataContext = this;
             TasksItemsControl.ItemsSource = _dailyMemos;
 
@@ -101,7 +101,7 @@ namespace DesktopMemo.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"加载任务失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"加载任务失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -110,15 +110,18 @@ namespace DesktopMemo.Views
             var totalCount = _dailyMemos.Count;
             var completedCount = _dailyMemos.Count(m => m.IsCompleted);
             var pendingCount = totalCount - completedCount;
-            StatusTextBlock.Text = $"共 {totalCount} 条，待完成 {pendingCount} 条，已完成 {completedCount} 条";
+            StatusTextBlock.Text = $"共 {totalCount} 条，未完成 {pendingCount} 条，已完成 {completedCount} 条";
         }
 
         private void AddNewTask()
         {
             try
             {
-                var dialog = new MemoInputDialog(_selectedDate, string.Empty, this);
-                dialog.Topmost = true;
+                var dialog = new MemoInputDialog(_selectedDate, string.Empty, this)
+                {
+                    Topmost = true
+                };
+
                 if (dialog.ShowDialog() != true)
                 {
                     return;
@@ -148,7 +151,7 @@ namespace DesktopMemo.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"添加任务失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"添加任务失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -180,7 +183,7 @@ namespace DesktopMemo.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"打开详情失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"打开详情失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -210,7 +213,7 @@ namespace DesktopMemo.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"编辑任务失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"编辑任务失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
