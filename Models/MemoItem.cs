@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 namespace DesktopMemo.Models
 {
     /// <summary>
-    /// 备忘录项目数据模型
+    /// 备忘录数据模型。
     /// </summary>
     public class MemoItem : INotifyPropertyChanged
     {
@@ -16,10 +16,10 @@ namespace DesktopMemo.Models
         private DateTime _createdAt;
         private DateTime? _completedAt;
         private int _sortOrder;
+        private int _priority;
+        private bool _isPinned;
+        private bool _isDeleted;
 
-        /// <summary>
-        /// 备忘录ID
-        /// </summary>
         public int Id
         {
             get => _id;
@@ -30,9 +30,6 @@ namespace DesktopMemo.Models
             }
         }
 
-        /// <summary>
-        /// 备忘录内容
-        /// </summary>
         public string Content
         {
             get => _content;
@@ -43,9 +40,6 @@ namespace DesktopMemo.Models
             }
         }
 
-        /// <summary>
-        /// 备忘录日期
-        /// </summary>
         public DateTime Date
         {
             get => _date;
@@ -56,9 +50,6 @@ namespace DesktopMemo.Models
             }
         }
 
-        /// <summary>
-        /// 是否已完成
-        /// </summary>
         public bool IsCompleted
         {
             get => _isCompleted;
@@ -69,9 +60,6 @@ namespace DesktopMemo.Models
             }
         }
 
-        /// <summary>
-        /// 创建时间
-        /// </summary>
         public DateTime CreatedAt
         {
             get => _createdAt;
@@ -82,9 +70,6 @@ namespace DesktopMemo.Models
             }
         }
 
-        /// <summary>
-        /// 完成时间
-        /// </summary>
         public DateTime? CompletedAt
         {
             get => _completedAt;
@@ -95,9 +80,6 @@ namespace DesktopMemo.Models
             }
         }
 
-        /// <summary>
-        /// 排序顺序
-        /// </summary>
         public int SortOrder
         {
             get => _sortOrder;
@@ -108,15 +90,54 @@ namespace DesktopMemo.Models
             }
         }
 
-        /// <summary>
-        /// 属性变化事件
-        /// </summary>
+        public int Priority
+        {
+            get => _priority;
+            set
+            {
+                _priority = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(PriorityText));
+                OnPropertyChanged(nameof(PriorityBadge));
+            }
+        }
+
+        public bool IsPinned
+        {
+            get => _isPinned;
+            set
+            {
+                _isPinned = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool IsDeleted
+        {
+            get => _isDeleted;
+            set
+            {
+                _isDeleted = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string PriorityText => Priority switch
+        {
+            2 => "高",
+            1 => "中",
+            _ => "低"
+        };
+
+        public string PriorityBadge => Priority switch
+        {
+            2 => "高",
+            1 => "中",
+            _ => string.Empty
+        };
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        /// <summary>
-        /// 触发属性变化事件
-        /// </summary>
-        /// <param name="propertyName">属性名</param>
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

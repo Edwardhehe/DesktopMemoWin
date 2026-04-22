@@ -2,9 +2,9 @@
         x:Name="TasksWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="当天待办事项" 
-        Height="400" 
-        Width="500"
+        Title="当日任务"
+        Height="420"
+        Width="520"
         WindowStartupLocation="Manual"
         ResizeMode="NoResize"
         WindowStyle="None"
@@ -12,7 +12,7 @@
         Background="Transparent"
         ShowInTaskbar="False"
         Topmost="True">
-    
+
     <Window.Resources>
         <LinearGradientBrush x:Key="DialogSurfaceBrush" StartPoint="0,0" EndPoint="1,1">
             <GradientStop Color="#F4EEF2" Offset="0"/>
@@ -20,124 +20,19 @@
             <GradientStop Color="#E6DAD9" Offset="1"/>
         </LinearGradientBrush>
         <SolidColorBrush x:Key="AccentBrush" Color="#9F8FBEF5"/>
-        <SolidColorBrush x:Key="AccentHoverBrush" Color="#B5A5CDF8"/>
         <SolidColorBrush x:Key="SuccessBrush" Color="#39A66A"/>
-        <!-- 阴影效果 -->
-        <DropShadowEffect x:Key="DropShadowEffect" 
-                          Color="#35557C" 
-                          Direction="270" 
-                          ShadowDepth="12" 
-                          BlurRadius="26" 
-                          Opacity="0.14"/>
-        
-        <!-- 按钮样式 -->
+        <DropShadowEffect x:Key="DropShadowEffect" Color="#35557C" Direction="270" ShadowDepth="12" BlurRadius="26" Opacity="0.14"/>
+
         <Style x:Key="ModernButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="#BFF8FAFD"/>
             <Setter Property="BorderBrush" Value="#D5D9E2"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="10,6"/>
             <Setter Property="FontSize" Value="12"/>
-            <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
             <Setter Property="Foreground" Value="#23415F"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="10"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#D8F5F8FC"/>
-                                <Setter Property="BorderBrush" Value="#DDE4EE"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        
-        <!-- 主要按钮样式 -->
-        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
-            <Setter Property="BorderBrush" Value="#00FFFFFF"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="10,6"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="12"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="{StaticResource AccentHoverBrush}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        
-        <!-- 待办事项样式 -->
-        <Style x:Key="TaskItemStyle" TargetType="Border">
-            <Setter Property="Background" Value="#D8F8FAFE"/>
-            <Setter Property="BorderBrush" Value="#CBD7E5"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="Margin" Value="0,0,0,8"/>
-            <Setter Property="Padding" Value="10,9"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#F2F5FA"/>
-                    <Setter Property="BorderBrush" Value="#C8D4E5"/>
-                    <Setter Property="BorderThickness" Value="1"/>
-                    <Setter Property="Effect">
-                        <Setter.Value>
-                            <DropShadowEffect Color="#7FA2D1" Direction="270" ShadowDepth="3" BlurRadius="8" Opacity="0.18"/>
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        
-        <!-- 已完成待办事项样式 -->
-        <Style x:Key="CompletedTaskStyle" TargetType="Border">
-            <Setter Property="Background" Value="#CFEFF7EA"/>
-            <Setter Property="BorderBrush" Value="#84F08A"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="Margin" Value="0,0,0,8"/>
-            <Setter Property="Padding" Value="10,9"/>
-            <Setter Property="Opacity" Value="0.88"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#F0F8ED"/>
-                    <Setter Property="BorderBrush" Value="#78E87E"/>
-                    <Setter Property="BorderThickness" Value="1"/>
-                    <Setter Property="Opacity" Value="0.96"/>
-                    <Setter Property="Effect">
-                        <Setter.Value>
-                            <DropShadowEffect Color="#72BC8F" Direction="270" ShadowDepth="3" BlurRadius="8" Opacity="0.16"/>
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-            </Style.Triggers>
         </Style>
     </Window.Resources>
-    
+
     <Border Background="{StaticResource DialogSurfaceBrush}" CornerRadius="28" BorderBrush="#D8CFD6" BorderThickness="1.2" Opacity="0.98" Effect="{StaticResource DropShadowEffect}">
         <Grid>
             <Grid.RowDefinitions>
@@ -146,139 +41,86 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            
-            <!-- 标题栏 -->
+
             <Border Grid.Row="0" CornerRadius="27,27,0,0" Height="56" Background="#DDF3EEF5" BorderBrush="#CFC6CF" BorderThickness="0,0,0,1">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" x:Name="TitleTextBlock" Text="📅 当天待办事项" FontWeight="Bold" FontSize="16" VerticalAlignment="Center" Margin="18,0" Foreground="#214162"/>
-                    <Button Grid.Column="1" Content="✕" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="34" Height="32" Margin="0,0,15,0" ToolTip="关闭"/>
+                    <TextBlock Grid.Column="0" x:Name="TitleTextBlock" Text="当日任务" FontWeight="Bold" FontSize="16" VerticalAlignment="Center" Margin="18,0" Foreground="#214162"/>
+                    <Button Grid.Column="1" Content="×" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="34" Height="32" Margin="0,0,15,0"/>
                 </Grid>
             </Border>
-            
-            <!-- 新建待办区域 -->
+
             <Border Grid.Row="1" Background="#D7F3EEF2" Margin="18,14,18,8" CornerRadius="18" Padding="12" BorderBrush="#D7CDD4" BorderThickness="1">
-                <Button Content="➕ 添加新待办事项" 
-                        Click="AddTaskButton_Click" 
-                        Style="{StaticResource PrimaryButtonStyle}"
-                        Height="38"
-                        FontSize="13"
-                        FontWeight="SemiBold"/>
+                <Button Content="添加新任务" Click="AddTaskButton_Click" Background="{StaticResource AccentBrush}" Foreground="White" Height="38" FontSize="13" FontWeight="SemiBold"/>
             </Border>
-            
-            <!-- 待办事项列表 -->
-            <ScrollViewer Grid.Row="2" 
-                          VerticalScrollBarVisibility="Auto" 
-                          HorizontalScrollBarVisibility="Disabled"
-                          Margin="18,6,18,14">
+
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="18,6,18,14">
                 <ItemsControl x:Name="TasksItemsControl">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Style="{Binding IsCompleted, Converter={StaticResource BoolToMemoStyleConverter}}"
-                                    MouseLeftButtonDown="TaskItem_MouseLeftButtonDown"
-                                    Tag="{Binding}">
-
+                            <Border BorderBrush="#CBD7E5" BorderThickness="1" CornerRadius="12" Margin="0,0,0,8" Padding="10,9" MouseLeftButtonDown="TaskItem_MouseLeftButtonDown" Tag="{Binding}">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#D8F8FAFE"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCompleted}" Value="True">
+                                                <Setter Property="Background" Value="#DCEEE4"/>
+                                                <Setter Property="BorderBrush" Value="#8DC7A7"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <Border.ContextMenu>
                                     <ContextMenu DataContext="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource Self}}">
-                                        <MenuItem Header="删除待办事项" 
-                                                  Command="{Binding DataContext.DeleteMemoCommand, Source={x:Reference TasksWindow}}"
-                                                  CommandParameter="{Binding}"/>
-                                        <MenuItem Header="标记为未完成"
-                                                  Command="{Binding DataContext.MarkUncompletedCommand, Source={x:Reference TasksWindow}}"
-                                                  CommandParameter="{Binding}"
-                                                  Visibility="{Binding IsCompleted, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                                        <MenuItem Header="标记为已完成"
-                                                  Command="{Binding DataContext.MarkCompletedCommand, Source={x:Reference TasksWindow}}"
-                                                  CommandParameter="{Binding}"
-                                                  Visibility="{Binding IsCompleted, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                        <MenuItem Header="删除到回收站" Command="{Binding DataContext.DeleteMemoCommand, Source={x:Reference TasksWindow}}" CommandParameter="{Binding}"/>
+                                        <MenuItem Header="标记为未完成" Command="{Binding DataContext.MarkUncompletedCommand, Source={x:Reference TasksWindow}}" CommandParameter="{Binding}" Visibility="{Binding IsCompleted, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                        <MenuItem Header="标记为已完成" Command="{Binding DataContext.MarkCompletedCommand, Source={x:Reference TasksWindow}}" CommandParameter="{Binding}" Visibility="{Binding IsCompleted, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                        <Separator/>
+                                        <MenuItem Header="置顶/取消置顶" Command="{Binding DataContext.TogglePinCommand, Source={x:Reference TasksWindow}}" CommandParameter="{Binding}"/>
+                                        <MenuItem Header="优先级低" Command="{Binding DataContext.SetLowPriorityCommand, Source={x:Reference TasksWindow}}" CommandParameter="{Binding}"/>
+                                        <MenuItem Header="优先级中" Command="{Binding DataContext.SetMediumPriorityCommand, Source={x:Reference TasksWindow}}" CommandParameter="{Binding}"/>
+                                        <MenuItem Header="优先级高" Command="{Binding DataContext.SetHighPriorityCommand, Source={x:Reference TasksWindow}}" CommandParameter="{Binding}"/>
                                     </ContextMenu>
                                 </Border.ContextMenu>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    
-                                    <TextBlock Grid.Column="0" 
-                                               Text="{Binding Content}" 
-                                               TextWrapping="Wrap" 
-                                               FontSize="12.5"
-                                               VerticalAlignment="Center"
-                                               Margin="0,0,10,0"
-                                               ToolTip="{Binding Content}"
-                                               TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToTextDecorationConverter}}"
-                                               Foreground="#2D3748">
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,10,0">
+                                        <TextBlock Text="★" FontSize="10" Foreground="#C97D2D" Margin="0,0,6,0" Visibility="{Binding IsPinned, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                        <TextBlock Text="{Binding PriorityText}" FontSize="10" Foreground="#B45A3C"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1" Text="{Binding Content}" TextWrapping="Wrap" FontSize="12.5" Margin="0,0,10,0" ToolTip="{Binding Content}" TextDecorations="{Binding IsCompleted, Converter={StaticResource BoolToTextDecorationConverter}}">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="#2D3748"/>
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Border}, Path=IsMouseOver}" Value="True">
-                                                        <Setter Property="Foreground" Value="#1A365D"/>
-                                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                                    <DataTrigger Binding="{Binding IsCompleted}" Value="True">
+                                                        <Setter Property="Foreground" Value="#5E7E6E"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </TextBlock.Style>
                                     </TextBlock>
-                                    
-                                    <Button Grid.Column="1"
-                                            Content="✓" 
-                                            Command="{Binding MarkCompletedCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" 
-                                            CommandParameter="{Binding}"
-                                            Width="22" 
-                                            Height="22" 
-                                            FontSize="10" 
-                                            Background="{StaticResource AccentBrush}"
-                                            Foreground="White"
-                                            BorderThickness="0"
-                                            ToolTip="标记为完成"
-                                            Visibility="{Binding IsCompleted, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                                        <Button.Template>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border Background="{TemplateBinding Background}" CornerRadius="11">
-                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                </Border>
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter Property="Background" Value="{StaticResource SuccessBrush}"/>
-                                                        <Setter Property="Effect">
-                                                            <Setter.Value>
-                                                                <DropShadowEffect Color="#28A745" Direction="270" ShadowDepth="1" BlurRadius="2" Opacity="0.6"/>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Button.Template>
-                                    </Button>
+                                    <Button Grid.Column="2" Content="✓" Command="{Binding MarkCompletedCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" CommandParameter="{Binding}" Width="22" Height="22" FontSize="10" Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0" Visibility="{Binding IsCompleted, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                                 </Grid>
                             </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
-            
-            <!-- 底部状态栏 -->
+
             <Border Grid.Row="3" CornerRadius="0,0,27,27" Height="46" Background="#D9F2ECEF" BorderBrush="#D5CCD4" BorderThickness="1,1,1,0">
-                <StackPanel Orientation="Horizontal" 
-                            HorizontalAlignment="Right" 
-                            VerticalAlignment="Center"
-                            Margin="0,0,18,0">
-                    <TextBlock x:Name="StatusTextBlock" 
-                               Text="共 0 个待办事项" 
-                               VerticalAlignment="Center" 
-                               FontSize="11" 
-                               Foreground="#36516D"
-                               Margin="0,0,15,0"/>
-                    <Button Content="关闭" 
-                            Click="CloseButton_Click" 
-                            Style="{StaticResource ModernButtonStyle}"
-                            Width="72" 
-                            Height="30"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,18,0">
+                    <TextBlock x:Name="StatusTextBlock" Text="共 0 条" VerticalAlignment="Center" FontSize="11" Foreground="#36516D" Margin="0,0,15,0"/>
+                    <Button Content="关闭" Click="CloseButton_Click" Style="{StaticResource ModernButtonStyle}" Width="72" Height="30"/>
                 </StackPanel>
             </Border>
         </Grid>
     </Border>
-</Window> 
+</Window>

@@ -112,9 +112,22 @@ namespace DesktopMemo.Views
             _systemTrayService.Initialize(this, _viewModel);
 
             // 强制显示窗口并设置位置
-            this.Left = SystemParameters.WorkArea.Width - this.Width;
-            this.Top = 0;
+            ApplyResponsiveWindowLayout();
             this.Show();
+        }
+
+        private void ApplyResponsiveWindowLayout()
+        {
+            var workArea = SystemParameters.WorkArea;
+            var targetWidth = Math.Min(780, Math.Max(560, workArea.Width * 0.62));
+            var targetHeight = Math.Min(820, Math.Max(620, workArea.Height * 0.86));
+
+            Width = targetWidth;
+            Height = targetHeight;
+            MaxWidth = Math.Max(560, workArea.Width - 16);
+            MaxHeight = Math.Max(620, workArea.Height - 16);
+            Left = Math.Max(0, workArea.Right - Width);
+            Top = Math.Max(0, workArea.Top);
         }
 
         /// <summary>
@@ -224,11 +237,13 @@ namespace DesktopMemo.Views
             try
             {
                 var oldDate = memo.Date; // 保存原日期
-                var dialog = new Views.MemoInputDialog(memo.Date, memo.Content, this);
+                var dialog = new Views.MemoInputDialog(memo.Date, memo.Content, this, memo.Priority, memo.IsPinned);
                 if (dialog.ShowDialog() == true)
                 {
                     memo.Content = dialog.MemoContent;
                     memo.Date = dialog.MemoDate;
+                    memo.Priority = dialog.MemoPriority;
+                    memo.IsPinned = dialog.MemoIsPinned;
 
                     // 更新数据库
                     _viewModel?.GetDatabaseService()?.UpdateMemo(memo);

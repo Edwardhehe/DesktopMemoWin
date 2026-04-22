@@ -2,25 +2,20 @@ using DesktopMemo.Models;
 using DesktopMemo.ViewModels;
 using System;
 using System.Windows;
+using System.Windows.Media;
 
 namespace DesktopMemo.Views
 {
     /// <summary>
-    /// 备忘录详情窗口
+    /// 备忘录详情窗口。
     /// </summary>
     public partial class MemoDetailWindow : Window
     {
         private MemoItem _memo;
-        private Action<MemoItem> _editCallback;
-        private MainViewModel _mainViewModel;
+        private readonly Action<MemoItem>? _editCallback;
+        private readonly MainViewModel? _mainViewModel;
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="memo">备忘录对象</param>
-        /// <param name="editCallback">编辑回调函数</param>
-        /// <param name="mainViewModel">主视图模型</param>
-        public MemoDetailWindow(MemoItem memo, Action<MemoItem> editCallback = null, MainViewModel mainViewModel = null)
+        public MemoDetailWindow(MemoItem memo, Action<MemoItem>? editCallback = null, MainViewModel? mainViewModel = null)
         {
             InitializeComponent();
 
@@ -31,43 +26,34 @@ namespace DesktopMemo.Views
             LoadMemoDetails();
         }
 
-        /// <summary>
-        /// 加载备忘录详情
-        /// </summary>
         private void LoadMemoDetails()
         {
-            if (_memo == null) return;
-
-            // 设置内容
             ContentTextBlock.Text = _memo.Content;
-
-            // 设置日期信息
             CreatedDateTextBlock.Text = _memo.CreatedAt.ToString("yyyy年MM月dd日 HH:mm:ss");
             MemoDateTextBlock.Text = _memo.Date.ToString("yyyy年MM月dd日");
+            PriorityTextBlock.Text = _memo.PriorityText;
+            PinnedTextBlock.Text = _memo.IsPinned ? "是" : "否";
 
-            // 设置状态信息
             if (_memo.IsCompleted)
             {
                 StatusTextBlock.Text = "已完成";
-                StatusTextBlock.Foreground = System.Windows.Media.Brushes.Green;
-
-                if (_memo.CompletedAt.HasValue)
-                {
-                    CompletedDateTextBlock.Text = $"完成时间：{_memo.CompletedAt.Value:yyyy年MM月dd日 HH:mm:ss}";
-                    CompletedDateTextBlock.Visibility = Visibility.Visible;
-                }
+                StatusTextBlock.Foreground = Brushes.Green;
+                CompletedDateTextBlock.Text = _memo.CompletedAt.HasValue
+                    ? $"完成时间：{_memo.CompletedAt.Value:yyyy年MM月dd日 HH:mm:ss}"
+                    : "完成时间：未知";
+                CompletedDateTextBlock.Visibility = Visibility.Visible;
             }
             else
             {
                 StatusTextBlock.Text = "未完成";
-                StatusTextBlock.Foreground = System.Windows.Media.Brushes.Orange;
+                StatusTextBlock.Foreground = Brushes.DarkOrange;
                 CompletedDateTextBlock.Visibility = Visibility.Collapsed;
             }
         }
 
         public void RefreshData()
         {
-            if (_mainViewModel == null || _memo == null || _memo.Id <= 0)
+            if (_mainViewModel == null || _memo.Id <= 0)
             {
                 LoadMemoDetails();
                 return;
@@ -76,7 +62,7 @@ namespace DesktopMemo.Views
             try
             {
                 var latestMemo = _mainViewModel.GetDatabaseService().GetMemoById(_memo.Id);
-                if (latestMemo == null)
+                if (latestMemo == null || latestMemo.IsDeleted)
                 {
                     Close();
                     return;
@@ -87,15 +73,10 @@ namespace DesktopMemo.Views
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"刷新备忘录详情失败: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"刷新详情失败: {ex.Message}");
             }
         }
 
-        /// <summary>
-        /// 编辑按钮点击事件
-        /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">路由事件参数</param>
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -104,70 +85,43 @@ namespace DesktopMemo.Views
                 {
                     _editCallback(_memo);
                     RefreshData();
+                    return;
                 }
-                else
+
+                if (_mainViewModel == null)
                 {
-                    // 打开编辑对话框
-                    var oldDate = _memo.Date; // 保存原日期
-                    var dialog = new MemoInputDialog(_memo.Date, _memo.Content, this.Owner);
-                    if (dialog.ShowDialog() == true)
-                    {
-                        try
-                        {
-                            var databaseService = _mainViewModel?.GetDatabaseService();
-                            if (databaseService != null)
-                            {
-                                var newDate = dialog.MemoDate;
-                                // 更新备忘录数据
-                                _memo.Content = dialog.MemoContent;
-                                _memo.Date = newDate;
-                                databaseService.UpdateMemo(_memo);
-
-                                // 刷新详情
-                                RefreshData();
-
-                                // 根据日期是否改变来刷新
-                                if (oldDate != newDate)
-                                {
-                                    _mainViewModel?.RefreshMemoDateChange(oldDate, newDate);
-                                }
-                                else
-                                {
-                                    _mainViewModel?.RefreshDate(oldDate);
-                                }
-
-                                // 通知所有窗口刷新
-                                NotifyAllWindowsRefresh();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"更新备忘录失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
+                    return;
                 }
+
+                var oldDate = _memo.Date;
+                var dialog = new MemoInputDialog(_memo.Date, _memo.Content, Owner, _memo.Priority, _memo.IsPinned);
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                _memo.Content = dialog.MemoContent;
+                _memo.Date = dialog.MemoDate;
+                _memo.Priority = dialog.MemoPriority;
+                _memo.IsPinned = dialog.MemoIsPinned;
+
+                _mainViewModel.GetDatabaseService().UpdateMemo(_memo);
+                _mainViewModel.RefreshMemoDateChange(oldDate, _memo.Date);
+                _mainViewModel.RefreshAllViews();
+                RefreshData();
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"编辑备忘录时发生异常：{ex.Message}");
-                MessageBox.Show($"编辑备忘录失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Diagnostics.Debug.WriteLine($"编辑备忘录失败: {ex.Message}");
+                MessageBox.Show($"编辑备忘录失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        /// <summary>
-        /// 关闭按钮点击事件
-        /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">路由事件参数</param>
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
 
-        /// <summary>
-        /// 窗口键盘事件处理
-        /// </summary>
-        /// <param name="e">键盘事件参数</param>
         protected override void OnKeyDown(System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == System.Windows.Input.Key.Escape)
@@ -180,42 +134,6 @@ namespace DesktopMemo.Views
             }
 
             base.OnKeyDown(e);
-        }
-
-        /// <summary>
-        /// 窗口关闭事件
-        /// </summary>
-        /// <param name="e">事件参数</param>
-        protected override void OnClosed(EventArgs e)
-        {
-            base.OnClosed(e);
-        }
-
-        /// <summary>
-        /// 通知所有打开的窗口刷新数据
-        /// </summary>
-        private void NotifyAllWindowsRefresh()
-        {
-            try
-            {
-                // 遍历所有打开的窗口
-                foreach (Window window in System.Windows.Application.Current.Windows)
-                {
-                    if (window is DailyTasksWindow dailyTasksWindow)
-                    {
-                        // 通知DailyTasksWindow刷新
-                        dailyTasksWindow.RefreshData();
-                    }
-                    else if (window is MemoDetailWindow memoDetailWindow && !ReferenceEquals(memoDetailWindow, this))
-                    {
-                        memoDetailWindow.RefreshData();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"通知窗口刷新时发生异常：{ex.Message}");
-            }
         }
     }
 }

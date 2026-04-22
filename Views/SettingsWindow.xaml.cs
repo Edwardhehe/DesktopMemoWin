@@ -3,7 +3,6 @@ using DesktopMemo.ViewModels;
 using Microsoft.Win32;
 using System;
 using System.ComponentModel;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
@@ -11,7 +10,7 @@ using System.Windows.Media;
 namespace DesktopMemo.Views
 {
     /// <summary>
-    /// SettingsWindow.xaml 的交互逻辑
+    /// 设置窗口。
     /// </summary>
     public partial class SettingsWindow : Window, INotifyPropertyChanged
     {
@@ -19,6 +18,7 @@ namespace DesktopMemo.Views
         private readonly DatabaseService _databaseService;
         private bool _startupEnabled;
         private string _selectedBackgroundColor = "#FFFFFF";
+        private int _recycleBinCount;
 
         public bool StartupEnabled
         {
@@ -41,6 +41,16 @@ namespace DesktopMemo.Views
             }
         }
 
+        public int RecycleBinCount
+        {
+            get => _recycleBinCount;
+            set
+            {
+                _recycleBinCount = value;
+                OnPropertyChanged();
+            }
+        }
+
         public Brush BackgroundPreviewBrush
         {
             get
@@ -56,9 +66,6 @@ namespace DesktopMemo.Views
             }
         }
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
         public SettingsWindow(MainViewModel viewModel)
         {
             InitializeComponent();
@@ -67,12 +74,10 @@ namespace DesktopMemo.Views
             _databaseService = viewModel.GetDatabaseService();
             StartupEnabled = viewModel.IsStartupEnabled;
             SelectedBackgroundColor = viewModel.BackgroundColor;
+            RecycleBinCount = _databaseService.GetRecycleBinMemos().Count;
             DataContext = this;
         }
 
-        /// <summary>
-        /// 背景颜色按钮点击事件
-        /// </summary>
         private void BackgroundColorButton_Click(object sender, RoutedEventArgs e)
         {
             var colors = new[] { "#FFFFFF", "#F0F0F0", "#E8F5E8", "#E6F3FF", "#FFF8E1", "#F3E5F5" };
@@ -81,103 +86,126 @@ namespace DesktopMemo.Views
             SelectedBackgroundColor = colors[nextIndex];
         }
 
-        /// <summary>
-        /// 导出数据按钮点击事件
-        /// </summary>
         private void ExportDataButton_Click(object sender, RoutedEventArgs e)
         {
             var saveFileDialog = new SaveFileDialog
             {
                 Title = "导出备忘录数据",
-                Filter = "SQLite数据库文件 (*.db)|*.db|所有文件 (*.*)|*.*",
+                Filter = "SQLite 数据库文件 (*.db)|*.db|所有文件 (*.*)|*.*",
                 DefaultExt = "db",
                 FileName = $"DesktopMemo_Backup_{DateTime.Now:yyyyMMdd_HHmmss}.db"
             };
 
-            if (saveFileDialog.ShowDialog() == true)
+            if (saveFileDialog.ShowDialog() != true)
             {
-                try
-                {
-                    _databaseService.ExportDatabase(saveFileDialog.FileName);
-                    MessageBox.Show("数据导出成功。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"数据导出失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                return;
+            }
+
+            try
+            {
+                _databaseService.ExportDatabase(saveFileDialog.FileName);
+                MessageBox.Show("数据导出成功。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"数据导出失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        /// <summary>
-        /// 导入数据按钮点击事件
-        /// </summary>
         private void ImportDataButton_Click(object sender, RoutedEventArgs e)
         {
             var result = MessageBox.Show(
-                "导入数据将覆盖当前所有备忘录数据，是否继续？",
+                "导入数据会覆盖当前备忘录，是否继续？",
                 "确认导入",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
 
-            if (result == MessageBoxResult.Yes)
+            if (result != MessageBoxResult.Yes)
             {
-                var openFileDialog = new OpenFileDialog
-                {
-                    Title = "导入备忘录数据",
-                    Filter = "SQLite数据库文件 (*.db)|*.db|所有文件 (*.*)|*.*",
-                    DefaultExt = "db"
-                };
+                return;
+            }
 
-                if (openFileDialog.ShowDialog() == true)
-                {
-                    try
-                    {
-                        _databaseService.ImportDatabase(openFileDialog.FileName);
-                        _databaseService.ReloadDatabase();
-                        _viewModel.RefreshAllViews();
-                        NotifyAllWindowsRefresh();
+            var openFileDialog = new OpenFileDialog
+            {
+                Title = "导入备忘录数据",
+                Filter = "SQLite 数据库文件 (*.db)|*.db|所有文件 (*.*)|*.*",
+                DefaultExt = "db"
+            };
 
-                        MessageBox.Show("数据导入成功，界面已刷新。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"数据导入失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
+            if (openFileDialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            try
+            {
+                _databaseService.ImportDatabase(openFileDialog.FileName);
+                _databaseService.ReloadDatabase();
+                _viewModel.RefreshAllViews();
+                NotifyAllWindowsRefresh();
+                RecycleBinCount = _databaseService.GetRecycleBinMemos().Count;
+                MessageBox.Show("数据导入成功，界面已刷新。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"数据导入失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        /// <summary>
-        /// 清空数据按钮点击事件
-        /// </summary>
         private void ClearDataButton_Click(object sender, RoutedEventArgs e)
         {
             var result = MessageBox.Show(
-                "清空数据将删除所有备忘录，此操作不可恢复，是否继续？",
+                "清空数据将删除所有备忘录且不可恢复，是否继续？",
                 "确认清空",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning);
 
-            if (result == MessageBoxResult.Yes)
+            if (result != MessageBoxResult.Yes)
             {
-                try
-                {
-                    _databaseService.ClearAllMemos();
-                    _viewModel.RefreshAllViews();
-                    NotifyAllWindowsRefresh();
+                return;
+            }
 
-                    MessageBox.Show("数据清空成功，界面已刷新。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"数据清空失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+            try
+            {
+                _databaseService.ClearAllMemos();
+                _viewModel.RefreshAllViews();
+                NotifyAllWindowsRefresh();
+                RecycleBinCount = 0;
+                MessageBox.Show("数据已清空。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"数据清空失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        /// <summary>
-        /// 确定按钮点击事件
-        /// </summary>
+        private void EmptyRecycleBinButton_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show(
+                "将彻底删除回收站中的所有备忘录，是否继续？",
+                "确认清空回收站",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            try
+            {
+                _databaseService.PurgeDeletedMemos();
+                _viewModel.RefreshAllViews();
+                NotifyAllWindowsRefresh();
+                RecycleBinCount = 0;
+                MessageBox.Show("回收站已清空。", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"清空回收站失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.IsStartupEnabled = StartupEnabled;
@@ -186,9 +214,6 @@ namespace DesktopMemo.Views
             Close();
         }
 
-        /// <summary>
-        /// 取消按钮点击事件
-        /// </summary>
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
@@ -197,23 +222,16 @@ namespace DesktopMemo.Views
 
         private void NotifyAllWindowsRefresh()
         {
-            try
+            foreach (Window window in Application.Current.Windows)
             {
-                foreach (Window window in Application.Current.Windows)
+                if (window is DailyTasksWindow dailyTasksWindow)
                 {
-                    if (window is DailyTasksWindow dailyTasksWindow)
-                    {
-                        dailyTasksWindow.RefreshData();
-                    }
-                    else if (window is MemoDetailWindow memoDetailWindow)
-                    {
-                        memoDetailWindow.RefreshData();
-                    }
+                    dailyTasksWindow.RefreshData();
                 }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"通知窗口刷新时发生异常：{ex.Message}");
+                else if (window is MemoDetailWindow memoDetailWindow)
+                {
+                    memoDetailWindow.RefreshData();
+                }
             }
         }
 

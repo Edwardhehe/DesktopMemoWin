@@ -1,107 +1,87 @@
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
-using System.IO;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace DesktopMemo.Views
 {
     /// <summary>
-    /// 备忘录输入对话框
+    /// 备忘录输入对话框。
     /// </summary>
     public partial class MemoInputDialog : Window
     {
-        /// <summary>
-        /// 备忘录内容（纯文本）
-        /// </summary>
         public string MemoContent { get; private set; } = string.Empty;
 
-        /// <summary>
-        /// 备忘录内容（富文本）
-        /// </summary>
-        public FlowDocument MemoRichContent { get; private set; }
+        public FlowDocument MemoRichContent { get; private set; } = new();
 
-        /// <summary>
-        /// 备忘录日期
-        /// </summary>
         public DateTime MemoDate { get; private set; }
 
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="date">备忘录日期</param>
-        /// <param name="existingContent">现有内容（用于编辑）</param>
-        /// <param name="owner">父窗口</param>
-        public MemoInputDialog(DateTime date, string existingContent = "", Window? owner = null)
+        public int MemoPriority { get; private set; }
+
+        public bool MemoIsPinned { get; private set; }
+
+        public MemoInputDialog(
+            DateTime date,
+            string existingContent = "",
+            Window? owner = null,
+            int priority = 0,
+            bool isPinned = false)
         {
             InitializeComponent();
 
             MemoDate = date;
             DatePicker.SelectedDate = date;
             DatePicker.DisplayDate = date;
+            PriorityComboBox.SelectedIndex = Math.Clamp(priority, 0, 2);
+            PinnedCheckBox.IsChecked = isPinned;
 
-            // 如果有现有内容，设置为编辑模式
-            if (!string.IsNullOrEmpty(existingContent))
+            if (!string.IsNullOrWhiteSpace(existingContent))
             {
                 ContentParagraph.Inlines.Add(new Run(existingContent));
                 Title = "编辑备忘录";
+                TitleTextBlock.Text = "编辑备忘录";
             }
 
-            // 设置父窗口并调整位置
             if (owner != null)
             {
-                this.Owner = owner;
-                this.WindowStartupLocation = WindowStartupLocation.Manual;
-                
-                // 计算对话框位置，确保在主窗口范围内
-                var ownerLeft = owner.Left;
-                var ownerTop = owner.Top;
-                var ownerWidth = owner.Width;
-                var ownerHeight = owner.Height;
-                
-                // 对话框位置：主窗口中心偏右下方
-                this.Left = ownerLeft + (ownerWidth - this.Width) / 2 + 50;
-                this.Top = ownerTop + (ownerHeight - this.Height) / 2 + 50;
-                
-                // 确保对话框不会超出屏幕边界
+                Owner = owner;
+                WindowStartupLocation = WindowStartupLocation.Manual;
+
+                Left = owner.Left + (owner.Width - Width) / 2 + 50;
+                Top = owner.Top + (owner.Height - Height) / 2 + 50;
+
                 var screenWidth = SystemParameters.WorkArea.Width;
                 var screenHeight = SystemParameters.WorkArea.Height;
-                
-                if (this.Left + this.Width > screenWidth)
+
+                if (Left + Width > screenWidth)
                 {
-                    this.Left = screenWidth - this.Width - 10;
+                    Left = screenWidth - Width - 10;
                 }
-                
-                if (this.Top + this.Height > screenHeight)
+
+                if (Top + Height > screenHeight)
                 {
-                    this.Top = screenHeight - this.Height - 10;
+                    Top = screenHeight - Height - 10;
                 }
             }
 
-            // 设置焦点到富文本框
-            Loaded += (s, e) => ContentRichTextBox.Focus();
+            Loaded += (_, _) => ContentRichTextBox.Focus();
         }
 
-        /// <summary>
-        /// 确定按钮点击事件
-        /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">路由事件参数</param>
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            // 获取选中的日期
             if (DatePicker.SelectedDate.HasValue)
             {
                 MemoDate = DatePicker.SelectedDate.Value;
             }
 
-            // 获取富文本内容
             MemoRichContent = ContentRichTextBox.Document;
+            MemoPriority = PriorityComboBox.SelectedIndex;
+            MemoIsPinned = PinnedCheckBox.IsChecked == true;
 
-            // 提取纯文本内容用于兼容性
             var textRange = new TextRange(MemoRichContent.ContentStart, MemoRichContent.ContentEnd);
             var content = textRange.Text.Trim();
 
@@ -117,29 +97,20 @@ namespace DesktopMemo.Views
             Close();
         }
 
-        /// <summary>
-        /// 取消按钮点击事件
-        /// </summary>
-        /// <param name="sender">事件发送者</param>
-        /// <param name="e">路由事件参数</param>
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
             Close();
         }
 
-        /// <summary>
-        /// 窗口键盘事件处理
-        /// </summary>
-        /// <param name="e">键盘事件参数</param>
-        protected override void OnKeyDown(System.Windows.Input.KeyEventArgs e)
+        protected override void OnKeyDown(KeyEventArgs e)
         {
-            if (e.Key == System.Windows.Input.Key.Escape)
+            if (e.Key == Key.Escape)
             {
                 DialogResult = false;
                 Close();
             }
-            else if (e.Key == System.Windows.Input.Key.Enter && e.KeyboardDevice.Modifiers == System.Windows.Input.ModifierKeys.Control)
+            else if (e.Key == Key.Enter && e.KeyboardDevice.Modifiers == ModifierKeys.Control)
             {
                 OkButton_Click(this, new RoutedEventArgs());
             }
@@ -147,32 +118,26 @@ namespace DesktopMemo.Views
             base.OnKeyDown(e);
         }
 
-        /// <summary>
-        /// 处理粘贴事件
-        /// </summary>
         private void ContentRichTextBox_Paste(object sender, DataObjectEventArgs e)
         {
             if (Clipboard.ContainsImage())
             {
-                // 处理图片粘贴
                 var image = Clipboard.GetImage();
                 if (image != null)
                 {
                     var bitmapImage = new BitmapImage();
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        var encoder = new PngBitmapEncoder();
-                        encoder.Frames.Add(BitmapFrame.Create(image));
-                        encoder.Save(memoryStream);
-                        memoryStream.Position = 0;
+                    using var memoryStream = new MemoryStream();
+                    var encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(image));
+                    encoder.Save(memoryStream);
+                    memoryStream.Position = 0;
 
-                        bitmapImage.BeginInit();
-                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                        bitmapImage.StreamSource = memoryStream;
-                        bitmapImage.EndInit();
-                    }
+                    bitmapImage.BeginInit();
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.StreamSource = memoryStream;
+                    bitmapImage.EndInit();
 
-                    var imageInline = new InlineUIContainer(new System.Windows.Controls.Image
+                    var imageInline = new InlineUIContainer(new Image
                     {
                         Source = bitmapImage,
                         MaxWidth = 200,
@@ -180,95 +145,65 @@ namespace DesktopMemo.Views
                         Margin = new Thickness(5)
                     });
 
-                    // 在当前光标位置插入图片
                     var caretPosition = ContentRichTextBox.CaretPosition;
-                    if (caretPosition != null)
-                    {
-                        caretPosition.Paragraph?.Inlines.Add(imageInline);
-                    }
-
+                    caretPosition?.Paragraph?.Inlines.Add(imageInline);
                     e.Handled = true;
                 }
             }
             else if (Clipboard.ContainsText())
             {
-                // 处理文本粘贴
-                var text = Clipboard.GetText();
-                if (!string.IsNullOrEmpty(text))
-                {
-                    ContentRichTextBox.Paste();
-                    e.Handled = true;
-                }
+                ContentRichTextBox.Paste();
+                e.Handled = true;
             }
         }
 
-        /// <summary>
-        /// 处理键盘快捷键
-        /// </summary>
         private void ContentRichTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyboardDevice.Modifiers == ModifierKeys.Control)
+            if (e.KeyboardDevice.Modifiers == ModifierKeys.Control && e.Key == Key.V)
             {
-                switch (e.Key)
-                {
-                    case Key.V:
-                        // Ctrl+V 粘贴
-                        HandlePaste();
-                        e.Handled = true;
-                        break;
-                }
+                HandlePaste();
+                e.Handled = true;
             }
         }
 
-        /// <summary>
-        /// 处理粘贴操作
-        /// </summary>
         private void HandlePaste()
         {
             if (Clipboard.ContainsImage())
             {
-                // 处理图片粘贴
                 var image = Clipboard.GetImage();
-                if (image != null)
+                if (image == null)
                 {
-                    var bitmapImage = new BitmapImage();
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        var encoder = new PngBitmapEncoder();
-                        encoder.Frames.Add(BitmapFrame.Create(image));
-                        encoder.Save(memoryStream);
-                        memoryStream.Position = 0;
-
-                        bitmapImage.BeginInit();
-                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                        bitmapImage.StreamSource = memoryStream;
-                        bitmapImage.EndInit();
-                    }
-
-                    var imageInline = new InlineUIContainer(new System.Windows.Controls.Image
-                    {
-                        Source = bitmapImage,
-                        MaxWidth = 200,
-                        MaxHeight = 200,
-                        Margin = new Thickness(5)
-                    });
-
-                    // 在当前光标位置插入图片
-                    var caretPosition = ContentRichTextBox.CaretPosition;
-                    if (caretPosition != null)
-                    {
-                        caretPosition.Paragraph?.Inlines.Add(imageInline);
-                    }
+                    return;
                 }
+
+                var bitmapImage = new BitmapImage();
+                using var memoryStream = new MemoryStream();
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(image));
+                encoder.Save(memoryStream);
+                memoryStream.Position = 0;
+
+                bitmapImage.BeginInit();
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.StreamSource = memoryStream;
+                bitmapImage.EndInit();
+
+                var imageInline = new InlineUIContainer(new Image
+                {
+                    Source = bitmapImage,
+                    MaxWidth = 200,
+                    MaxHeight = 200,
+                    Margin = new Thickness(5)
+                });
+
+                var caretPosition = ContentRichTextBox.CaretPosition;
+                caretPosition?.Paragraph?.Inlines.Add(imageInline);
+                return;
             }
-            else if (Clipboard.ContainsText())
+
+            if (Clipboard.ContainsText())
             {
-                // 处理文本粘贴
-                var text = Clipboard.GetText();
-                if (!string.IsNullOrEmpty(text))
-                {
-                    ContentRichTextBox.Paste();
-                }
+                ContentRichTextBox.Paste();
             }
         }
     }
