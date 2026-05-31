@@ -1,23 +1,49 @@
-# 桌面备忘录数据库格式说明
+# DesktopMemoWin
 
-## 概述
+桌面备忘录是一个基于 .NET 8 和 WPF 的 Windows 桌面便签工具，主界面直接以月历形式展示每天的待办事项，支持桌面常驻、系统托盘、回收站、优先级、置顶和数据备份恢复。
 
-桌面备忘录应用程序使用SQLite数据库存储所有备忘录数据。本文档详细说明了数据库结构、字段定义和数据格式，以便其他UI程序能够正确读取和操作数据。
+## 当前版本
 
-## 数据库信息
+- 版本：`v1.3.0`
+- 平台：`Windows x64`
+- 运行时：`.NET 8`
+- 数据库：`SQLite`
 
-- **数据库类型**: SQLite 3
-- **数据库文件位置**: `%USERPROFILE%\DesktopMemo\memo.db`
-- **数据库名称**: 无特定名称，使用文件名作为标识
-- **编码**: UTF-8
+## 主要功能
 
-## 数据库表结构
+- 月历视图：每天用日期格子展示备忘录，支持快速新增、双击查看详情。
+- 列表视图：按筛选条件查看备忘录，适合集中整理。
+- 当日任务窗口：查看指定日期任务并直接操作完成状态、优先级、置顶。
+- 新增与编辑：支持修改内容、日期、优先级、置顶状态。
+- 完成态排序：未完成项目优先，已完成项目自动变色并排到后面。
+- 回收站：支持软删除、恢复和清空回收站。
+- 系统托盘：关闭主窗体后隐藏到托盘，不打断桌面使用。
+- 开机启动：可在设置中启用。
+- 数据管理：支持导出、导入和数据库备份恢复。
 
-### MemoItems 表
+## 界面说明
 
-存储所有备忘录项目的主表。
+### 主界面
 
-#### 表结构定义
+- 顶部集成月份切换、视图切换、筛选和设置入口。
+- 月历格子默认按 4 条任务的视觉密度布局，避免多余留白。
+- 主界面会根据屏幕分辨率自动调整尺寸，尽量贴近内容高度。
+
+### 弹窗
+
+- 当日任务
+- 新增备忘录
+- 备忘录详情
+- 设置
+
+以上窗口都已统一为更紧凑的标题栏、字号和按钮尺寸，便于日常快速操作。
+
+## 数据存储
+
+- 数据库路径：`%USERPROFILE%\DesktopMemo\memo.db`
+- 配置文件路径：`%USERPROFILE%\DesktopMemo\config.txt`
+
+### MemoItems 表结构
 
 ```sql
 CREATE TABLE IF NOT EXISTS MemoItems (
@@ -31,269 +57,73 @@ CREATE TABLE IF NOT EXISTS MemoItems (
 );
 ```
 
-#### 字段详细说明
-
-| 字段名 | 数据类型 | 约束 | 说明 |
-|--------|----------|------|------|
-| `Id` | INTEGER | PRIMARY KEY AUTOINCREMENT | 备忘录唯一标识符，自增主键 |
-| `Content` | TEXT | NOT NULL | 备忘录内容文本 |
-| `Date` | TEXT | NOT NULL | 备忘录日期，格式：`yyyy-MM-dd` |
-| `IsCompleted` | INTEGER | NOT NULL DEFAULT 0 | 完成状态：0=未完成，1=已完成 |
-| `CreatedAt` | TEXT | NOT NULL | 创建时间，格式：`yyyy-MM-dd HH:mm:ss` |
-| `CompletedAt` | TEXT | NULL | 完成时间，格式：`yyyy-MM-dd HH:mm:ss`，未完成时为NULL |
-| `SortOrder` | INTEGER | NOT NULL DEFAULT 0 | 排序顺序，用于控制备忘录显示顺序 |
-
-## 数据格式规范
-
-### 日期时间格式
-
-- **日期字段**: `Date` - `yyyy-MM-dd` 格式
-  - 示例：`2024-01-15`
-
-- **时间字段**: `CreatedAt`, `CompletedAt` - `yyyy-MM-dd HH:mm:ss` 格式
-  - 示例：`2024-01-15 14:30:25`
-
-### 布尔值处理
-
-- `IsCompleted` 字段使用 INTEGER 类型：
-  - `0` = 未完成 (false)
-  - `1` = 已完成 (true)
-
 ### 排序规则
 
-备忘录按以下规则排序：
-1. **完成状态优先**：未完成项目在前，已完成项目在后
-2. **排序顺序**：相同状态下，按 `SortOrder` 升序排列
-3. **创建时间**：相同排序顺序下，按 `CreatedAt` 升序排列
+1. 未完成项目优先
+2. 同状态下按 `SortOrder` 升序
+3. 同排序下按 `CreatedAt` 升序
 
-## SQL 查询示例
+## 构建与运行
 
-### 基础查询
+### 调试运行
 
-```sql
--- 获取所有备忘录
-SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
-FROM MemoItems
-ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC;
+```powershell
+dotnet build DesktopMemo.csproj -c Debug
+dotnet run --project DesktopMemo.csproj
 ```
 
-### 按日期查询
+### 发布构建
 
-```sql
--- 获取指定日期的所有备忘录
-SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
-FROM MemoItems
-WHERE Date = '2024-01-15'
-ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC;
+```powershell
+dotnet build DesktopMemo.csproj -c Release --self-contained -r win-x64
 ```
 
-### 获取今日备忘录
+发布后的可执行文件默认位于：
 
-```sql
--- 获取今日所有备忘录
-SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
-FROM MemoItems
-WHERE Date = date('now')
-ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC;
+```text
+bin\Release\net8.0-windows\win-x64\DesktopMemo.exe
 ```
 
-### 获取本周备忘录
+## 项目结构
 
-```sql
--- 获取本周所有备忘录
-SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
-FROM MemoItems
-WHERE Date >= date('now', 'weekday 0', '-6 days')
-AND Date <= date('now', 'weekday 0')
-ORDER BY Date ASC, IsCompleted ASC, SortOrder ASC;
+```text
+DesktopMemoWin
+├─ Models
+├─ Services
+├─ ViewModels
+├─ Views
+├─ Converters
+└─ DesktopMemo.csproj
 ```
 
-### 获取未完成备忘录
+### 关键模块
 
-```sql
--- 获取所有未完成的备忘录
-SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
-FROM MemoItems
-WHERE IsCompleted = 0
-ORDER BY Date ASC, SortOrder ASC, CreatedAt ASC;
-```
+- `Services/DatabaseService.cs`：SQLite 数据访问、导入导出、备份恢复
+- `Services/SystemTrayService.cs`：系统托盘逻辑
+- `Services/DesktopMonitorService.cs`：桌面显示状态监控
+- `Services/StartupService.cs`：开机启动管理
+- `ViewModels/MainViewModel.cs`：主业务逻辑与命令
+- `Views/MainWindow.xaml`：主月历界面
 
-## 数据操作示例
+## 安全检查
 
-### 插入新备忘录
+发布前已检查以下内容：
 
-```sql
-INSERT INTO MemoItems (Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder)
-VALUES ('完成项目报告', '2024-01-15', 0, '2024-01-15 09:00:00', NULL, 0);
-```
+- 未发现硬编码 API Key、Token、私钥或密码
+- 未将本地 `.codex/` 目录纳入版本库
+- 未将 `AGENTS.md` 发布到仓库
 
-### 更新备忘录内容
+## 版本记录
 
-```sql
-UPDATE MemoItems
-SET Content = '完成季度财务报告'
-WHERE Id = 1;
-```
-
-### 标记备忘录为已完成
-
-```sql
-UPDATE MemoItems
-SET IsCompleted = 1, CompletedAt = '2024-01-15 16:30:00'
-WHERE Id = 1;
-```
-
-### 删除备忘录
-
-```sql
-DELETE FROM MemoItems
-WHERE Id = 1;
-```
-
-### 更新排序顺序
-
-```sql
--- 批量更新排序顺序
-UPDATE MemoItems
-SET SortOrder = CASE Id
-    WHEN 1 THEN 0
-    WHEN 2 THEN 1
-    WHEN 3 THEN 2
-    ELSE SortOrder
-END
-WHERE Id IN (1, 2, 3);
-```
-
-## 编程语言示例
-
-### C# 示例
-
-```csharp
-using System.Data.SQLite;
-
-// 读取备忘录
-string connectionString = "Data Source=memo.db;Version=3;";
-using (var connection = new SQLiteConnection(connectionString))
-{
-    connection.Open();
-
-    string sql = @"
-        SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
-        FROM MemoItems
-        ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC";
-
-    using (var command = new SQLiteCommand(sql, connection))
-    using (var reader = command.ExecuteReader())
-    {
-        while (reader.Read())
-        {
-            int id = reader.GetInt32(0);
-            string content = reader.GetString(1);
-            DateTime date = DateTime.Parse(reader.GetString(2));
-            bool isCompleted = reader.GetInt32(3) == 1;
-            DateTime createdAt = DateTime.Parse(reader.GetString(4));
-            DateTime? completedAt = reader.IsDBNull(5) ? (DateTime?)null : DateTime.Parse(reader.GetString(5));
-            int sortOrder = reader.GetInt32(6);
-
-            Console.WriteLine($"ID: {id}, 内容: {content}, 日期: {date:yyyy-MM-dd}, 完成: {isCompleted}");
-        }
-    }
-}
-```
-
-### Python 示例
-
-```python
-import sqlite3
-from datetime import datetime
-
-# 连接数据库
-conn = sqlite3.connect('memo.db')
-cursor = conn.cursor()
-
-# 查询备忘录
-cursor.execute("""
-    SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
-    FROM MemoItems
-    ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC
-""")
-
-for row in cursor.fetchall():
-    id, content, date_str, is_completed, created_at_str, completed_at_str, sort_order = row
-
-    # 转换数据类型
-    date = datetime.strptime(date_str, '%Y-%m-%d').date()
-    created_at = datetime.strptime(created_at_str, '%Y-%m-%d %H:%M:%S')
-    completed_at = datetime.strptime(completed_at_str, '%Y-%m-%d %H:%M:%S') if completed_at_str else None
-
-    print(f"ID: {id}, 内容: {content}, 日期: {date}, 完成: {bool(is_completed)}")
-
-conn.close()
-```
-
-### JavaScript (Node.js) 示例
-
-```javascript
-const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('memo.db');
-
-// 查询备忘录
-db.all(`
-    SELECT Id, Content, Date, IsCompleted, CreatedAt, CompletedAt, SortOrder
-    FROM MemoItems
-    ORDER BY IsCompleted ASC, SortOrder ASC, CreatedAt ASC
-`, (err, rows) => {
-    if (err) {
-        console.error(err);
-        return;
-    }
-
-    rows.forEach(row => {
-        const memo = {
-            id: row.Id,
-            content: row.Content,
-            date: row.Date,
-            isCompleted: row.IsCompleted === 1,
-            createdAt: row.CreatedAt,
-            completedAt: row.CompletedAt,
-            sortOrder: row.SortOrder
-        };
-        console.log(memo);
-    });
-});
-
-db.close();
-```
-
-## 注意事项
-
-1. **数据库访问**: 数据库文件可能被桌面备忘录应用程序锁定，建议在访问前确保应用程序已关闭
-2. **并发访问**: 不建议多个程序同时写入数据库，可能导致数据损坏
-3. **备份**: 在进行任何数据操作前，建议先备份数据库文件
-4. **字符编码**: 所有文本数据使用UTF-8编码
-5. **事务处理**: 对于重要操作，建议使用数据库事务确保数据一致性
-
-## 数据库验证
-
-检查数据库文件是否有效的SQL：
-
-```sql
--- 检查表是否存在
-SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='MemoItems';
-
--- 检查表结构
-PRAGMA table_info(MemoItems);
-
--- 检查数据完整性
-SELECT COUNT(*) FROM MemoItems;
-```
-
-## 版本历史
-
-- **v1.0.0**: 初始版本，包含基本的备忘录功能
-- **v1.1.0**: 添加排序功能 (SortOrder字段)
-- **v1.2.0**: 添加完成时间跟踪 (CompletedAt字段)
-
----
-
-如有任何疑问或需要进一步的数据库信息，请联系开发者。
+- `v1.3.0`
+  - 收紧主界面和弹窗布局，减少空白区域
+  - 统一字体层级和窗口尺寸
+  - 修复右键菜单乱码与若干界面文案问题
+  - 优化已完成任务排序与显示状态
+  - 调整月历格子密度，提升不同分辨率下的显示效果
+- `v1.2.0`
+  - 添加完成时间跟踪
+- `v1.1.0`
+  - 添加排序字段
+- `v1.0.0`
+  - 初始版本
