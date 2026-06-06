@@ -43,6 +43,20 @@
             <Setter Property="Foreground" Value="#23415F"/>
         </Style>
 
+        <Style x:Key="QuickAddButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="22"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
         <Style x:Key="CalendarCardStyle" TargetType="Border">
             <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
             <Setter Property="BorderBrush" Value="#D6CBD2"/>
@@ -204,12 +218,30 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <Border Grid.Row="0" Background="#D7F3EEF2" BorderBrush="#D7CDD4" BorderThickness="1" CornerRadius="16" Padding="12" Margin="4,0,4,10">
-                            <StackPanel>
-                                <TextBlock Text="{Binding ListSummary}" FontWeight="SemiBold" Foreground="#36516D"/>
-                                <TextBlock Text="{Binding ListDescription}" Margin="0,5,0,0" FontSize="11" Foreground="#71849A" TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Border>
+                        <Grid Grid.Row="0" Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0"
+                                    Command="{Binding QuickAddMemoCommand}"
+                                    Style="{StaticResource QuickAddButtonStyle}"
+                                    Margin="4,2,10,0"
+                                    VerticalAlignment="Top"
+                                    Visibility="{Binding CanQuickAddInListView, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <TextBlock Text="+"
+                                           TextAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Margin="0,-1,0,0"/>
+                            </Button>
+                            <Border Grid.Column="1" Background="#D7F3EEF2" BorderBrush="#D7CDD4" BorderThickness="1" CornerRadius="16" Padding="12" Margin="4,0,4,0">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding ListSummary}" FontWeight="SemiBold" Foreground="#36516D"/>
+                                    <TextBlock Text="{Binding ListDescription}" Margin="0,5,0,0" FontSize="11" Foreground="#71849A" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
 
                         <Border Grid.Row="1" Background="#D7F3EEF2" BorderBrush="#D7CDD4" BorderThickness="1" CornerRadius="18" Padding="22" Margin="0,0,0,10" Visibility="{Binding IsFilteredMemosEmpty, Converter={StaticResource BoolToVisibilityConverter}}">
                             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">

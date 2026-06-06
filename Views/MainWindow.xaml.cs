@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace DesktopMemo.Views
 {
@@ -15,6 +16,9 @@ namespace DesktopMemo.Views
     {
         private MainViewModel _viewModel;
         private SystemTrayService _systemTrayService;
+        private StickyNoteWindow? _stickyNoteWindow;
+        private bool _isUpdatingStickyNotePosition;
+        private readonly DispatcherTimer _stickyNoteLayoutTimer = new() { Interval = TimeSpan.FromMilliseconds(120) };
 
         /// <summary>
         /// 获取系统托盘服务。
@@ -36,6 +40,9 @@ namespace DesktopMemo.Views
             _viewModel.PropertyChanged += ViewModel_PropertyChanged;
             Loaded += MainWindow_Loaded;
             Closing += MainWindow_Closing;
+            LocationChanged += MainWindow_LocationChanged;
+            SizeChanged += MainWindow_SizeChanged;
+            _stickyNoteLayoutTimer.Tick += StickyNoteLayoutTimer_Tick;
         }
 
         /// <summary>
@@ -48,6 +55,7 @@ namespace DesktopMemo.Views
                 if (_viewModel.IsDesktopVisible)
                 {
                     Show();
+                    _stickyNoteWindow?.Show();
                     SetWindowPos(
                         new System.Windows.Interop.WindowInteropHelper(this).Handle,
                         new IntPtr(-1),
@@ -59,6 +67,7 @@ namespace DesktopMemo.Views
                 }
                 else
                 {
+                    _stickyNoteWindow?.Hide();
                     Hide();
                 }
             }
@@ -90,6 +99,13 @@ namespace DesktopMemo.Views
             _systemTrayService.Initialize(this, _viewModel);
             ApplyResponsiveWindowLayout();
             Show();
+            EnsureStickyNoteWindow();
+            ApplyStickyNoteLayout();
+
+            if (_stickyNoteWindow != null)
+            {
+                _stickyNoteWindow.Show();
+            }
         }
 
         private void ApplyResponsiveWindowLayout()
@@ -110,6 +126,8 @@ namespace DesktopMemo.Views
         {
             try
             {
+                SaveStickyNoteLayout();
+                _stickyNoteWindow?.Close();
                 _viewModel?.StopDesktopMonitoring();
                 _systemTrayService?.Dispose();
             }
@@ -219,6 +237,112 @@ namespace DesktopMemo.Views
             {
                 System.Diagnostics.Debug.WriteLine($"通知窗口刷新时发生异常：{ex.Message}");
             }
+        }
+
+        private void MainWindow_LocationChanged(object? sender, EventArgs e)
+        {
+            ScheduleStickyNoteLayoutUpdate();
+        }
+
+        private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ScheduleStickyNoteLayoutUpdate();
+        }
+
+        private void StickyNoteLayoutTimer_Tick(object? sender, EventArgs e)
+        {
+            _stickyNoteLayoutTimer.Stop();
+            ApplyStickyNoteLayout();
+        }
+
+        private void ScheduleStickyNoteLayoutUpdate()
+        {
+            if (_stickyNoteWindow == null)
+            {
+                return;
+            }
+
+            _stickyNoteLayoutTimer.Stop();
+            _stickyNoteLayoutTimer.Start();
+        }
+
+        private void EnsureStickyNoteWindow()
+        {
+            if (_stickyNoteWindow != null)
+            {
+                return;
+            }
+
+            _stickyNoteWindow = new StickyNoteWindow
+            {
+                Owner = this
+            };
+
+            _stickyNoteWindow.LocationChanged += StickyNoteWindow_LayoutChanged;
+            _stickyNoteWindow.SizeChanged += StickyNoteWindow_LayoutChanged;
+            _stickyNoteWindow.Closing += StickyNoteWindow_Closing;
+        }
+
+        private void StickyNoteWindow_Closing(object? sender, CancelEventArgs e)
+        {
+            SaveStickyNoteLayout();
+        }
+
+        private void StickyNoteWindow_LayoutChanged(object? sender, EventArgs e)
+        {
+            if (_isUpdatingStickyNotePosition)
+            {
+                return;
+            }
+
+            SaveStickyNoteLayout();
+        }
+
+        private void ApplyStickyNoteLayout()
+        {
+            if (_stickyNoteWindow == null)
+            {
+                return;
+            }
+
+            _isUpdatingStickyNotePosition = true;
+            try
+            {
+                var workArea = SystemParameters.WorkArea;
+                var layout = _stickyNoteWindow.GetSavedLayout();
+
+                var noteWidth = Math.Clamp(Width * layout.WidthRatio, 240, Math.Max(240, workArea.Width * 0.55));
+                var noteHeight = Math.Clamp(Height * layout.HeightRatio, 220, Math.Max(220, workArea.Height * 0.85));
+                var noteLeft = Left + (Width * layout.OffsetXRatio);
+                var noteTop = Top + (Height * layout.OffsetYRatio);
+
+                noteLeft = Math.Max(workArea.Left, Math.Min(noteLeft, workArea.Right - noteWidth));
+                noteTop = Math.Max(workArea.Top, Math.Min(noteTop, workArea.Bottom - noteHeight));
+
+                _stickyNoteWindow.Width = noteWidth;
+                _stickyNoteWindow.Height = noteHeight;
+                _stickyNoteWindow.Left = noteLeft;
+                _stickyNoteWindow.Top = noteTop;
+
+                if (IsVisible)
+                {
+                    _stickyNoteWindow.Show();
+                }
+            }
+            finally
+            {
+                _isUpdatingStickyNotePosition = false;
+            }
+        }
+
+        private void SaveStickyNoteLayout()
+        {
+            if (_stickyNoteWindow == null)
+            {
+                return;
+            }
+
+            _stickyNoteWindow.SaveRelativeLayout(this);
         }
     }
 }

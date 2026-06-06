@@ -7,9 +7,9 @@
     <UseWindowsForms>True</UseWindowsForms>
     <AssemblyTitle>桌面备忘录</AssemblyTitle>
     <AssemblyDescription>桌面背景备忘录软件</AssemblyDescription>
-    <AssemblyVersion>1.3.0.0</AssemblyVersion>
-    <FileVersion>1.3.0.0</FileVersion>
-    <Version>1.3.0</Version>
+    <AssemblyVersion>1.4.0.0</AssemblyVersion>
+    <FileVersion>1.4.0.0</FileVersion>
+    <Version>1.4.0</Version>
     <ApplicationIcon>memo.ico</ApplicationIcon>
   </PropertyGroup>
 

@@ -1,49 +1,41 @@
 # DesktopMemoWin
 
-桌面备忘录是一个基于 .NET 8 和 WPF 的 Windows 桌面便签工具，主界面直接以月历形式展示每天的待办事项，支持桌面常驻、系统托盘、回收站、优先级、置顶和数据备份恢复。
+DesktopMemoWin is a lightweight WPF desktop memo app for Windows. It keeps a calendar-style memo board on the desktop, supports fast daily task management, and now includes a sticky side note panel that can stay attached to the main window.
 
-## 当前版本
+## Current Version
 
-- 版本：`v1.3.0`
-- 平台：`Windows x64`
-- 运行时：`.NET 8`
-- 数据库：`SQLite`
+- Version: `v1.4.0`
+- Platform: `Windows x64`
+- Runtime: `.NET 8`
+- Database: `SQLite`
 
-## 主要功能
+## Features
 
-- 月历视图：每天用日期格子展示备忘录，支持快速新增、双击查看详情。
-- 列表视图：按筛选条件查看备忘录，适合集中整理。
-- 当日任务窗口：查看指定日期任务并直接操作完成状态、优先级、置顶。
-- 新增与编辑：支持修改内容、日期、优先级、置顶状态。
-- 完成态排序：未完成项目优先，已完成项目自动变色并排到后面。
-- 回收站：支持软删除、恢复和清空回收站。
-- 系统托盘：关闭主窗体后隐藏到托盘，不打断桌面使用。
-- 开机启动：可在设置中启用。
-- 数据管理：支持导出、导入和数据库备份恢复。
+- Monthly calendar view for daily memos
+- List views for today, overdue, this week, recycle bin, and more
+- Daily task window for focused one-day management
+- Quick add buttons in list views
+- Completed items move to the end and use a different visual style
+- Priority and pin support
+- Recycle bin with restore and clear actions
+- System tray integration
+- Startup on boot option
+- Data import, export, backup, and restore
+- Sticky side note panel
+  - docked beside the main window by default
+  - resizable and draggable
+  - remembers relative size and position
+  - supports scrolling
+  - supports pasted text and images
 
-## 界面说明
+## Storage Paths
 
-### 主界面
+- Database: `%USERPROFILE%\DesktopMemo\memo.db`
+- Config: `%USERPROFILE%\DesktopMemo\config.txt`
+- Sticky note layout: `%USERPROFILE%\DesktopMemo\sticky-note-layout.json`
+- Sticky note content: `%USERPROFILE%\DesktopMemo\sticky-note-content.xamlpkg`
 
-- 顶部集成月份切换、视图切换、筛选和设置入口。
-- 月历格子默认按 4 条任务的视觉密度布局，避免多余留白。
-- 主界面会根据屏幕分辨率自动调整尺寸，尽量贴近内容高度。
-
-### 弹窗
-
-- 当日任务
-- 新增备忘录
-- 备忘录详情
-- 设置
-
-以上窗口都已统一为更紧凑的标题栏、字号和按钮尺寸，便于日常快速操作。
-
-## 数据存储
-
-- 数据库路径：`%USERPROFILE%\DesktopMemo\memo.db`
-- 配置文件路径：`%USERPROFILE%\DesktopMemo\config.txt`
-
-### MemoItems 表结构
+## Database Schema
 
 ```sql
 CREATE TABLE IF NOT EXISTS MemoItems (
@@ -57,73 +49,72 @@ CREATE TABLE IF NOT EXISTS MemoItems (
 );
 ```
 
-### 排序规则
+## Build and Run
 
-1. 未完成项目优先
-2. 同状态下按 `SortOrder` 升序
-3. 同排序下按 `CreatedAt` 升序
-
-## 构建与运行
-
-### 调试运行
+### Debug
 
 ```powershell
 dotnet build DesktopMemo.csproj -c Debug
 dotnet run --project DesktopMemo.csproj
 ```
 
-### 发布构建
+### Release
 
 ```powershell
-dotnet build DesktopMemo.csproj -c Release --self-contained -r win-x64
+dotnet publish DesktopMemo.csproj -c Release -r win-x64 --self-contained true
 ```
 
-发布后的可执行文件默认位于：
+Default published executable:
 
 ```text
-bin\Release\net8.0-windows\win-x64\DesktopMemo.exe
+bin\Release\net8.0-windows\win-x64\publish\DesktopMemo.exe
 ```
 
-## 项目结构
+## Project Structure
 
-```text
-DesktopMemoWin
-├─ Models
-├─ Services
-├─ ViewModels
-├─ Views
-├─ Converters
-└─ DesktopMemo.csproj
-```
+- `Models`
+- `Services`
+- `ViewModels`
+- `Views`
+- `Converters`
+- `DesktopMemo.csproj`
 
-### 关键模块
+## Key Modules
 
-- `Services/DatabaseService.cs`：SQLite 数据访问、导入导出、备份恢复
-- `Services/SystemTrayService.cs`：系统托盘逻辑
-- `Services/DesktopMonitorService.cs`：桌面显示状态监控
-- `Services/StartupService.cs`：开机启动管理
-- `ViewModels/MainViewModel.cs`：主业务逻辑与命令
-- `Views/MainWindow.xaml`：主月历界面
+- `Services/DatabaseService.cs`: SQLite access, import/export, backup/restore
+- `Services/SystemTrayService.cs`: tray icon behavior
+- `Services/DesktopMonitorService.cs`: desktop visibility monitoring
+- `Services/StartupService.cs`: startup registration
+- `Services/StickyNoteStateService.cs`: sticky note persistence
+- `ViewModels/MainViewModel.cs`: main app logic
+- `Views/MainWindow.xaml`: main calendar UI
+- `Views/StickyNoteWindow.xaml`: sticky side note UI
 
-## 安全检查
+## Security Check
 
-发布前已检查以下内容：
+This release was checked for common sensitive information patterns before publishing:
 
-- 未发现硬编码 API Key、Token、私钥或密码
-- 未将本地 `.codex/` 目录纳入版本库
-- 未将 `AGENTS.md` 发布到仓库
+- no hard-coded API keys found
+- no hard-coded tokens found
+- no private keys found
+- `.codex/` is excluded from version control
+- `AGENTS.md` is excluded from version control
 
-## 版本记录
+## Changelog
 
-- `v1.3.0`
-  - 收紧主界面和弹窗布局，减少空白区域
-  - 统一字体层级和窗口尺寸
-  - 修复右键菜单乱码与若干界面文案问题
-  - 优化已完成任务排序与显示状态
-  - 调整月历格子密度，提升不同分辨率下的显示效果
-- `v1.2.0`
-  - 添加完成时间跟踪
-- `v1.1.0`
-  - 添加排序字段
-- `v1.0.0`
-  - 初始版本
+### v1.4.0
+
+- Added a sticky side note window attached to the main window
+- Added sticky note size and relative position persistence
+- Added sticky note support for pasted images and text
+- Added quick add buttons to list-based views
+- Improved first-launch sticky note display behavior
+- Adjusted sticky note docking so it sits flush against the main window
+
+### v1.3.0
+
+- Tightened the main window and dialog layouts
+- Unified typography across windows
+- Fixed multiple garbled UI texts
+- Improved completed-task sorting and styling
+- Improved calendar density on different display sizes

@@ -55,6 +55,7 @@ namespace DesktopMemo.ViewModels
             PreviousMonthCommand = new RelayCommand(PreviousMonth);
             NextMonthCommand = new RelayCommand(NextMonth);
             AddMemoCommand = new RelayCommand<CalendarDayViewModel>(AddMemo);
+            QuickAddMemoCommand = new RelayCommand(AddQuickMemo);
             MarkCompletedCommand = new RelayCommand<MemoItem>(MarkCompleted);
             MarkUncompletedCommand = new RelayCommand<MemoItem>(MarkUncompleted);
             DeleteMemoCommand = new RelayCommand<MemoItem>(DeleteMemo);
@@ -90,6 +91,7 @@ namespace DesktopMemo.ViewModels
         public ICommand PreviousMonthCommand { get; }
         public ICommand NextMonthCommand { get; }
         public ICommand AddMemoCommand { get; }
+        public ICommand QuickAddMemoCommand { get; }
         public ICommand MarkCompletedCommand { get; }
         public ICommand MarkUncompletedCommand { get; }
         public ICommand DeleteMemoCommand { get; }
@@ -160,6 +162,7 @@ namespace DesktopMemo.ViewModels
                 OnPropertyChanged(nameof(IsMonthView));
                 OnPropertyChanged(nameof(IsListView));
                 OnPropertyChanged(nameof(IsRecycleBinView));
+                OnPropertyChanged(nameof(CanQuickAddInListView));
                 OnPropertyChanged(nameof(HasFilteredMemos));
                 OnPropertyChanged(nameof(IsFilteredMemosEmpty));
                 LoadFilteredMemos();
@@ -211,6 +214,7 @@ namespace DesktopMemo.ViewModels
         public bool IsMonthView => SelectedViewMode == "月历";
         public bool IsListView => !IsMonthView;
         public bool IsRecycleBinView => SelectedViewMode == "回收站";
+        public bool CanQuickAddInListView => IsListView && !IsRecycleBinView;
 
         public string ListDescription
         {
@@ -606,6 +610,41 @@ namespace DesktopMemo.ViewModels
             {
                 System.Diagnostics.Debug.WriteLine($"添加备忘录失败: {ex.Message}");
                 MessageBox.Show($"添加备忘录失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void AddQuickMemo()
+        {
+            try
+            {
+                var dialog = new Views.MemoInputDialog(DateTime.Today, string.Empty, Application.Current.MainWindow);
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                var sortOrder = _databaseService
+                    .GetAllMemos()
+                    .Count(m => !m.IsDeleted && m.Date.Date == dialog.MemoDate.Date);
+
+                var memo = new MemoItem
+                {
+                    Content = dialog.MemoContent,
+                    Date = dialog.MemoDate,
+                    IsCompleted = false,
+                    CreatedAt = DateTime.Now,
+                    SortOrder = sortOrder,
+                    Priority = dialog.MemoPriority,
+                    IsPinned = dialog.MemoIsPinned
+                };
+
+                _databaseService.AddMemo(memo);
+                RefreshAllViews();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"快速添加备忘录失败: {ex.Message}");
+                MessageBox.Show($"快速添加备忘录失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
