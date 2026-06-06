@@ -219,13 +219,11 @@ namespace DesktopMemo.Services
             {
                 if (_mainWindow.IsVisible)
                 {
-                    _mainWindow.Hide();
+                    _mainWindow.HideWindowGroupToTray();
                 }
                 else
                 {
-                    _mainWindow.Show();
-                    _mainWindow.WindowState = WindowState.Normal;
-                    _mainWindow.Activate();
+                    _mainWindow.RestoreWindowGroupFromTray();
                 }
             });
         }
@@ -341,7 +339,7 @@ namespace DesktopMemo.Services
         {
             if (_mainWindow != null)
             {
-                _mainWindow.Hide();
+                _mainWindow.HideWindowGroupToTray();
             }
         }
 

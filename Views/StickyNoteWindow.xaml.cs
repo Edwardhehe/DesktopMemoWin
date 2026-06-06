@@ -62,6 +62,12 @@ namespace DesktopMemo.Views
             _stateService.SaveLayout(layout);
         }
 
+        public void SaveContentNow()
+        {
+            _saveTimer.Stop();
+            _stateService.SaveContent(EditorRichTextBox);
+        }
+
         private void HeaderBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -83,20 +89,17 @@ namespace DesktopMemo.Views
                 return;
             }
 
-            _saveTimer.Stop();
-            _saveTimer.Start();
+            ScheduleSave();
         }
 
         private void SaveTimer_Tick(object? sender, EventArgs e)
         {
-            _saveTimer.Stop();
-            _stateService.SaveContent(EditorRichTextBox);
+            SaveContentNow();
         }
 
         private void StickyNoteWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
-            _saveTimer.Stop();
-            _stateService.SaveContent(EditorRichTextBox);
+            SaveContentNow();
         }
 
         private void EditorRichTextBox_PreviewDragOver(object sender, DragEventArgs e)
@@ -196,12 +199,19 @@ namespace DesktopMemo.Views
 
             var container = new InlineUIContainer(image, EditorRichTextBox.CaretPosition);
             EditorRichTextBox.CaretPosition = container.ElementEnd;
+            ScheduleSave();
         }
 
         private static bool IsSupportedImage(string filePath)
         {
             var extension = Path.GetExtension(filePath)?.ToLowerInvariant();
             return extension is ".png" or ".jpg" or ".jpeg" or ".bmp" or ".gif" or ".webp";
+        }
+
+        private void ScheduleSave()
+        {
+            _saveTimer.Stop();
+            _saveTimer.Start();
         }
     }
 }

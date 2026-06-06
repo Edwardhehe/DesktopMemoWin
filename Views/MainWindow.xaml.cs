@@ -139,7 +139,7 @@ namespace DesktopMemo.Views
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            _systemTrayService.HideToTray();
+            HideWindowGroupToTray();
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
@@ -343,6 +343,26 @@ namespace DesktopMemo.Views
             }
 
             _stickyNoteWindow.SaveRelativeLayout(this);
+        }
+
+        public void HideWindowGroupToTray()
+        {
+            SaveStickyNoteLayout();
+            _stickyNoteWindow?.SaveContentNow();
+            _stickyNoteWindow?.Hide();
+            Hide();
+        }
+
+        public void RestoreWindowGroupFromTray()
+        {
+            Show();
+            WindowState = WindowState.Normal;
+            Activate();
+
+            EnsureStickyNoteWindow();
+            ApplyStickyNoteLayout();
+            _stickyNoteWindow?.Show();
+            _stickyNoteWindow?.Activate();
         }
     }
 }
