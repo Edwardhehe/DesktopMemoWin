@@ -1,41 +1,34 @@
-# DesktopMemoWin
+﻿# 桌面备忘录 DesktopMemoWin
 
-DesktopMemoWin is a lightweight WPF desktop memo app for Windows. It keeps a calendar-style memo board on the desktop, supports fast daily task management, and now includes a sticky side note panel that can stay attached to the main window.
+`DesktopMemoWin` 是一个基于 WPF 的 Windows 桌面备忘录应用。它以月历为主界面，把每天的待办直接贴在桌面上，同时支持侧边便签、当日任务管理、回收站、系统托盘和开机启动等功能。
 
-## Current Version
+## 当前版本
 
-- Version: `v1.4.0`
-- Platform: `Windows x64`
-- Runtime: `.NET 8`
-- Database: `SQLite`
+- 版本：`v1.4.1`
+- 平台：`Windows x64`
+- 运行时：`.NET 8`
+- 数据库：`SQLite`
 
-## Features
+## 主要功能
 
-- Monthly calendar view for daily memos
-- List views for today, overdue, this week, recycle bin, and more
-- Daily task window for focused one-day management
-- Quick add buttons in list views
-- Completed items move to the end and use a different visual style
-- Priority and pin support
-- Recycle bin with restore and clear actions
-- System tray integration
-- Startup on boot option
-- Data import, export, backup, and restore
-- Sticky side note panel
-  - docked beside the main window by default
-  - resizable and draggable
-  - remembers relative size and position
-  - supports scrolling
-  - supports pasted text and images
+- 月历视图：按日期展示备忘录，支持快速新增、完成、置顶、优先级
+- 列表视图：支持今日、逾期、本周、全部、回收站等常用视图
+- 当日任务窗口：专注查看和管理某一天的任务
+- 侧边便签：默认紧贴主界面，可自由拖动、缩放，支持滚动
+- 便签内容：支持粘贴文字和图片，并自动保存
+- 完成状态：已完成条目自动变色并排到后面
+- 系统托盘：双击托盘可恢复窗口，主界面与便签联动显示和隐藏
+- 数据管理：支持导入、导出、备份、恢复
+- 开机启动：可在界面中直接开关
 
-## Storage Paths
+## 数据存储位置
 
-- Database: `%USERPROFILE%\DesktopMemo\memo.db`
-- Config: `%USERPROFILE%\DesktopMemo\config.txt`
-- Sticky note layout: `%USERPROFILE%\DesktopMemo\sticky-note-layout.json`
-- Sticky note content: `%USERPROFILE%\DesktopMemo\sticky-note-content.xamlpkg`
+- 数据库：`%USERPROFILE%\DesktopMemo\memo.db`
+- 配置文件：`%USERPROFILE%\DesktopMemo\config.txt`
+- 便签布局：`%USERPROFILE%\DesktopMemo\sticky-note-layout.json`
+- 便签内容：`%USERPROFILE%\DesktopMemo\sticky-note-content.xamlpkg`
 
-## Database Schema
+## 数据表结构
 
 ```sql
 CREATE TABLE IF NOT EXISTS MemoItems (
@@ -49,72 +42,70 @@ CREATE TABLE IF NOT EXISTS MemoItems (
 );
 ```
 
-## Build and Run
+## 构建与运行
 
-### Debug
+### 调试模式
 
 ```powershell
 dotnet build DesktopMemo.csproj -c Debug
 dotnet run --project DesktopMemo.csproj
 ```
 
-### Release
+### 发布模式
 
 ```powershell
 dotnet publish DesktopMemo.csproj -c Release -r win-x64 --self-contained true
 ```
 
-Default published executable:
+默认发布后的可执行文件：
 
 ```text
 bin\Release\net8.0-windows\win-x64\publish\DesktopMemo.exe
 ```
 
-## Project Structure
+## 项目结构
 
-- `Models`
-- `Services`
-- `ViewModels`
-- `Views`
-- `Converters`
-- `DesktopMemo.csproj`
+- `Models`：数据模型
+- `Services`：数据库、托盘、桌面监听、开机启动、便签状态等服务
+- `ViewModels`：主界面业务逻辑
+- `Views`：主窗口、当日任务、便签、设置、编辑窗口
+- `Converters`：界面绑定转换器
 
-## Key Modules
+## 核心模块
 
-- `Services/DatabaseService.cs`: SQLite access, import/export, backup/restore
-- `Services/SystemTrayService.cs`: tray icon behavior
-- `Services/DesktopMonitorService.cs`: desktop visibility monitoring
-- `Services/StartupService.cs`: startup registration
-- `Services/StickyNoteStateService.cs`: sticky note persistence
-- `ViewModels/MainViewModel.cs`: main app logic
-- `Views/MainWindow.xaml`: main calendar UI
-- `Views/StickyNoteWindow.xaml`: sticky side note UI
+- `Services/DatabaseService.cs`：SQLite 读写、导入导出、备份恢复
+- `Services/SystemTrayService.cs`：系统托盘行为
+- `Services/DesktopMonitorService.cs`：桌面显示状态监听
+- `Services/StartupService.cs`：开机启动注册
+- `Services/StickyNoteStateService.cs`：侧边便签布局与内容持久化
+- `ViewModels/MainViewModel.cs`：主界面数据与命令
+- `Views/MainWindow.xaml`：月历主界面
+- `Views/StickyNoteWindow.xaml`：侧边便签窗口
 
-## Security Check
+## 本次版本更新
 
-This release was checked for common sensitive information patterns before publishing:
+### v1.4.1
 
-- no hard-coded API keys found
-- no hard-coded tokens found
-- no private keys found
-- `.codex/` is excluded from version control
-- `AGENTS.md` is excluded from version control
-
-## Changelog
+- 修复主界面点击右上角 `X` 后，便签与主界面托盘联动不一致的问题
+- 修复双击系统托盘图标时，主界面恢复但便签未同步恢复的问题
+- 优化主界面与便签的成组显示和隐藏行为
+- 保留并强化便签自动保存逻辑
+- 修正项目元数据中的乱码标题与说明
 
 ### v1.4.0
 
-- Added a sticky side note window attached to the main window
-- Added sticky note size and relative position persistence
-- Added sticky note support for pasted images and text
-- Added quick add buttons to list-based views
-- Improved first-launch sticky note display behavior
-- Adjusted sticky note docking so it sits flush against the main window
+- 新增紧贴主界面的侧边便签窗口
+- 新增便签相对位置与大小记忆
+- 新增便签粘贴文字与图片支持
+- 为今日、逾期、本周等列表视图新增快速添加按钮
+- 优化便签首次显示与贴边逻辑
 
-### v1.3.0
+## 敏感信息检查
 
-- Tightened the main window and dialog layouts
-- Unified typography across windows
-- Fixed multiple garbled UI texts
-- Improved completed-task sorting and styling
-- Improved calendar density on different display sizes
+发布前已对仓库进行常见敏感信息扫描，结果如下：
+
+- 未发现硬编码 API Key
+- 未发现硬编码 Token
+- 未发现私钥文件内容
+- `.codex/` 未纳入版本控制
+- `AGENTS.md` 未纳入版本控制
