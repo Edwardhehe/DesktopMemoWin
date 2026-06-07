@@ -1,10 +1,10 @@
-﻿# 桌面备忘录 DesktopMemoWin
+# 桌面备忘录 DesktopMemoWin
 
 `DesktopMemoWin` 是一个基于 WPF 的 Windows 桌面备忘录应用。它以月历为主界面，把每天的待办直接贴在桌面上，同时支持侧边便签、当日任务管理、回收站、系统托盘和开机启动等功能。
 
 ## 当前版本
 
-- 版本：`v1.4.1`
+- 版本：`v1.4.2`
 - 平台：`Windows x64`
 - 运行时：`.NET 8`
 - 数据库：`SQLite`
@@ -15,7 +15,7 @@
 - 列表视图：支持今日、逾期、本周、全部、回收站等常用视图
 - 当日任务窗口：专注查看和管理某一天的任务
 - 侧边便签：默认紧贴主界面，可自由拖动、缩放，支持滚动
-- 便签内容：支持粘贴文字和图片，并自动保存
+- 便签自动保存：每次编辑即时写入文本文件，关闭再打开内容不丢失
 - 完成状态：已完成条目自动变色并排到后面
 - 系统托盘：双击托盘可恢复窗口，主界面与便签联动显示和隐藏
 - 数据管理：支持导入、导出、备份、恢复
@@ -26,7 +26,7 @@
 - 数据库：`%USERPROFILE%\DesktopMemo\memo.db`
 - 配置文件：`%USERPROFILE%\DesktopMemo\config.txt`
 - 便签布局：`%USERPROFILE%\DesktopMemo\sticky-note-layout.json`
-- 便签内容：`%USERPROFILE%\DesktopMemo\sticky-note-content.xamlpkg`
+- 便签内容：`%USERPROFILE%\DesktopMemo\sticky-note-content.txt`
 
 ## 数据表结构
 
@@ -83,6 +83,14 @@ bin\Release\net8.0-windows\win-x64\publish\DesktopMemo.exe
 - `Views/StickyNoteWindow.xaml`：侧边便签窗口
 
 ## 本次版本更新
+
+### v1.4.2
+
+- 修复侧边便签内容在关闭程序后丢失的问题，改为每次编辑即时保存纯文本
+- 新增多处保存触发点：编辑时、窗口隐藏时、关闭时、托盘退出时
+- 便签内容持久化文件改为 `sticky-note-content.txt`（BOM-free UTF-8）
+- 简化便签界面，移除图片相关提示（纯文字便签）
+- 精简 `StickyNoteStateService`，去除不稳定的格式序列化，改用纯文本 I/O
 
 ### v1.4.1
 
