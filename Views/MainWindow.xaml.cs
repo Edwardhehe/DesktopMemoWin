@@ -67,6 +67,8 @@ namespace DesktopMemo.Views
                 }
                 else
                 {
+                    // 隐藏前保存便签内容
+                    _stickyNoteWindow?.SaveContentNow();
                     _stickyNoteWindow?.Hide();
                     Hide();
                 }
@@ -126,6 +128,8 @@ namespace DesktopMemo.Views
         {
             try
             {
+                // 先保存便签内容，再保存布局
+                _stickyNoteWindow?.SaveContentNow();
                 SaveStickyNoteLayout();
                 _stickyNoteWindow?.Close();
                 _viewModel?.StopDesktopMonitoring();
@@ -343,6 +347,15 @@ namespace DesktopMemo.Views
             }
 
             _stickyNoteWindow.SaveRelativeLayout(this);
+        }
+
+        /// <summary>
+        /// 保存侧边便签的完整状态（内容和布局），供外部（如托盘退出）调用。
+        /// </summary>
+        public void SaveStickyNoteState()
+        {
+            _stickyNoteWindow?.SaveContentNow();
+            SaveStickyNoteLayout();
         }
 
         public void HideWindowGroupToTray()

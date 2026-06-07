@@ -69,19 +69,7 @@
                              FontSize="12"
                              VerticalScrollBarVisibility="Auto"
                              AcceptsTab="True"
-                             AllowDrop="True"
-                             TextChanged="EditorRichTextBox_TextChanged"
-                             PreviewDragOver="EditorRichTextBox_PreviewDragOver"
-                             Drop="EditorRichTextBox_Drop"
-                             DataObject.Pasting="EditorRichTextBox_Pasting">
-                    <FlowDocument PagePadding="0"
-                                  FontFamily="Microsoft YaHei UI"
-                                  FontSize="12"
-                                  Foreground="#24415F"
-                                  LineHeight="20">
-                        <Paragraph Margin="0"/>
-                    </FlowDocument>
-                </RichTextBox>
+                             TextChanged="EditorRichTextBox_TextChanged"/>
 
                 <Thumb x:Name="ResizeThumb"
                        Width="18"
@@ -108,7 +96,7 @@
                     BorderBrush="#D5CCD4"
                     BorderThickness="1,1,1,0"
                     CornerRadius="0,0,27,27">
-                <TextBlock Text="支持滚动、粘贴文字和图片"
+                <TextBlock Text="支持滚动，每次编辑自动保存"
                            Margin="14,0"
                            VerticalAlignment="Center"
                            FontSize="10"

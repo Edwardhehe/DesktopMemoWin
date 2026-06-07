@@ -1,8 +1,8 @@
 using DesktopMemo.Models;
 using System;
 using System.IO;
+using System.Text;
 using System.Text.Json;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 
@@ -13,6 +13,8 @@ namespace DesktopMemo.Services
     /// </summary>
     public class StickyNoteStateService
     {
+        private static readonly Encoding Utf8NoBom = new UTF8Encoding(false);
+
         private readonly string _appFolder;
         private readonly string _layoutPath;
         private readonly string _contentPath;
@@ -23,7 +25,7 @@ namespace DesktopMemo.Services
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
                 "DesktopMemo");
             _layoutPath = Path.Combine(_appFolder, "sticky-note-layout.json");
-            _contentPath = Path.Combine(_appFolder, "sticky-note-content.xamlpkg");
+            _contentPath = Path.Combine(_appFolder, "sticky-note-content.txt");
         }
 
         public StickyNoteLayout? LoadLayout()
@@ -73,9 +75,19 @@ namespace DesktopMemo.Services
                     return;
                 }
 
-                using var stream = new FileStream(_contentPath, FileMode.Open, FileAccess.Read);
-                var range = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd);
-                range.Load(stream, DataFormats.XamlPackage);
+                var text = File.ReadAllText(_contentPath, Utf8NoBom).TrimEnd('\r', '\n');
+                if (string.IsNullOrEmpty(text))
+                {
+                    return;
+                }
+
+                // 清空默认段落，按行重建
+                richTextBox.Document.Blocks.Clear();
+                var lines = text.Replace("\r\n", "\n").Split('\n');
+                foreach (var line in lines)
+                {
+                    richTextBox.Document.Blocks.Add(new Paragraph(new Run(line)));
+                }
             }
             catch (Exception ex)
             {
@@ -88,9 +100,30 @@ namespace DesktopMemo.Services
             try
             {
                 EnsureAppFolder();
-                using var stream = new FileStream(_contentPath, FileMode.Create, FileAccess.Write);
-                var range = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd);
-                range.Save(stream, DataFormats.XamlPackage);
+
+                // 逐段落提取纯文本，用 \n 分隔
+                var sb = new StringBuilder();
+                var i = 0;
+                foreach (var block in richTextBox.Document.Blocks)
+                {
+                    if (block is Paragraph para)
+                    {
+                        var range = new TextRange(para.ContentStart, para.ContentEnd);
+                        if (i > 0) sb.Append('\n');
+                        sb.Append(range.Text);
+                        i++;
+                    }
+                }
+
+                var text = sb.ToString().TrimEnd('\r', '\n');
+
+                // 空内容不写入文件（保留已持久化内容）
+                if (text.Length == 0)
+                {
+                    return;
+                }
+
+                File.WriteAllText(_contentPath, text, Utf8NoBom);
             }
             catch (Exception ex)
             {

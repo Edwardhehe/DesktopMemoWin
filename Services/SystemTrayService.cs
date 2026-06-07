@@ -311,6 +311,9 @@ namespace DesktopMemo.Services
         {
             try
             {
+                // 保存侧边便签状态（内容和布局），确保重启后数据不丢失
+                _mainWindow?.SaveStickyNoteState();
+
                 // 停止桌面监控服务
                 if (_mainViewModel != null)
                 {
